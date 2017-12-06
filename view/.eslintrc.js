@@ -11,9 +11,7 @@ module.exports = {
     ],
     globals: {
         "$": true,
-        "jcrop_api": true,
-        "noUiSlider": true,
-        "html2canvas": true
+        'Caman': true
     },
     rules: {
         // Indentation

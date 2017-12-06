@@ -38,18 +38,19 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin(publicDir, { root: rootDir }),
-        new CopyWebpackPlugin(['assets']),
+        new CopyWebpackPlugin([{ from: 'src/assets/static', to: path.join(publicDir, 'static/') }]),
         new HtmlWebpackPlugin({
-            template: 'src/index.html',
+            template: 'src/assets/index.html',
             filename: 'index.html'
         }),
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',
-            'window.jQuery': 'jquery',
-            noUiSlider: 'nouislider',
-            jcrop_api: 'jquery-jcrop'
+            'window.jQuery': 'jquery'
         }),
         new webpack.optimize.UglifyJsPlugin()
-    ]
+    ],
+    node: {
+        fs: "empty"
+    }
 };

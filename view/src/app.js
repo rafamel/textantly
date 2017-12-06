@@ -10,13 +10,11 @@ import '../libraries/bootstrap-material-design-0510/bootstrap-material-design.mi
 import '../libraries/bootstrap-material-design-0510/ripples.min.js';
 import '../libraries/bootstrap-material-design-0510/ripples.min.css';
 
-// Snackbar
-import '../libraries/snackbarjs-11/snackbar.min.js';
-import '../libraries/snackbarjs-11/snackbar.min.css';
-
-// Jcrop (css)
-import 'jquery-jcrop/css/jquery.Jcrop.css';
-
 // Textantly
-import './style.css';
-import './textantly';
+import './assets/style.css';
+import Canvaser from './engine';
+
+const Textantly = new Canvaser('#main-canvas');
+Textantly.load('static/default.png').then(() => {
+    global.Textantly = Textantly;
+});
