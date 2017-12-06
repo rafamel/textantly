@@ -1,0 +1,47 @@
+{
+  "name": "textantly-server",
+  "version": "0.0.1",
+  "description": "Delicious morning coffee. A keystroke away.",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon --ignore 'src/public/*' ./node_modules/.bin/run-s lint start",
+    "lint": "eslint ./src --ext .js",
+    "lint:test": "eslint ./src/test --ext .js",
+    "test": "npm run lint:test && jest ./src/test/.*.test.js --runInBand --verbose",
+    "checks": "run-s lint lint:* && jest ./src/test/.*.test.js && npm outdated",
+    "update:packages": "rm -rf node_modules && rm package-lock.json && npm update --save/save-dev && npm install && npm outdated"
+  },
+  "author": "Rafa Mel",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.17.1",
+    "compression": "^1.7.1",
+    "dotenv-safe": "^4.0.4",
+    "express": "^4.16.2",
+    "helmet": "^3.9.0",
+    "joi": "^13.0.2",
+    "joi-add": "^0.5.2",
+    "jsonwebtoken": "^8.1.0",
+    "morgan": "^1.9.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.11.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jest": "^21.3.2",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "jest-cli": "^21.2.1",
+    "nodemon": "^1.12.1",
+    "npm-run-all": "^4.1.1"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true
+  }
+}

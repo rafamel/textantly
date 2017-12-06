@@ -1,0 +1,25 @@
+{
+  "name": "textantly",
+  "version": "0.0.1",
+  "description": "Delicious morning coffee. A keystroke away.",
+  "scripts": {
+    "install": "cd server && npm i && cd ../view && npm i",
+    "watch": "run-p watch:*",
+    "watch:view": "cd view && npm run watch",
+    "watch:server": "cd server && npm run dev",
+    "lint:md": "markdownlint *.md --config markdown.json",
+    "checks": "run-s lint:* checks:*",
+    "checks:view": "cd view && npm run checks",
+    "checks:server": "cd server && npm run checks"
+  },
+  "author": "Rafa Mel",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "devDependencies": {
+    "markdownlint-cli": "^0.5.0",
+    "npm-run-all": "^4.1.1"
+  },
+  "dependencies": {}
+}
