@@ -19,7 +19,7 @@ async function play(canvasId, callback, render = true) {
 
 async function imgLoad(canvasId, src, cors, width, height) {
     const img = new Image();
-    if (cors) img.crossOrigin = "Anonymous";
+    if (cors) img.crossOrigin = 'Anonymous';
     img.src = src;
     return new Promise((resolve, reject) => {
         img.onload = () => {

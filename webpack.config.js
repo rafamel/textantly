@@ -5,8 +5,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const rootDir = path.join(__dirname, '../');
-const publicDir = path.join(rootDir, 'server/src/public');
+const rootDir = path.join(__dirname);
+const publicDir = path.join(rootDir, 'public');
 
 module.exports = {
     entry: "./src/app.js",
