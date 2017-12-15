@@ -1,5 +1,5 @@
 'use strict';
-const { Caman } = require('./camando');
+const camando = require('./camando');
 const operations = require('./operations');
 const PublicError = require('../public-error');
 const config = require('../config');
@@ -14,7 +14,7 @@ class Canvaser {
             arr: []
         };
     }
-    load(image) {
+    async load(image) {
         this.name = image
             .split('/').slice(-1)[0]
             .split('.').slice(0, -1).join('.');
@@ -22,9 +22,16 @@ class Canvaser {
         let ans;
         return new Promise((resolve, reject) => {
             try {
-                ans = Caman(this.id, image, () => resolve());
+                ans = camando.Caman(this.id, image, () => resolve());
             } catch (e) { reject(e); };
         }).then(() => ans);
+    }
+    async loadUrl(url) {
+        this.name = url
+            .split('/').slice(-1)[0]
+            .split('.').slice(0, -1).join('.');
+
+        return camando.imgLoad(this.id, url, true);
     }
     async render(operationType, data) {
         if (!this.operations.hasOwnProperty(operationType)) {

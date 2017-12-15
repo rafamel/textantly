@@ -26,7 +26,10 @@ module.exports = {
             }
         }, {
             test: /\.js$/,
-            exclude: /node_modules/,
+            // https://github.com/webpack/webpack-dev-server/issues/1101
+            exclude: (process.env.ENV === 'development')
+                ? /node_modules(?!\/webpack-dev-server)/
+                : /node_modules/,
             use: {
                 loader: 'babel-loader',
                 options: {
