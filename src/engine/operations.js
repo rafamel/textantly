@@ -2,39 +2,43 @@
 const camando = require('./camando');
 const PublicError = require('../public-error');
 
-module.exports = (canvasId) => {
-    class Operation {
-        constructor(forwards) {
-            this._forwards = forwards;
-        }
-        async render() {
-            const canvas = document.getElementById(canvasId.slice(1));
-            const caman = camando.Caman(canvasId);
-            this.saved = {
-                image: canvas.toDataURL(),
-                width: caman.width,
-                height: caman.height
-            };
-            return this.forwards();
-        }
-        async forwards() {
-            return camando.play(canvasId, this._forwards);
-        }
-        async backwards() {
-            if (!this.saved || !this.saved.image || !this.saved.width) {
-                throw new PublicError('No image data saved to undo');
-            }
-            return camando.imgLoad(canvasId, this.saved.image,
-                false, this.saved.width, this.saved.height);
-        }
+class Operation {
+    constructor(canvasId, forwards) {
+        this.canvasId = canvasId;
+        this._forwards = forwards;
     }
+    async render() {
+        const canvas = document.getElementById(this.canvasId.slice(1));
+        const caman = camando.Caman(this.canvasId);
+        this.saved = {
+            image: canvas.toDataURL(),
+            width: caman.width,
+            height: caman.height
+        };
+        return this.forwards();
+    }
+    async forwards() {
+        return camando.play(this.canvasId, this._forwards);
+    }
+    async backwards() {
+        if (!this.saved || !this.saved.image || !this.saved.width) {
+            throw new PublicError('No image data saved to undo');
+        }
+        return camando.imgLoad(this.canvasId, this.saved.image,
+            false, this.saved.width, this.saved.height);
+    }
+}
 
+module.exports = (canvasId) => {
     return {
-        resize: (data) => new Operation(function () {
+        resize: (data) => new Operation(canvasId, function () {
             this.resize({
                 width: data.w,
                 height: data.h
             });
+        }),
+        rotate: (data) => new Operation(canvasId, function () {
+            this.rotate(data);
         })
     };
 };

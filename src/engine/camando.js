@@ -1,6 +1,5 @@
 'use strict';
-// eslint-disable-next-line
-require('imports-loader?exports=>undefined,require=>false,this=>window!caman');
+const Caman = require('./caman');
 
 async function play(canvasId, callback, render = true) {
     let ans;
