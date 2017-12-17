@@ -1,14 +1,18 @@
 # Project Specific #
 ####################
-public
+/build
 
 # Node, Frameworks, Editors #
 #############################
+config.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 _test.js
-coverage
 node_modules
 npm-debug.log
-config.env
+/coverage
 
 # Compiled source #
 ###################

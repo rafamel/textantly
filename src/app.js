@@ -1,20 +1,21 @@
-'use strict';
+import React from 'react';
+import logo from './logo.svg';
+import './App.css';
 
-// Bootstrap
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap';
+class App extends React.Component {
+    render() {
+        return (
+            <div className="App">
+                <header className="App-header">
+                    <img src={logo} className="App-logo" alt="logo" />
+                    <h1 className="App-title">Welcome to React</h1>
+                </header>
+                <p className="App-intro">
+                    To get started, edit <code>src/App.js</code> and save to reload.
+                </p>
+            </div>
+        );
+    }
+}
 
-// Bootstrap material
-import '../libraries/bootstrap-material-design-0510/material.min.js';
-import '../libraries/bootstrap-material-design-0510/bootstrap-material-design.min.css';
-import '../libraries/bootstrap-material-design-0510/ripples.min.js';
-import '../libraries/bootstrap-material-design-0510/ripples.min.css';
-
-// Textantly
-import './assets/style.css';
-import Canvaser from './engine';
-
-const Textantly = new Canvaser('#main-canvas');
-Textantly.load('static/default.png').then(() => {
-    global.Textantly = Textantly;
-});
+export default App;
