@@ -1,10 +1,9 @@
-'use strict';
-const camando = require('./camando');
-const operations = require('./operations');
-const PublicError = require('../public-error');
-const config = require('../config');
+import camando from './camando';
+import operations from './operations';
+import PublicError from '../public-error';
+import config from '../config';
 
-class Canvaser {
+class Engine {
     constructor(id) {
         this.id = id;
         this.name = 'image';
@@ -76,4 +75,4 @@ class Canvaser {
     }
 }
 
-module.exports = Canvaser;
+export default Engine;

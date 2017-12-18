@@ -1,252 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Textantly</title>
-	<!-- Material Design fonts -->
-	<link href="https://fonts.googleapis.com/css?family=Playfair+Display+SC|Roboto:300,400,500,700|Material+Icons" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
+    <!--
+      manifest.json provides metadata used when your web app is added to the
+      homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title>Textantly</title>
 </head>
 <body>
+    <noscript>
+        You need to enable JavaScript to run this app.
+    </noscript>
     <div id="root"></div>
-	<div class="container main">
-		<div class="page-header" id="banner">
-		    <div class="row">
-		        <div class="col-xs-12">
-		        	<fieldset class="pull-right hidden-xs">
-		        	<a href="javascript: void(0)" class="btn btn-default btn-fab edit-btn" id="top-edit-btn" data-toggle="tooltip" data-placement="left" title="" data-original-title="Crop & Resize"><i class="material-icons">edit</i></a>
-		        	<a href="javascript: void(0)" class="btn btn-default btn-fab textantly-btn hidden" id="top-textantly-btn" data-toggle="tooltip" data-placement="left" title="" data-original-title="Back to Text"><i class="material-icons">text_fields</i></a>
-		        	</fieldset>
-		        	<h1><a href="javascript: void(0)" class="btn btn-primary btn-fab"><i class="material-icons">grade</i></a> Textantly</h1>
-		        	<p class="lead">Delicious morning coffee. A keystroke away.</p>
-		        </div>
-		    </div>
-		</div>
-		<div class="row">
-		    <div class="col-md-12">
-
-				<div class="well bs-component" id="main-form">
-					<div class="form-horizontal">
-					  <fieldset>
-						<div class="row">
-							<div class="col-md-6">
-
-					            <div class="form-group">
-								    <label for="i-text" class="control-label">Text</label>
-								    <input type="text" class="form-control" id="i-text" placeholder="Your Text Here" value="Your Text Here">
-							    </div>
-
-							    <div class="form-group">
-								    <label for="i-font" class="control-label">Font family</label>
-								    <input type="text" class="form-control" id="i-font" value="Playfair Display SC" placeholder="Playfair Display SC">
-								    <span class="help-block">Any <a href="https://fonts.google.com/" target="_blank">Google Font</a> is valid.</span>
-							    </div>
-
-							    <div class="form-group">
-								    <label for="i-weight" class="control-label">Text Weight</label>
-								    <select class="form-control" id="i-weight">
-									  <option value="300">Light</option>
-									  <option value="400" selected>Normal</option>
-									  <option value="700">Bold</option>
-									</select>
-							    </div>
-
-							    <div class="form-group">
-								    <label for="i-align" class="control-label">Text Alignment</label>
-								    <select class="form-control" id="i-align">
-									  <option value="left">Left</option>
-									  <option value="center" selected>Center</option>
-									  <option value="right">Right</option>
-									</select>
-							    </div>
-
-						    </div>
-
-							<div class="col-md-6">
-					            <div class="form-group" id="url-form">
-								    <label for="i-image-url" class="control-label">Image</label>
-								    <div class="sm-btn-input">
-								    	<input type="text" class="form-control" id="i-image-url" placeholder="http://...">
-								    	<a href="javascript:void(0)" class="btn btn-default btn-fab btn-fab-mini btn-url-file" data-toggle="tooltip" data-placement="left" title="" data-original-title="Get Image from File"><i class="material-icons">folder_open</i></a>
-								    </div>
-							    </div>
-
-							    <div id="file-form">
-									<label for="i-image-local" class="control-label">Image</label>
-								    <div class="sm-btn-input">
-								    	<div class="form-group">
-								    		<input type="text" readonly="" class="form-control" placeholder="Click to select file...">
-        									<input type="file" id="i-image-local" multiple="">
-								    	</div>
-								    	<a href="javascript:void(0)" class="btn btn-default btn-fab btn-fab-mini btn-url-file" data-toggle="tooltip" data-placement="left" title="" data-original-title="Get Image from URL"><i class="material-icons">http</i></a>
-								    </div>
-							    </div>
-
-							    <div class="form-group">
-								    <label for="i-position" class="control-label">Overlay Position</label>
-								    <select class="form-control" id="i-position">
-									  <option value="left" selected>Left</option>
-									  <option value="right">Right</option>
-									  <option value="top">Top</option>
-									  <option value="bottom">Bottom</option>
-									</select>
-							    </div>
-
-							    <div class="form-group">
-								    <label for="i-width" class="control-label">Overlay Width</label>
-								    <input type="text" class="form-control" id="i-width" value="40%" placeholder="40%">
-								    <span class="help-block">Percentages, px, and rem units are valid.</span>
-							    </div>
-
-					            <div class="form-group">
-								    <label for="i-scheme" class="control-label">Color Scheme</label>
-								    <select class="form-control" id="i-scheme">
-									  <option value="light" selected>Light</option>
-									  <option value="dark">Dark</option>
-									</select>
-							    </div>
-
-						    </div>
-
-					    	<div class="col-md-6">
-
-						  		<div class="bs-component btn-group-sm btn-group-margin">
-									<a href="javascript: void(0)" class="btn btn-fab btn-primary edit-btn" data-toggle="tooltip" data-placement="right" title="" data-original-title="Crop & Resize"><i class="material-icons">edit</i></a>
-									<a href="javascript: overlayOnOff();" class="btn btn-fab btn-default" id="overlay-on-off" data-toggle="tooltip" data-placement="right" title="" data-original-title="Activate / Deactivate Text"><i class="material-icons">text_fields</i></a>
-								</div>
-					        </div>
-					        <div class="col-md-6 text-right">
-					            <a class="btn btn-flat" href="javascript: updateAll();">Update</a>
-					            <a class="btn btn-flat btn-raised btn-primary" id="download-btn" href="javascript: void(0)">Download</a>
-					        </div>
-					  </div>
-
-					  </fieldset>
-					</div>
-				</div>
-
-				<div id="edit-form" class="inactive">
-					<div class="row">
-
-					    <div class="col-md-12">
-					    	<div class="well bs-component" id="well-crop">
-					    		<div class="form-horizontal">
-								  	<div class="row">
-								  		<div class="col-xs-3 col-sm-6">
-								  			<legend>Crop</legend>
-										</div>
-								  		<div class="col-xs-9 col-sm-6 bs-component btn-group-sm btn-group-margin text-right">
-      										<a href="javascript: resetCropSelector(1280,720)" class="btn btn-fab btn-fab-mini-fa btn-fab-fa control-restore-btn" data-toggle="tooltip" data-placement="left" title="" data-original-title="Set to Youtube Optimal Dimensions"><i class="fa fa-youtube"></i></a>
-      										<a href="javascript: resetCropSelector(1200,630)" class="btn btn-fab btn-fab-mini-fa btn-fab-fa control-restore-btn" data-toggle="tooltip" data-placement="left" title="" data-original-title="Set to Facebook Optimal Dimensions"><i class="fa fa-facebook"></i></a>
-      										<a href="javascript: resetCropSelector(1,1)" class="btn  btn-fab btn-fab-mini-fa control-restore-btn" data-toggle="tooltip" data-placement="left" title="" data-original-title="Set to Square Dimensions"><i class="material-icons">crop_square</i></a>
-      										<a href="javascript: resetCropSelector(0,0)" class="btn  btn-fab btn-fab-mini-fa control-restore-btn" data-toggle="tooltip" data-placement="left" title="" data-original-title="Set to Free Dimensions"><i class="material-icons">crop_free</i></a>
-								  			<a href="javascript: void(0)" class="btn btn-default btn-fab slide-down-btn"><i class="material-icons">keyboard_arrow_down</i></a>
-										</div>
-									</div>
-									<fieldset>
-										<div class="form-group">
-										    <div class="btn-group btn-group-justified btn-group-raised">
-									            <a href="javascript: void(0)" class="btn ">Width</a>
-									            <a href="javascript: void(0)" class="btn ">Height</a>
-									        </div>
-										    <div class="btn-group btn-group-justified">
-									            <a href="javascript: void(0)" class="btn" id="crop-width">0</a>
-									            <a href="javascript: void(0)" class="btn" id="crop-height">0</a>
-									        </div>
-									    </div>
-					    			</fieldset>
-					    		</div>
-					    	</div>
-					    </div>
-						<div class="col-md-6">
-							<div class="well bs-component">
-								<div class="form-horizontal">
-								  	<div class="row">
-								  		<div class="col-xs-6">
-								  			<legend>Resize</legend>
-										</div>
-								  		<div class="col-xs-6 bs-component btn-group-sm text-right">
-									  		<a href="javascript: void(0)" class="btn btn-default btn-fab slide-down-btn "><i class="material-icons">keyboard_arrow_down</i></a>
-								  			<a href="javascript: void(0)" class="btn btn-default btn-fab control-restore-btn" id="restore-resize" data-toggle="tooltip" data-placement="left" title="" data-original-title="Reset to Current Base Values"><i class="material-icons">settings_backup_restore</i></a>
-										</div>
-									</div>
-									<fieldset>
-										<div class="row">
-											<div class="col-xs-6">
-												<div class="form-group">
-												    <label for="e-width" class="control-label">Width</label>
-												    <input type="text" class="form-control" id="e-width">
-											    </div>
-											</div>
-											<div class="col-xs-6">
-									            <div class="form-group">
-												    <label for="e-height" class="control-label">Height</label>
-												    <input type="text" class="form-control" id="e-height">
-											    </div>
-											</div>
-										</div>
-								    </fieldset>
-								</div>
-							</div>
-					    </div>
-						<div class="col-md-6">
-							<div class="well bs-component" id="well-transform">
-								<div class="form-horizontal">
-								  	<div class="row">
-								  		<div class="col-xs-6">
-								  			<legend>Transform</legend>
-										</div>
-								  		<div class="col-xs-6 bs-component btn-group-sm text-right">
-								  			<a href="javascript: void(0)" class="btn btn-default btn-fab slide-down-btn "><i class="material-icons">keyboard_arrow_down</i></a>
-								  			<a href="javascript: void(0)" class="btn btn-default btn-fab control-restore-btn" id="restore-transform" data-toggle="tooltip" data-placement="left" title="" data-original-title="Reset to Current Base Values"><i class="material-icons">settings_backup_restore</i></a>
-										</div>
-									</div>
-									<fieldset>
-										<div class="r-btn-input">
-											<span class="input-group-btn input-group-sm">
-							                    <button type="button" class="btn btn-fab btn-fab-mini" id="horizontal-swap" data-toggle="tooltip" data-placement="right" title="" data-original-title="Horizontal Swap">
-							                    	<i class="material-icons">swap_horiz</i>
-							                    </button>
-							                </span>
-								            <div class="form-group">
-											    <label for="i-text" class="control-label">Rotate</label>
-										    	<div class="slider svert" id="e-rotate-slider"></div>
-										    </div>
-									    </div>
-								    </fieldset>
-								</div>
-							</div>
-					    </div>
-					    <div class="col-xs-12">
-					    	<a href="javascript: void(0)" class="btn btn-primary btn-lg btn-block btn-raised textantly-btn">Done</a>
-					    </div>
-				  	</div>
-				</div>
-
-
-		    </div>
-		</div>
-	</div>
-	<div id="displayer">
-		<div class="loading-img"><i class="fa fa-circle-o-notch fa-spin"></i></div>
-		<div class="container">
-			<div id="img-container">
-				<canvas id="main-canvas">
-				<div id="text-container" class="left horizontal-bars"><div><div><p>Your Text Here</p></div></div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="editer">
-		<div class="loading-img"><i class="fa fa-circle-o-notch fa-spin"></i></div>
-		<div class="container">
-			<div id="edit-img-container">
-
-			</div>
-		</div>
-	</div>
-	<div class="hide" id="undo-img">
-	</div>
-
-
 </body>
 </html>

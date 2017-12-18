@@ -1,6 +1,5 @@
-'use strict';
-const camando = require('./camando');
-const PublicError = require('../public-error');
+import camando from './camando';
+import PublicError from '../public-error';
 
 class Operation {
     constructor(canvasId, forwards) {
@@ -29,7 +28,7 @@ class Operation {
     }
 }
 
-module.exports = (canvasId) => {
+export default (canvasId) => {
     return {
         resize: (data) => new Operation(canvasId, function () {
             this.resize({

@@ -1,8 +1,8 @@
-'use strict';
 // eslint-disable-next-line
 require('imports-loader?exports=>undefined,require=>false,this=>window!caman');
+const Caman = window.Caman;
 
-Caman.Plugin.register("rotate", function(degrees) {
+Caman.Plugin.register("rotate", function (degrees) {
     const radians = (angle) => angle * (Math.PI / 180);
     const trig = (angleA, bLength) => {
         const [A, B, C] = [angleA, 90, 90-angleA].map(x => radians(x));
@@ -40,8 +40,8 @@ Caman.Plugin.register("rotate", function(degrees) {
     return this.replaceCanvas(canvas);
 });
 
-Caman.Filter.register("rotate", function() {
+Caman.Filter.register("rotate", function () {
     return this.processPlugin("rotate", Array.prototype.slice.call(arguments, 0));
 });
 
-module.exports = Caman;
+export default Caman;

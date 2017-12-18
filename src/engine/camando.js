@@ -1,5 +1,4 @@
-'use strict';
-const Caman = require('./caman');
+import Caman from './caman';
 
 async function play(canvasId, callback, render = true) {
     let ans;
@@ -40,7 +39,7 @@ async function imgLoad(canvasId, src, cors, width, height) {
     });
 }
 
-module.exports = {
+export default {
     Caman,
     play,
     imgLoad
