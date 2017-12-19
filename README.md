@@ -4,7 +4,7 @@
 
 **Delicious morning coffee*. A keystroke away.**
 
-Trying bring back to life an old project with new technologies. A hacky way of putting captions on your pictures powered by your browser.**
+Trying bring back to life an old project - rewritten on React. A hacky way of putting captions on your pictures powered by your browser.**
 
 \* Coffee not included.
 

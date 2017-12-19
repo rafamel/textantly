@@ -8,33 +8,44 @@ class App extends React.Component {
     defaultImage = 'static/default.png';
     state = {
         hasLoaded: false,
-        image: this.defaultImage,
-        textEditor: true
-    };
-    toggle = (property) => () => {
-        const obj = {};
-        obj[property] = !this.state[property];
-        this.setState(obj);
-    }
-    changeImage = (image) => {
-        if (!image) {
-            return this.setState({ image: this.defaultImage });
+        textEditor: true,
+        image: {
+            src: this.defaultImage,
+            name: '',
+            last: {}
         }
-        if (image.hasOwnProperty('target')) {
-            return this.setState({ image: image.target.value });
-        }
-        return this.setState({ image: image.base64 });
     };
     componentDidMount() {
         let count = -50;
         const interval = setInterval(() => {
             count += 50;
             if (document.readyState === 'complete' || count > 5000) {
-                this.toggle('hasLoaded')();
+                this.toggleOnApp('hasLoaded')();
                 clearInterval(interval);
             }
         }, 50);
     }
+    toggleOnApp = (property) => () => {
+        const obj = {};
+        obj[property] = !this.state[property];
+        this.setState(obj);
+    };
+    changeImage = ({ src, name }) => {
+        const last = {
+            name: this.state.image.name,
+            src: this.state.image.src
+        };
+        this.setState({ image: { src, name, last } });
+    };
+    revertImage = () => {
+        this.setState({
+            image: {
+                src: this.state.image.last.src,
+                name: this.state.image.last.name,
+                last: this.state.image.last
+            }
+        });
+    };
     render() {
         return (
             <div
@@ -42,21 +53,22 @@ class App extends React.Component {
                 style={
                     (!this.state.hasLoaded) ? { display: 'none' } : {}
                 }
-                >
+            >
                 <div className="container main">
                     <Header
                         textEditor={this.state.textEditor}
-                        toggle={this.toggle} />
+                        toggleOnApp={this.toggleOnApp} />
                     <div className="row">
                         <div className="col-md-12">
                             <Editor
                                 textEditor={this.state.textEditor}
-                                changeImage={this.changeImage} />
+                                changeImage={this.changeImage}
+                                imageName={this.state.image.name} />
                         </div>
                     </div>
                     <Displayer
-                        image={this.state.image}
-                        changeImage={this.changeImage} />
+                        src={this.state.image.src}
+                        revertImage={this.revertImage} />
                 </div>
             </div>
         );

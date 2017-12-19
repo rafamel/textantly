@@ -14,17 +14,17 @@ class ImageEditor extends React.Component {
                                     </div>
                                     <div className="col-xs-9 col-sm-6 bs-component btn-group-sm btn-group-margin text-right">
                                         <a className="btn btn-fab btn-fab-mini-fa btn-fab-fa control-restore-btn" data-toggle="tooltip" data-placement="left" title="" data-original-title="Set to Youtube Optimal Dimensions">
-                                        {/* href="javascript: resetCropSelector(1280,720)" */}
+                                            {/* resetCropSelector(1280,720) */}
                                             <i className="fa fa-youtube"></i>
                                         </a>
                                         <a className="btn btn-fab btn-fab-mini-fa btn-fab-fa control-restore-btn" data-toggle="tooltip" data-placement="left" title="" data-original-title="Set to Facebook Optimal Dimensions">
-                                            {/* href="javascript: resetCropSelector(1200,630)" */}
+                                            {/* resetCropSelector(1200,630) */}
                                             <i className="fa fa-facebook"></i></a>
                                         <a className="btn  btn-fab btn-fab-mini-fa control-restore-btn" data-toggle="tooltip" data-placement="left" title="" data-original-title="Set to Square Dimensions">
-                                            {/* href="javascript: resetCropSelector(1,1)" */}
+                                            {/* resetCropSelector(1,1) */}
                                             <i className="material-icons">crop_square</i></a>
                                         <a className="btn  btn-fab btn-fab-mini-fa control-restore-btn" data-toggle="tooltip" data-placement="left" title="" data-original-title="Set to Free Dimensions">
-                                            {/* href="javascript: resetCropSelector(0,0)"  */}
+                                            {/* resetCropSelector(0,0)  */}
                                             <i className="material-icons">crop_free</i>
                                         </a>
                                         <a className="btn btn-default btn-fab slide-down-btn"><i className="material-icons">keyboard_arrow_down</i></a>

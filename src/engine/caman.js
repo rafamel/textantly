@@ -2,11 +2,13 @@
 require('imports-loader?exports=>undefined,require=>false,this=>window!caman');
 const Caman = window.Caman;
 
-Caman.Plugin.register("rotate", function (degrees) {
+Caman.Plugin.register('rotate', function (degrees) {
     const radians = (angle) => angle * (Math.PI / 180);
     const trig = (angleA, bLength) => {
-        const [A, B, C] = [angleA, 90, 90-angleA].map(x => radians(x));
-        const length = (radians) => Math.ceil((Math.sin(radians) * bLength) / Math.sin(B));
+        const [A, B, C] = [angleA, 90, 90 - angleA].map(x => radians(x));
+        const length = (radians) => Math.ceil(
+            (Math.sin(radians) * bLength) / Math.sin(B)
+        );
         return [length(A), length(C)];
     };
 
@@ -35,13 +37,14 @@ Caman.Plugin.register("rotate", function (degrees) {
     ctx.save();
     ctx.translate(width / 2, height / 2);
     ctx.rotate(radians(angle));
-    ctx.drawImage(this.canvas, -this.canvas.width / 2, -this.canvas.height / 2, this.canvas.width, this.canvas.height);
+    ctx.drawImage(this.canvas, -this.canvas.width / 2,
+        -this.canvas.height / 2, this.canvas.width, this.canvas.height);
     ctx.restore();
     return this.replaceCanvas(canvas);
 });
 
-Caman.Filter.register("rotate", function () {
-    return this.processPlugin("rotate", Array.prototype.slice.call(arguments, 0));
+Caman.Filter.register('rotate', function () {
+    return this.processPlugin('rotate', Array.prototype.slice.call(arguments, 0));
 });
 
 export default Caman;

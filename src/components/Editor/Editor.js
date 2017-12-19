@@ -5,13 +5,15 @@ import ImageEditor from './ImageEditor';
 
 class Editor extends React.Component {
     static propTypes = {
-        textEditor: propTypes.boolean,
-        changeImage: propTypes.function
+        textEditor: propTypes.bool.isRequired,
+        changeImage: propTypes.func.isRequired,
+        imageName: propTypes.string
     };
     render() {
         return (this.props.textEditor)
             ? (<TextEditor
-                changeImage={this.props.changeImage} />)
+                changeImage={this.props.changeImage}
+                imageName={this.props.imageName} />)
             : (<ImageEditor />);
     }
 }

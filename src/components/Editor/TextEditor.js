@@ -4,14 +4,15 @@ import ReactFileReader from 'react-file-reader';
 
 class TextEditor extends React.Component {
     static propTypes = {
-        changeImage: propTypes.function
+        changeImage: propTypes.func.isRequired,
+        imageName: propTypes.string
     };
     state = {
         urlForm: false
-    }
+    };
     changeForm = () => {
         this.setState({ urlForm: !this.state.urlForm });
-    }
+    };
     render() {
         return (
             <div className="well bs-component" id="main-form">
@@ -49,12 +50,12 @@ class TextEditor extends React.Component {
                                 </div>
 
                             </div>
-
                             <div className="col-md-6">
                                 <FileUrlForm
                                     changeForm={this.changeForm}
                                     urlForm={this.state.urlForm}
-                                    changeImage={this.props.changeImage} />
+                                    changeImage={this.props.changeImage}
+                                    imageName={this.props.imageName} />
 
                                 <div className="form-group">
                                     <label htmlFor="i-position" className="control-label">Overlay Position</label>
@@ -103,73 +104,89 @@ class TextEditor extends React.Component {
 }
 
 class FileUrlForm extends React.Component {
+    static propTypes = {
+        urlForm: propTypes.bool.isRequired,
+        changeForm: propTypes.func.isRequired,
+        changeImage: propTypes.func.isRequired,
+        imageName: propTypes.string
+    };
+    onChangeImage = (image) => {
+        const imageName = (str) => str.split('/').slice(-1)[0];
+        let src, name;
+        if (!image) {
+            src = this.defaultImage;
+            name = '';
+        } else if (image.hasOwnProperty('target')) {
+            src = name = image.target.value;
+        } else {
+            src = image.base64;
+            name = imageName(image.fileList[0].name);
+        }
+        this.props.changeImage({ src, name });
+    };
     render() {
         return (this.props.urlForm)
             ? (<UrlForm
-                changeForm={this.props.changeForm}
-                changeImage={this.props.changeImage} />)
+                onChangeImage={this.onChangeImage}
+                changeForm={this.props.changeForm} />)
             : (<FileForm
+                onChangeImage={this.onChangeImage}
                 changeForm={this.props.changeForm}
-                changeImage={this.props.changeImage} />);
+                imageName={this.props.imageName} />);
     }
 }
 
-class UrlForm extends React.Component {
-    render() {
-        return (
-            <div className="form-group" id="url-form">
-                <label htmlFor="i-image-url" className="control-label">Image</label>
-                <div className="sm-btn-input">
+const UrlForm = (props) => (
+    <div className="form-group" id="url-form">
+        <label htmlFor="i-image-url" className="control-label">URL Image</label>
+        <div className="sm-btn-input">
+            <input
+                onChange={props.onChangeImage}
+                type="text"
+                className="form-control"
+                id="i-image-url"
+                placeholder="http://..."
+            />
+            <a
+                onClick={props.changeForm}
+                className="btn btn-default btn-fab btn-fab-mini btn-url-file"
+                data-toggle="tooltip"
+                data-placement="left"
+                data-original-title="Get Image from URL">
+                <i className="material-icons">http</i>
+            </a>
+        </div>
+    </div>
+);
+
+const FileForm = (props) => (
+    <div id="file-form">
+        <label htmlFor="i-image-local" className="control-label">File Image</label>
+        <div className="sm-btn-input">
+            <div className="form-group">
+                <ReactFileReader
+                    fileTypes={['image/']} base64={true} multipleFiles={false}
+                    handleFiles={props.onChangeImage}>
                     <input
-                        onChange={this.props.changeImage}
+                        value={props.imageName}
+                        readOnly={true}
                         type="text"
                         className="form-control"
-                        id="i-image-url"
-                        placeholder="http://..."
+                        placeholder="Click to select file..."
                     />
-                    <a
-                        onClick={this.props.changeForm}
-                        className="btn btn-default btn-fab btn-fab-mini btn-url-file"
-                        data-toggle="tooltip"
-                        data-placement="left"
-                        title=""
-                        data-original-title="Get Image from File">
-                        <i className="material-icons">folder_open</i>
-                    </a>
-                </div>
+                </ReactFileReader>
             </div>
-        );
-    }
-}
-class FileForm extends React.Component {
-    render() {
-        return (
-            <div id="file-form">
-                <label htmlFor="i-image-local" className="control-label">Image</label>
-                <div className="sm-btn-input">
-                    <div className="form-group">
-                        <ReactFileReader
-                            fileTypes={["image/"]} base64={true} multipleFiles={false}
-                            handleFiles={this.props.changeImage}>
-                            <input
-                                type="text"
-                                className="form-control"
-                                placeholder="Click to select file..."
-                            />
-                        </ReactFileReader>
-                    </div>
-                    <a
-                        onClick={this.props.changeForm}
-                        className="btn btn-default btn-fab btn-fab-mini btn-url-file"
-                        data-toggle="tooltip"
-                        data-placement="left"
-                        data-original-title="Get Image from URL">
-                        <i className="material-icons">http</i>
-                    </a>
-                </div>
-            </div>
-        );
-    }
-}
+            <a
+                onClick={props.changeForm}
+                className="btn btn-default btn-fab btn-fab-mini btn-url-file"
+                data-toggle="tooltip"
+                data-placement="left"
+                title=""
+                data-original-title="Get Image from File">
+                <i className="material-icons">folder_open</i>
+            </a>
+        </div>
+    </div>
+);
 
 export default TextEditor;
