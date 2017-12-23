@@ -30,6 +30,7 @@ module.exports = {
     },
     rules: {
         'jsx-a11y/img-has-alt': 0, // breaking change of jsx-x11y with 'react-app' defaults
+        'import/no-webpack-loader-syntax': 0,
         'class-property/class-property-semicolon': 2,
         // Indentation
         'indent': [ 2, 4 ],

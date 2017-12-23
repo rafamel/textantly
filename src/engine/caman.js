@@ -1,4 +1,3 @@
-// eslint-disable-next-line
 require('imports-loader?exports=>undefined,require=>false,this=>window!caman');
 const Caman = window.Caman;
 

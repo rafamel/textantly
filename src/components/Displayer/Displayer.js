@@ -1,15 +1,20 @@
 import React from 'react';
-/* eslint-disable */
-class Displayer extends React.Component {
-    // static propTypes = {
+import { connect } from 'react-redux';
+import { actions } from '../store';
 
-    // };
+export default connect(
+    (state) => ({
+        src: state.image.src
+    }), {
+        revert: actions.image.revert
+    }
+)(class Displayer extends React.Component {
     imageHasLoaded = () => {
         console.log('LOADED');
     };
     imageHasFailed = () => {
         console.log('Failed!');
-        this.props.revertImage();
+        this.props.revert();
     };
     render() {
         return (
@@ -35,6 +40,4 @@ class Displayer extends React.Component {
             </div>
         );
     }
-}
-
-export default Displayer;
+});

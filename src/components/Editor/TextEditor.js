@@ -1,12 +1,10 @@
 import React from 'react';
 import propTypes from 'prop-types';
 import ReactFileReader from 'react-file-reader';
+import { connect } from 'react-redux';
+import { actions } from '../store';
 
 class TextEditor extends React.Component {
-    static propTypes = {
-        changeImage: propTypes.func.isRequired,
-        imageName: propTypes.string
-    };
     state = {
         urlForm: false
     };
@@ -53,9 +51,7 @@ class TextEditor extends React.Component {
                             <div className="col-md-6">
                                 <FileUrlForm
                                     changeForm={this.changeForm}
-                                    urlForm={this.state.urlForm}
-                                    changeImage={this.props.changeImage}
-                                    imageName={this.props.imageName} />
+                                    urlForm={this.state.urlForm} />
 
                                 <div className="form-group">
                                     <label htmlFor="i-position" className="control-label">Overlay Position</label>
@@ -103,12 +99,16 @@ class TextEditor extends React.Component {
     }
 }
 
-class FileUrlForm extends React.Component {
+const FileUrlForm = connect(
+    (state) => ({
+        imageName: state.image.name
+    }), {
+        changeImage: actions.image.change
+    }
+)(class extends React.Component {
     static propTypes = {
         urlForm: propTypes.bool.isRequired,
-        changeForm: propTypes.func.isRequired,
-        changeImage: propTypes.func.isRequired,
-        imageName: propTypes.string
+        changeForm: propTypes.func.isRequired
     };
     onChangeImage = (image) => {
         const imageName = (str) => str.split('/').slice(-1)[0];
@@ -134,7 +134,8 @@ class FileUrlForm extends React.Component {
                 changeForm={this.props.changeForm}
                 imageName={this.props.imageName} />);
     }
-}
+});
+
 
 const UrlForm = (props) => (
     <div className="form-group" id="url-form">

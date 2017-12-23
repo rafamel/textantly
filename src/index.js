@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './components/App';
 import registerServiceWorker from './registerServiceWorker';
 
-// Polyfill
+// Polyfills
 import 'babel-polyfill';
 
 import 'typeface-playfair-display-sc';
