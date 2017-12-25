@@ -7,19 +7,16 @@ const { types: t, actions } = typesActions({
 
 const initialState = 'text';
 
-function reducer (state = initialState, { type, payload }) {
+function reducer(state = initialState, { type, payload }) {
     switch (type) {
-        case t.TOGGLE: {
-            return (state === 'text')
-                ? 'image'
-                : 'text';
-        }
-        case t.CHANGE: {
-            return payload.to
-        }
-        default: {
-            return state;
-        }
+    case t.TOGGLE:
+        return (state === 'text')
+            ? 'image'
+            : 'text';
+    case t.CHANGE:
+        return payload.to;
+    default:
+        return state;
     }
 }
 
@@ -27,4 +24,4 @@ export default {
     reducer,
     actions,
     types: t
-}
+};

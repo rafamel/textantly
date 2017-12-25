@@ -4,8 +4,8 @@
   "description": "Delicious morning coffee. A keystroke away.",
   "private": true,
   "scripts": {
-    "start": "node util/daemon --rundaemon \"npm run react-start\" --watch ./src --run \"npm run lint\"",
-    "react-start": "react-app-rewired start",
+    "start": "react-app-rewired start",
+    "dev": "node util/daemon --rundaemon \"npm start\" --watch ./src --run \"npm run lint\"",
     "build": "npm run checks && react-app-rewired build",
     "lint": "eslint ./src --ext .js",
     "lint:test": "eslint ./test --ext .js",

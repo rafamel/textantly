@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { actions } from 'store';
 import config from 'config';
@@ -14,6 +15,13 @@ const connector = connect(
 );
 
 class Displayer extends React.Component {
+    static propTypes = {
+        // State
+        src: PropTypes.any.isRequired,
+        textString: PropTypes.string.isRequired,
+        // Actions
+        revert: PropTypes.func.isRequired
+    };
     imageHasLoaded = () => {
         console.log('LOADED');
     };

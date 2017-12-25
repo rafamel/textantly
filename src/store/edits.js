@@ -2,7 +2,6 @@ import merge from 'lodash.merge';
 import config from 'config';
 import typesActions from './types-actions';
 
-
 const { types: t, actions } = typesActions({
     pre: 'EDITS',
     types: ['RESET', 'CHANGE_TEXT']
@@ -23,17 +22,14 @@ const initialState = {
     }
 };
 
-function reducer (state = initialState, { type, payload }) {
+function reducer(state = initialState, { type, payload }) {
     switch (type) {
-        case t.RESET: {
-            return initialState;
-        }
-        case t.CHANGE_TEXT: {
-            return merge({}, state, { current: { text: payload } });
-        }
-        default: {
-            return state;
-        }
+    case t.RESET:
+        return initialState;
+    case t.CHANGE_TEXT:
+        return merge({}, state, { current: { text: payload } });
+    default:
+        return state;
     }
 }
 
@@ -41,4 +37,4 @@ export default {
     reducer,
     actions,
     types: t
-}
+};

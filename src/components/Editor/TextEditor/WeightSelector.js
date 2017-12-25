@@ -3,24 +3,27 @@ import PropTypes from 'prop-types';
 import Selector from './Selector';
 
 const weightsDict = {
-    100: "Thin",
-    200: "Extra Light",
-    300: "Light",
-    400: "Normal",
-    500: "Medium",
-    600: "Semi Bold",
-    700: "Bold",
-    800: "Extra Bold",
-    900: "Heavy"
+    100: 'Thin',
+    200: 'Extra Light',
+    300: 'Light',
+    400: 'Normal',
+    500: 'Medium',
+    600: 'Semi Bold',
+    700: 'Bold',
+    800: 'Extra Bold',
+    900: 'Heavy'
 };
 
 class WeightSelector extends React.Component {
     static propTypes = {
+        // Props
+        name: PropTypes.string.isRequired,
         value: PropTypes.oneOfType([
             PropTypes.string,
             PropTypes.number
         ]),
-        fontFamilyWeights: PropTypes.array.isRequired
+        fontFamilyWeights: PropTypes.array.isRequired,
+        onChange: PropTypes.func.isRequired
     };
     state = {
         lastIntentionalWeight: this.props.value,
@@ -58,7 +61,7 @@ class WeightSelector extends React.Component {
             lastIntentionalWeight: e.target.value,
             isIntentional: true
         });
-    }
+    };
     render() {
         return (
             <Selector
@@ -68,7 +71,7 @@ class WeightSelector extends React.Component {
                 options={
                     this.props.fontFamilyWeights
                         .map(weight => (
-                            { display: weightsDict[weight], value: weight}
+                            { display: weightsDict[weight], value: weight }
                         ))
                 }
             />

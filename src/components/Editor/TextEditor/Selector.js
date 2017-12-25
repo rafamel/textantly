@@ -6,6 +6,7 @@ import Select from 'material-ui/Select';
 
 class Selector extends React.Component {
     static propTypes = {
+        // Props
         label: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
         id: PropTypes.string.isRequired,
@@ -30,7 +31,7 @@ class Selector extends React.Component {
                     onChange={this.props.onChange}
                     input={<Input />}
                 >
-                    {this.props.options.map(({ display, value}) => (
+                    {this.props.options.map(({ display, value }) => (
                         <option
                             value={value}
                             key={this.props.name + value}

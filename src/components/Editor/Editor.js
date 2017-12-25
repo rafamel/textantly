@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux'
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from 'store';
 import { withStyles } from 'material-ui/styles';
@@ -18,8 +18,8 @@ const styles = (theme) => ({
         margin: '0 auto'
     },
     nomax: {
-        maxWidth: 'none',
-    },
+        maxWidth: 'none'
+    }
 });
 
 const connector = connect(
@@ -32,7 +32,13 @@ const connector = connect(
 
 class Navigation extends React.Component {
     static propTypes = {
+        // State
+        activeIndex: PropTypes.number.isRequired,
+        // Actions
+        changeEditor: PropTypes.func.isRequired,
+        // JSS
         classes: PropTypes.object.isRequired,
+        theme: PropTypes.object.isRequired
     };
     handleChange = (index) => {
         this.props.changeEditor({

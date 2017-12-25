@@ -11,7 +11,7 @@ function createTypes({ pre: prefix, types: typesArr }) {
     const cleanTypesArr = typesArr.map(cleanType);
     const duplicates = cleanTypesArr
         .filter((x, i, arr) => arr.lastIndexOf(x) !== i)
-        .length
+        .length;
     if (duplicates) {
         throw Error(`There is a duplicate type for ${prefix}`);
     }
@@ -30,7 +30,7 @@ function createActions(types) {
         const cleanKey = cleanType(key);
         for (let i = 0; i < cleanKey.length; i++) {
             if (cleanKey[i] === '_' && cleanKey.length - 1 >= i + 1) {
-                fnKey += cleanKey[i+1].toUpperCase();
+                fnKey += cleanKey[i + 1].toUpperCase();
                 i++;
             } else {
                 fnKey += cleanKey[i].toLowerCase();
@@ -56,4 +56,4 @@ function typesActions(obj) {
 export {
     typesActions as default,
     createTypes
-}
+};

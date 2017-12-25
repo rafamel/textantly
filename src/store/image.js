@@ -11,27 +11,24 @@ const initialState = {
     last: {}
 };
 
-function reducer (state = initialState, { type, payload }) {
+function reducer(state = initialState, { type, payload }) {
     switch (type) {
-        case t.CHANGE: {
-            return {
-                src: payload.src,
-                name: payload.name,
-                last: {
-                    name: state.name,
-                    src: state.src
-                }
-            };
-        }
-        case t.REVERT: {
-            return {
-                ...state.last,
-                last: state.last
+    case t.CHANGE:
+        return {
+            src: payload.src,
+            name: payload.name,
+            last: {
+                name: state.name,
+                src: state.src
             }
-        }
-        default: {
-            return state;
-        }
+        };
+    case t.REVERT:
+        return {
+            ...state.last,
+            last: state.last
+        };
+    default:
+        return state;
     }
 }
 
@@ -39,4 +36,4 @@ export default {
     reducer,
     actions,
     types: t
-}
+};

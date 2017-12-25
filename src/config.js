@@ -4,7 +4,7 @@ export default {
         text: {
             textString: 'Your Text Here',
             fontFamily: 'Playfair Display SC',
-            fontWeight: "400",
+            fontWeight: '400',
             alignment: 'center'
         }
     },

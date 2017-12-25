@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux'
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from 'store';
 import { withStyles } from 'material-ui/styles';
@@ -32,13 +32,18 @@ const connector = connect(
 
 class TextEditor extends React.Component {
     static propTypes = {
+        // State
+        text: PropTypes.object.isRequired,
+        // Actions
+        textEditsHandler: PropTypes.func.isRequired,
+        // JSS
         classes: PropTypes.object.isRequired
-    }
+    };
     handleChange = (e) => {
         this.props.textEditsHandler({
             [e.target.name]: e.target.value
         });
-    }
+    };
     render() {
         const { classes, text } = this.props;
         return (
@@ -96,9 +101,9 @@ class TextEditor extends React.Component {
                     onChange={this.handleChange}
                     value={this.props.text.alignment}
                     options={[
-                        { display: 'Center', value: 'center'},
-                        { display: 'Left', value: 'left'},
-                        { display: 'Right', value: 'right'}
+                        { display: 'Center', value: 'center' },
+                        { display: 'Left', value: 'left' },
+                        { display: 'Right', value: 'right' }
                     ]}
                 />
             </form>
@@ -107,6 +112,6 @@ class TextEditor extends React.Component {
 }
 
 export default compose(
-    withStyles(styles, { withTheme: true }),
+    withStyles(styles),
     connector
 )(TextEditor);

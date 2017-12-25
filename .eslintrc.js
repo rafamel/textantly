@@ -33,6 +33,8 @@ module.exports = {
         'import/no-unresolved': 0, // Can't detect non-relative to ./src
         'import/no-webpack-loader-syntax': 0,
         'class-property/class-property-semicolon': 2,
+        // Switch
+        'default-case': 0,
         // Indentation
         'indent': [ 2, 4 ],
         // Semicolons
