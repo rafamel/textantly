@@ -1,7 +1,7 @@
 import typesActions from './types-actions';
 
 const { types: t, actions } = typesActions({
-    pre: 'IMAGE',
+    pre: 'IMAG',
     types: ['CHANGE', 'REVERT']
 });
 
@@ -11,9 +11,7 @@ const initialState = {
     last: {}
 };
 
-function reducer (state, { type, payload }) {
-    if (!state) state = initialState;
-
+function reducer (state = initialState, { type, payload }) {
     switch (type) {
         case t.CHANGE: {
             return {

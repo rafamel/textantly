@@ -30,6 +30,7 @@ module.exports = {
     },
     rules: {
         'jsx-a11y/img-has-alt': 0, // breaking change of jsx-x11y with 'react-app' defaults
+        'import/no-unresolved': 0, // Can't detect non-relative to ./src
         'import/no-webpack-loader-syntax': 0,
         'class-property/class-property-semicolon': 2,
         // Indentation

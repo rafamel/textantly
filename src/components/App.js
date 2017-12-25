@@ -1,31 +1,43 @@
 import React from 'react';
-import './App.css';
+import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import { Provider } from 'react-redux';
+import store from 'store';
 import Header from './Header';
 import Editor from './Editor/Editor';
 import Displayer from './Displayer/Displayer';
-import { Provider } from 'react-redux';
-import { store } from './store';
+
+// CSS
+import './App.css';
+// Colors
+import teal from 'material-ui/colors/teal';
+import blueGrey from 'material-ui/colors/blueGrey';
+
+const theme = createMuiTheme({
+    palette: {
+        primary: teal,
+        secondary: blueGrey
+    },
+    typography: {
+    // Use the system font.
+        fontFamily: '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Roboto,Helvetica,Arial,sans-serif',
+        htmlFontSize: '19'
+    }
+});
 
 class App extends React.Component {
     state = {
-        hasLoaded: false,
-        textEditor: true
+        hasLoaded: false
     };
     componentDidMount() {
         let count = -50;
         const interval = setInterval(() => {
             count += 50;
             if (document.readyState === 'complete' || count > 5000) {
-                this.toggleOnApp('hasLoaded')();
+                this.setState({ hasLoaded: true });
                 clearInterval(interval);
             }
         }, 50);
     }
-    toggleOnApp = (property) => () => {
-        const obj = {};
-        obj[property] = !this.state[property];
-        this.setState(obj);
-    };
     render() {
         return (
             <div
@@ -34,25 +46,20 @@ class App extends React.Component {
                     (!this.state.hasLoaded) ? { display: 'none' } : {}
                 }
             >
-                <div className="container main">
-                    <Header
-                        textEditor={this.state.textEditor}
-                        toggleOnApp={this.toggleOnApp} />
-                    <div className="ro  ">
-                        <div className="col-md-12">
-                            <Editor
-                                textEditor={this.state.textEditor} />
-                        </div>
-                    </div>
-                    <Displayer />
-                </div>
+                <Header />
+                <Editor />
+                <Displayer />
             </div>
         );
-    }
+    };
 }
 
-export default () => (
+const AppWrapper = () => (
     <Provider store={store}>
-        <App />
+        <MuiThemeProvider theme={theme}>
+            <App />
+        </MuiThemeProvider>
     </Provider>
 );
+
+export default AppWrapper;

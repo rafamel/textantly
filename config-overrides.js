@@ -20,6 +20,11 @@ module.exports = {
         // Rewire babel
         config = babel(config, env);
 
+        // Absolute paths for ./src
+        if (!config.resolve) config.resolve = [];
+        config.resolve.modules = (config.resolve.modules || [])
+            .concat(['./src']);
+
         // Not rewiting Eslint at the moment:
         // Maintaining a more strict eslint config for the console via
         // util/daemon, and the looser react-app default one

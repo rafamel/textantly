@@ -1,14 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { actions } from '../store';
+import { actions } from 'store';
+import config from 'config';
 
-export default connect(
+const connector = connect(
     (state) => ({
-        src: state.image.src
+        src: state.image.src,
+        textString: state.edits.current.text.textString
+            || config.defaults.text.textString
     }), {
         revert: actions.image.revert
     }
-)(class Displayer extends React.Component {
+);
+
+class Displayer extends React.Component {
     imageHasLoaded = () => {
         console.log('LOADED');
     };
@@ -31,7 +36,7 @@ export default connect(
                         <div id="text-container" className="left horizontal-bars">
                             <div>
                                 <div>
-                                    <p>Your Text Here</p>
+                                    <p>{this.props.textString}</p>
                                 </div>
                             </div>
                         </div>
@@ -40,4 +45,6 @@ export default connect(
             </div>
         );
     }
-});
+};
+
+export default connector(Displayer);
