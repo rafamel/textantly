@@ -8,6 +8,7 @@ import Header from './Header';
 import Editor from './Editor/Editor';
 import Displayer from './Displayer/Displayer';
 import LoadingBar from './LoadingBar';
+import SnackBar from './SnackBar';
 
 // CSS
 import './App.css';
@@ -22,8 +23,8 @@ const theme = createMuiTheme({
     },
     typography: {
     // Use the system font.
-        fontFamily: '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Roboto,Helvetica,Arial,sans-serif',
-        htmlFontSize: '19'
+        fontFamily: '"Roboto","Helvetica Neue",-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif',
+        htmlFontSize: '18'
     }
 });
 
@@ -66,6 +67,7 @@ class App extends React.Component {
                     <Header />
                     <Editor />
                     <Displayer />
+                    <SnackBar />
                 </div>
             </div>
         );

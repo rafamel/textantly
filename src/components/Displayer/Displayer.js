@@ -6,11 +6,12 @@ import config from 'config';
 
 const connector = connect(
     (state) => ({
-        src: state.image.src,
+        src: state.edits.current.src.src,
         textString: state.edits.current.text.textString
             || config.defaults.text.textString
     }), {
-        revert: actions.image.revert
+        hardBackwards: actions.edits.hardBackwards,
+        addAlert: actions.alerts.add
     }
 );
 
@@ -20,27 +21,53 @@ class Displayer extends React.Component {
         src: PropTypes.any.isRequired,
         textString: PropTypes.string.isRequired,
         // Actions
-        revert: PropTypes.func.isRequired
+        hardBackwards: PropTypes.func.isRequired,
+        addAlert: PropTypes.func.isRequired
     };
-    imageHasLoaded = () => {
-        console.log('LOADED');
+    state = {
+        src: null
     };
-    imageHasFailed = () => {
-        console.log('Failed!');
-        this.props.revert();
+    componentDidMount() {
+        this.loadImage(this.props.src);
+    }
+    componentWillReceiveProps(nextProps) {
+        this.loadImage(nextProps.src);
+    }
+    loadImage = (src) => {
+        if (src === this.state.src) return;
+
+        const img = new Image();
+        img.src = src;
+        img.onload = () => {
+            // Load success
+            this.setState({ src: src });
+        };
+        img.onerror = () => {
+            // Load fail
+            this.props.addAlert('Image could not be loaded');
+            this.props.hardBackwards();
+        };
+
     };
     render() {
+        const image = (!this.state.src)
+            ? null
+            : (
+                <img
+                    src={this.state.src}
+                    id="main-canvas"
+                    alt="Main"
+                />
+            );
         return (
             <div id="displayer">
                 <div className="container">
-                    <div id="img-container">
-                        <img
-                            src={this.props.src}
-                            onLoad={this.imageHasLoaded}
-                            onError={this.imageHasFailed}
-                            id="main-canvas"
-                            alt="Main"
-                        />
+                    <div id="img-container"
+                        style={
+                            (!this.state.src) ? { opacity: 0 } : {}
+                        }
+                    >
+                        { image }
                         <div id="text-container" className="left horizontal-bars">
                             <div>
                                 <div>

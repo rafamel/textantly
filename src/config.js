@@ -1,6 +1,11 @@
 export default {
     name: 'Textantly',
+    snackbarDuration: 4000,
     defaults: {
+        src: {
+            name: '',
+            src: 'static/default.png'
+        },
         text: {
             textString: 'Your Text Here',
             fontFamily: 'Playfair Display SC',

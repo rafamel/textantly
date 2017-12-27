@@ -21,7 +21,7 @@ class WeightSelector extends React.Component {
         value: PropTypes.oneOfType([
             PropTypes.string,
             PropTypes.number
-        ]),
+        ]).isRequired,
         fontFamilyWeights: PropTypes.array.isRequired,
         onChange: PropTypes.func.isRequired
     };

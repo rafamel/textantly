@@ -8,6 +8,7 @@ import TextField from 'material-ui/TextField';
 import config from 'config';
 import Selector from './Selector';
 import WeightSelector from './WeightSelector';
+import ImageSelector from './ImageSelector/ImageSelector';
 import fontData from 'services/font-data';
 
 const fontFamilies = Object.keys(fontData);
@@ -26,7 +27,8 @@ const connector = connect(
     (state) => ({
         text: state.edits.current.text
     }), {
-        textEditsHandler: actions.edits.changeText
+        textEditsHandler: actions.edits.changeText,
+        changeSrc: actions.edits.changeSrc
     }
 );
 
@@ -36,6 +38,7 @@ class TextEditor extends React.Component {
         text: PropTypes.object.isRequired,
         // Actions
         textEditsHandler: PropTypes.func.isRequired,
+        changeSrc: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };
@@ -105,6 +108,9 @@ class TextEditor extends React.Component {
                         { display: 'Left', value: 'left' },
                         { display: 'Right', value: 'right' }
                     ]}
+                />
+                <ImageSelector
+                    changeSrc={this.props.changeSrc}
                 />
             </form>
         );

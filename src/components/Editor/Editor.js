@@ -26,7 +26,10 @@ const connector = connect(
     (state) => ({
         activeIndex: (state._activeEditor === 'text') ? 0 : 1
     }), {
-        changeEditor: actions._activeEditor.change
+        changeEditor: actions._activeEditor.change,
+        reset: actions.edits.reset,
+        backwards: actions.edits.backwards,
+        forwards: actions.edits.forwards
     }
 );
 
@@ -36,6 +39,9 @@ class Navigation extends React.Component {
         activeIndex: PropTypes.number.isRequired,
         // Actions
         changeEditor: PropTypes.func.isRequired,
+        reset: PropTypes.func.isRequired,
+        backwards: PropTypes.func.isRequired,
+        forwards: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired,
         theme: PropTypes.object.isRequired
@@ -52,6 +58,15 @@ class Navigation extends React.Component {
         const { classes, theme } = this.props;
         return (
             <Paper className={classes.paper}>
+                <button onClick={this.props.backwards}>
+                    BACKWARDS
+                </button>
+                <button onClick={this.props.reset}>
+                    RESET
+                </button>
+                <button onClick={this.props.forwards}>
+                    FORWARDS
+                </button>
                 <AppBar position="static" color="inherit">
                     <Tabs
                         value={this.props.activeIndex}
