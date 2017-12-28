@@ -6,11 +6,11 @@ import config from 'config';
 
 const connector = connect(
     (state) => ({
-        src: state.edits.current.src.src,
-        textString: state.edits.current.text.textString
+        src: state.edits.src.src,
+        textString: state.edits.text.textString
             || config.defaults.text.textString
     }), {
-        hardBackwards: actions.edits.hardBackwards,
+        backwards: actions.edits.backwards,
         addAlert: actions.alerts.add
     }
 );
@@ -21,7 +21,7 @@ class Displayer extends React.Component {
         src: PropTypes.any.isRequired,
         textString: PropTypes.string.isRequired,
         // Actions
-        hardBackwards: PropTypes.func.isRequired,
+        backwards: PropTypes.func.isRequired,
         addAlert: PropTypes.func.isRequired
     };
     state = {
@@ -45,9 +45,8 @@ class Displayer extends React.Component {
         img.onerror = () => {
             // Load fail
             this.props.addAlert('Image could not be loaded');
-            this.props.hardBackwards();
+            this.props.backwards('hard');
         };
-
     };
     render() {
         const image = (!this.state.src)

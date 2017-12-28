@@ -53,7 +53,8 @@ if (watch) {
 
     if (argv.rd) {
         const args = argv.rd.split(' ');
-        const p = spawn(args.shift(), args);
+        const current = args.shift();
+        const p = spawn(current, args);
         p.stdout.on('data', chalker('rd'));
         p.stderr.on('data', chalker('rd'));
         p.on('close', (code) => {

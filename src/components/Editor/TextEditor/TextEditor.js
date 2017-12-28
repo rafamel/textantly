@@ -25,7 +25,7 @@ const styles = (theme) => ({
 
 const connector = connect(
     (state) => ({
-        text: state.edits.current.text
+        text: state.edits.text
     }), {
         textEditsHandler: actions.edits.changeText,
         changeSrc: actions.edits.changeSrc

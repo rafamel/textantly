@@ -24,7 +24,11 @@ const styles = (theme) => ({
 
 const connector = connect(
     (state) => ({
-        activeIndex: (state._activeEditor === 'text') ? 0 : 1
+        activeIndex: (state._activeEditor === 'text') ? 0 : 1,
+        historyCan: {
+            backwards: state.edits._history.can.backwards,
+            forwards: state.edits._history.can.forwards
+        }
     }), {
         changeEditor: actions._activeEditor.change,
         reset: actions.edits.reset,
@@ -37,6 +41,7 @@ class Navigation extends React.Component {
     static propTypes = {
         // State
         activeIndex: PropTypes.number.isRequired,
+        historyCan: PropTypes.object.isRequired,
         // Actions
         changeEditor: PropTypes.func.isRequired,
         reset: PropTypes.func.isRequired,
@@ -58,13 +63,19 @@ class Navigation extends React.Component {
         const { classes, theme } = this.props;
         return (
             <Paper className={classes.paper}>
-                <button onClick={this.props.backwards}>
+                <button
+                    onClick={this.props.backwards}
+                    disabled={!this.props.historyCan.backwards}
+                >
                     BACKWARDS
                 </button>
                 <button onClick={this.props.reset}>
                     RESET
                 </button>
-                <button onClick={this.props.forwards}>
+                <button
+                    onClick={this.props.forwards}
+                    disabled={!this.props.historyCan.forwards}
+                >
                     FORWARDS
                 </button>
                 <AppBar position="static" color="inherit">
