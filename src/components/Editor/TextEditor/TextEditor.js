@@ -6,10 +6,14 @@ import { actions } from 'store';
 import { withStyles } from 'material-ui/styles';
 import TextField from 'material-ui/TextField';
 import config from 'config';
-import Selector from './Selector';
-import WeightSelector from './WeightSelector';
-import ImageSelector from './ImageSelector/ImageSelector';
 import fontData from 'services/font-data';
+import {
+    Selector,
+    WeightSelector,
+    ImageSelector
+} from './Selectors';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 
 const fontFamilies = Object.keys(fontData);
 
@@ -27,7 +31,8 @@ const connector = connect(
     (state) => ({
         text: state.edits.text
     }), {
-        textEditsHandler: actions.edits.changeText,
+        changeText: actions.edits.changeText,
+        changeTextTemp: actions.edits.changeTextTemp,
         changeSrc: actions.edits.changeSrc
     }
 );
@@ -37,13 +42,19 @@ class TextEditor extends React.Component {
         // State
         text: PropTypes.object.isRequired,
         // Actions
-        textEditsHandler: PropTypes.func.isRequired,
+        changeText: PropTypes.func.isRequired,
+        changeTextTemp: PropTypes.func.isRequired,
         changeSrc: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };
     handleChange = (e) => {
-        this.props.textEditsHandler({
+        this.props.changeText({
+            [e.target.name]: e.target.value
+        });
+    };
+    handleChangeTemp = (e) => {
+        this.props.changeTextTemp({
             [e.target.name]: e.target.value
         });
     };
@@ -71,7 +82,7 @@ class TextEditor extends React.Component {
                         fullWidth: true
                     }}
                     onChange={this.handleChange}
-                    value={this.props.text.fontFamily}
+                    value={text.fontFamily}
                     options={
                         fontFamilies.map(font => ({
                             display: font,
@@ -89,8 +100,8 @@ class TextEditor extends React.Component {
                         fullWidth: true
                     }}
                     onChange={this.handleChange}
-                    value={this.props.text.fontWeight}
-                    fontFamilyWeights={fontData[this.props.text.fontFamily]}
+                    value={text.fontWeight}
+                    fontFamilyWeights={fontData[text.fontFamily]}
                 />
                 <Selector
                     name="alignment"
@@ -102,7 +113,7 @@ class TextEditor extends React.Component {
                         fullWidth: true
                     }}
                     onChange={this.handleChange}
-                    value={this.props.text.alignment}
+                    value={text.alignment}
                     options={[
                         { display: 'Center', value: 'center' },
                         { display: 'Left', value: 'left' },
@@ -111,6 +122,42 @@ class TextEditor extends React.Component {
                 />
                 <ImageSelector
                     changeSrc={this.props.changeSrc}
+                />
+                <Selector
+                    name="overlayPosition"
+                    id="overlay-position"
+                    label="Overlay Position"
+                    formControl={{
+                        className: classes.textField,
+                        margin: 'normal',
+                        fullWidth: true
+                    }}
+                    onChange={this.handleChange}
+                    value={text.overlayPosition}
+                    options={[
+                        { display: 'Left', value: 'left' },
+                        { display: 'Right', value: 'right' },
+                        { display: 'Top', value: 'top' },
+                        { display: 'Bottom', value: 'bottom' }
+                    ]}
+                />
+                <Slider
+                    id="overlay-width"
+                    value={text.overlayWidth}
+                    min={0}
+                    max={100}
+                    step={2}
+                    // label="Overlay Width"
+                    onChange={(val) => {
+                        this.handleChangeTemp(
+                            { target: { name: 'overlayWidth', value: val } }
+                        );
+                    }}
+                    onAfterChange={(val) => {
+                        this.handleChange(
+                            { target: { name: 'overlayWidth', value: val } }
+                        );
+                    }}
                 />
             </form>
         );

@@ -1,7 +1,7 @@
 import { diff, diffBackwards, diffForwards } from './diff';
 
 function addCan(history) {
-    const { index, arr } = history;
+    const { index, arr, temp } = history;
     const can = {};
     if (!arr.length) {
         can.forwards = false;
@@ -16,6 +16,7 @@ function addCan(history) {
         can.forwards = true;
         can.backwards = true;
     }
+    if (temp) can.forwards = false;
     history.can = can;
     return history;
 }
@@ -23,6 +24,7 @@ function addCan(history) {
 const defaultHistoryValues = {
     index: -1,
     arr: [],
+    temp: null,
     can: {
         forwards: false,
         backwards: false
@@ -33,6 +35,10 @@ export { defaultHistoryValues };
 
 export default function (key) {
     function insert(previous, updated) {
+        if (previous[key].temp) {
+            return insert(previous[key].temp, updated);
+        }
+
         const diffObj = diff(previous, updated, key);
         if (!diffObj) return previous;
 
@@ -43,14 +49,30 @@ export default function (key) {
             : currentHistory.arr.slice(0, index);
         updated[key] = addCan({
             index: -1,
-            arr: arr.concat([diffObj])
+            arr: arr.concat([diffObj]),
+            temp: null
         });
+        return updated;
+    }
+
+    function tempInsert(previous, updated) {
+        const history = previous[key];
+        if (history.temp) {
+            updated[key] = history;
+        } else {
+            updated[key] = addCan({
+                index: history.index,
+                arr: history.arr,
+                temp: previous
+            });
+        }
         return updated;
     }
 
     function backwards(current) {
         const history = current[key];
         if (!history || !history.can.backwards) return current;
+        if (history.temp) return history.temp;
 
         const select = (history.index === -1)
             ? history.arr.length - 1
@@ -78,6 +100,7 @@ export default function (key) {
 
     return {
         insert,
+        tempInsert,
         backwards,
         forwards
     };

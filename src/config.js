@@ -10,7 +10,10 @@ export default {
             textString: 'Your Text Here',
             fontFamily: 'Playfair Display SC',
             fontWeight: '400',
-            alignment: 'center'
+            alignment: 'center',
+            overlayPosition: 'left',
+            overlayWidth: 40,
+            overlayHeight: 20
         }
     },
     maxSizepx: 1200 // Modify in css: #img-container.max-recommended-px
