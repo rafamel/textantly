@@ -17,13 +17,16 @@ const weightsDict = {
 class WeightSelector extends React.Component {
     static propTypes = {
         // Props
-        name: PropTypes.string.isRequired,
+        id: PropTypes.string,
+        name: PropTypes.string,
+        label: PropTypes.string,
         value: PropTypes.oneOfType([
             PropTypes.string,
             PropTypes.number
         ]).isRequired,
         fontFamilyWeights: PropTypes.array.isRequired,
-        onChange: PropTypes.func.isRequired
+        className: PropTypes.string,
+        onChange: PropTypes.func
     };
     state = {
         lastIntentionalWeight: this.props.value,
@@ -66,8 +69,8 @@ class WeightSelector extends React.Component {
         return (
             <Selector
                 {...this.props}
-                value={String(this.props.value)}
                 onChange={this.handleChange}
+                value={String(this.props.value)}
                 options={
                     this.props.fontFamilyWeights
                         .map(weight => (

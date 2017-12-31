@@ -7,22 +7,29 @@ import Select from 'material-ui/Select';
 class Selector extends React.Component {
     static propTypes = {
         // Props
-        label: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        id: PropTypes.string.isRequired,
+        id: PropTypes.string,
+        name: PropTypes.string,
+        label: PropTypes.string,
         value: PropTypes.string.isRequired,
         options: PropTypes.array.isRequired,
-        formControl: PropTypes.object.isRequired,
-        onChange: PropTypes.func.isRequired
+        className: PropTypes.string,
+        onChange: PropTypes.func
     };
     render() {
-        return (
-            <FormControl
-                {...this.props.formControl}
-            >
+        const label = (!this.props.label)
+            ? null
+            : (
                 <InputLabel htmlFor={this.props.id}>
                     {this.props.label}
                 </InputLabel>
+            );
+        return (
+            <FormControl
+                className={this.props.className}
+                margin="normal"
+                fullWidth
+            >
+                {label}
                 <Select
                     native
                     name={this.props.name}

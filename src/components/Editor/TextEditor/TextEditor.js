@@ -4,14 +4,10 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from 'store';
 import { withStyles } from 'material-ui/styles';
-import TextField from 'material-ui/TextField';
 import config from 'config';
 import fontData from 'services/font-data';
-import {
-    Selector,
-    WeightSelector,
-    ImageSelector
-} from './Selectors';
+import Selector, { WeightSelector, ImageSelector } from './Fields/Selector';
+import TextInput from './Fields/TextInput';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
@@ -62,26 +58,20 @@ class TextEditor extends React.Component {
         const { classes, text } = this.props;
         return (
             <form className={classes.container} noValidate autoComplete="off">
-                <TextField
+                <TextInput
+                    id="text-string"
                     name="textString"
                     label="Text"
                     placeholder={config.defaults.text.textString}
                     value={text.textString}
                     className={classes.textField}
-                    onChange={this.handleChange}
-                    margin="normal"
-                    fullWidth
+                    onChange={this.handleChangeTemp}
+                    onAfterChange={this.handleChange}
                 />
                 <Selector
-                    name="fontFamily"
                     id="font-family"
+                    name="fontFamily"
                     label="Font Family"
-                    formControl={{
-                        className: classes.textField,
-                        margin: 'normal',
-                        fullWidth: true
-                    }}
-                    onChange={this.handleChange}
                     value={text.fontFamily}
                     options={
                         fontFamilies.map(font => ({
@@ -89,29 +79,23 @@ class TextEditor extends React.Component {
                             value: font
                         }))
                     }
+                    className={classes.textField}
+                    onChange={this.handleChange}
                 />
                 <WeightSelector
-                    name="fontWeight"
                     id="font-weight"
+                    name="fontWeight"
                     label="Font Weight"
-                    formControl={{
-                        className: classes.textField,
-                        margin: 'normal',
-                        fullWidth: true
-                    }}
-                    onChange={this.handleChange}
                     value={text.fontWeight}
+                    className={classes.textField}
+                    onChange={this.handleChange}
                     fontFamilyWeights={fontData[text.fontFamily]}
                 />
                 <Selector
+                    id="text-alignment"
                     name="alignment"
-                    id="alignment"
                     label="Text Alignment"
-                    formControl={{
-                        className: classes.textField,
-                        margin: 'normal',
-                        fullWidth: true
-                    }}
+                    className={classes.textField}
                     onChange={this.handleChange}
                     value={text.alignment}
                     options={[
@@ -124,14 +108,10 @@ class TextEditor extends React.Component {
                     changeSrc={this.props.changeSrc}
                 />
                 <Selector
-                    name="overlayPosition"
                     id="overlay-position"
+                    name="overlayPosition"
                     label="Overlay Position"
-                    formControl={{
-                        className: classes.textField,
-                        margin: 'normal',
-                        fullWidth: true
-                    }}
+                    className={classes.textField}
                     onChange={this.handleChange}
                     value={text.overlayPosition}
                     options={[
