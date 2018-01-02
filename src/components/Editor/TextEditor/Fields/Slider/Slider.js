@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import classnames from 'classnames';
 import { InputLabel } from 'material-ui/Input';
-import Slider, { createSliderWithTooltip } from 'rc-slider';
+import RCSlider, { createSliderWithTooltip } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
-const SliderWithTooltip = createSliderWithTooltip(Slider);
+const SliderWithTooltip = createSliderWithTooltip(RCSlider);
 
 const styles = (theme) => {
     const primary = theme.palette.primary['500'];
@@ -57,7 +57,7 @@ const styles = (theme) => {
     };
 };
 
-class SingleSlider extends React.Component {
+class Slider extends React.Component {
     static propTypes = {
         // Props
         id: PropTypes.string,
@@ -117,4 +117,4 @@ class SingleSlider extends React.Component {
     }
 }
 
-export default withStyles(styles)(SingleSlider);
+export default withStyles(styles)(Slider);
