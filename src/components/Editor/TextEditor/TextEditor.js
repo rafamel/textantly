@@ -8,8 +8,7 @@ import config from 'config';
 import fontData from 'services/font-data';
 import Selector, { WeightSelector, ImageSelector } from './Fields/Selector';
 import TextInput from './Fields/TextInput';
-import Slider from 'rc-slider';
-import 'rc-slider/assets/index.css';
+import SingleSlider from './Fields/SingleSlider';
 
 const fontFamilies = Object.keys(fontData);
 
@@ -121,23 +120,17 @@ class TextEditor extends React.Component {
                         { display: 'Bottom', value: 'bottom' }
                     ]}
                 />
-                <Slider
+                <SingleSlider
                     id="overlay-width"
+                    name="overlayWidth"
+                    label="Overlay Width"
                     value={text.overlayWidth}
                     min={0}
                     max={100}
                     step={2}
-                    // label="Overlay Width"
-                    onChange={(val) => {
-                        this.handleChangeTemp(
-                            { target: { name: 'overlayWidth', value: val } }
-                        );
-                    }}
-                    onAfterChange={(val) => {
-                        this.handleChange(
-                            { target: { name: 'overlayWidth', value: val } }
-                        );
-                    }}
+                    className={classes.textField}
+                    onChange={this.handleChangeTemp}
+                    onAfterChange={this.handleChange}
                 />
             </form>
         );
