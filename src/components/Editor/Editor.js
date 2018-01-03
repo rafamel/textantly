@@ -19,6 +19,9 @@ const styles = (theme) => ({
     },
     nomax: {
         maxWidth: 'none'
+    },
+    editor: {
+        margin: '14px 22px 18px'
     }
 });
 
@@ -101,8 +104,8 @@ class Navigation extends React.Component {
                     index={this.props.activeIndex}
                     onChangeIndex={this.handleChange}
                 >
-                    <TextEditor />
-                    <TextEditor />
+                    <TextEditor className={classes.editor} />
+                    <TextEditor className={classes.editor} />
                 </SwipeableViews>
             </Paper>
         );

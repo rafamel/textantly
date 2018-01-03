@@ -6,6 +6,7 @@ import { actions } from 'store';
 import { withStyles } from 'material-ui/styles';
 import config from 'config';
 import fontData from 'services/font-data';
+import Row from './Row';
 import Selector, { WeightSelector, ImageSelector } from './Fields/Selector';
 import TextInput from './Fields/TextInput';
 import { OverlayLengthSlider } from './Fields/Slider';
@@ -13,12 +14,9 @@ import { OverlayLengthSlider } from './Fields/Slider';
 const fontFamilies = Object.keys(fontData);
 
 const styles = (theme) => ({
-    container: {
-        display: 'flex',
-        flexWrap: 'wrap'
-    },
     textField: {
-        margin: theme.spacing.unit
+        boxSizing: 'border-box',
+        margin: `${theme.spacing.unit}px 0`
     }
 });
 
@@ -34,6 +32,8 @@ const connector = connect(
 
 class TextEditor extends React.Component {
     static propTypes = {
+        // Props
+        className: PropTypes.string,
         // State
         text: PropTypes.object.isRequired,
         // Actions
@@ -54,80 +54,104 @@ class TextEditor extends React.Component {
         });
     };
     render() {
-        const { classes, text } = this.props;
+        const { classes, text, className } = this.props;
         return (
-            <form className={classes.container} noValidate autoComplete="off">
-                <TextInput
-                    id="text-string"
-                    name="textString"
-                    label="Text"
-                    placeholder={config.defaults.text.textString}
-                    value={text.textString}
-                    className={classes.textField}
-                    onChange={this.handleChangeTemp}
-                    onAfterChange={this.handleChange}
-                />
-                <Selector
-                    id="font-family"
-                    name="fontFamily"
-                    label="Font Family"
-                    value={text.fontFamily}
-                    options={
-                        fontFamilies.map(font => ({
-                            display: font,
-                            value: font
-                        }))
-                    }
-                    className={classes.textField}
-                    onChange={this.handleChange}
-                />
-                <WeightSelector
-                    id="font-weight"
-                    name="fontWeight"
-                    label="Font Weight"
-                    value={text.fontWeight}
-                    className={classes.textField}
-                    onChange={this.handleChange}
-                    fontFamilyWeights={fontData[text.fontFamily]}
-                />
-                <Selector
-                    id="text-alignment"
-                    name="alignment"
-                    label="Text Alignment"
-                    className={classes.textField}
-                    onChange={this.handleChange}
-                    value={text.alignment}
-                    options={[
-                        { display: 'Center', value: 'center' },
-                        { display: 'Left', value: 'left' },
-                        { display: 'Right', value: 'right' }
-                    ]}
-                />
-                <ImageSelector
-                    changeSrc={this.props.changeSrc}
-                />
-                <Selector
-                    id="overlay-position"
-                    name="overlayPosition"
-                    label="Overlay Position"
-                    className={classes.textField}
-                    onChange={this.handleChange}
-                    value={text.overlayPosition}
-                    options={[
-                        { display: 'Left', value: 'left' },
-                        { display: 'Right', value: 'right' },
-                        { display: 'Top', value: 'top' },
-                        { display: 'Bottom', value: 'bottom' }
-                    ]}
-                />
-                <OverlayLengthSlider
-                    overlayPosition={text.overlayPosition}
-                    overlayWidth={text.overlayWidth}
-                    overlayHeight={text.overlayHeight}
-                    className={classes.textField}
-                    onChange={this.handleChangeTemp}
-                    onAfterChange={this.handleChange}
-                />
+            <form
+                className={className}
+                noValidate
+                autoComplete="off"
+            >
+                <Row
+                    lateralSeparation={30}
+                >
+                    <div>
+                        <TextInput
+                            id="text-string"
+                            name="textString"
+                            label="Text"
+                            placeholder={config.defaults.text.textString}
+                            value={text.textString}
+                            className={classes.textField}
+                            onChange={this.handleChangeTemp}
+                            onAfterChange={this.handleChange}
+                        />
+                        <Selector
+                            id="font-family"
+                            name="fontFamily"
+                            label="Font Family"
+                            value={text.fontFamily}
+                            options={
+                                fontFamilies.map(font => ({
+                                    display: font,
+                                    value: font
+                                }))
+                            }
+                            className={classes.textField}
+                            onChange={this.handleChange}
+                        />
+                        <WeightSelector
+                            id="font-weight"
+                            name="fontWeight"
+                            label="Font Weight"
+                            value={text.fontWeight}
+                            className={classes.textField}
+                            onChange={this.handleChange}
+                            fontFamilyWeights={fontData[text.fontFamily]}
+                        />
+                        <Selector
+                            id="text-alignment"
+                            name="alignment"
+                            label="Text Alignment"
+                            className={classes.textField}
+                            onChange={this.handleChange}
+                            value={text.alignment}
+                            options={[
+                                { display: 'Center', value: 'center' },
+                                { display: 'Left', value: 'left' },
+                                { display: 'Right', value: 'right' }
+                            ]}
+                        />
+                    </div>
+                    <div>
+                        <ImageSelector
+                            changeSrc={this.props.changeSrc}
+                        />
+                        <Selector
+                            id="overlay-position"
+                            name="overlayPosition"
+                            label="Overlay Position"
+                            className={classes.textField}
+                            onChange={this.handleChange}
+                            value={text.overlayPosition}
+                            options={[
+                                { display: 'Left', value: 'left' },
+                                { display: 'Right', value: 'right' },
+                                { display: 'Top', value: 'top' },
+                                { display: 'Bottom', value: 'bottom' }
+                            ]}
+                        />
+                        <OverlayLengthSlider
+                            overlayPosition={text.overlayPosition}
+                            overlayWidth={text.overlayWidth}
+                            overlayHeight={text.overlayHeight}
+                            className={classes.textField}
+                            onChange={this.handleChangeTemp}
+                            onAfterChange={this.handleChange}
+                        />
+                        <Selector
+                            id="color-scheme"
+                            name="colorScheme"
+                            label="Color Scheme"
+                            className={classes.textField}
+                            onChange={this.handleChange}
+                            value={text.colorScheme}
+                            options={[
+                                { display: 'Light', value: 'light' },
+                                { display: 'Dark', value: 'dark' }
+                            ]}
+                        />
+                    </div>
+                </Row>
             </form>
         );
     }

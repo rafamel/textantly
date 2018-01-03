@@ -13,7 +13,8 @@ export default {
             alignment: 'center',
             overlayPosition: 'left',
             overlayWidth: 40,
-            overlayHeight: 20
+            overlayHeight: 20,
+            colorScheme: 'light'
         }
     },
     maxSizepx: 1200 // Modify in css: #img-container.max-recommended-px

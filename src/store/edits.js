@@ -27,7 +27,8 @@ const initialState = {
         alignment: config.defaults.text.alignment,
         overlayPosition: config.defaults.text.overlayPosition,
         overlayWidth: config.defaults.text.overlayWidth,
-        overlayHeight: config.defaults.text.overlayHeight
+        overlayHeight: config.defaults.text.overlayHeight,
+        colorScheme: config.defaults.text.colorScheme
     },
     image: {
         some: 'nice'

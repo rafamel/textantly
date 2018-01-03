@@ -4,6 +4,7 @@ import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 import { Provider, connect } from 'react-redux';
 import store, { actions } from 'store';
 import { compose } from 'redux';
+import Reboot from 'material-ui/Reboot';
 import Header from './Header';
 import Editor from './Editor/Editor';
 import Displayer from './Displayer/Displayer';
@@ -76,11 +77,14 @@ class App extends React.Component {
 
 const wrapApp = (App) => function AppWrapper() {
     return (
-        <Provider store={store}>
-            <MuiThemeProvider theme={theme}>
-                <App />
-            </MuiThemeProvider>
-        </Provider>
+        <div>
+            <Reboot />
+            <Provider store={store}>
+                <MuiThemeProvider theme={theme}>
+                    <App />
+                </MuiThemeProvider>
+            </Provider>
+        </div>
     );
 };
 
