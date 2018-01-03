@@ -26,7 +26,10 @@ const connector = connect(
     }), {
         changeText: actions.edits.changeText,
         changeTextTemp: actions.edits.changeTextTemp,
-        changeSrc: actions.edits.changeSrc
+        changeSrc: actions.edits.changeSrc,
+        loadingStart: actions._loading.start,
+        loadingStop: actions._loading.stop,
+        addAlert: actions.alerts.add
     }
 );
 
@@ -40,6 +43,9 @@ class TextEditor extends React.Component {
         changeText: PropTypes.func.isRequired,
         changeTextTemp: PropTypes.func.isRequired,
         changeSrc: PropTypes.func.isRequired,
+        loadingStart: PropTypes.func.isRequired,
+        loadingStop: PropTypes.func.isRequired,
+        addAlert: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };
@@ -115,6 +121,9 @@ class TextEditor extends React.Component {
                     <div>
                         <ImageSelector
                             changeSrc={this.props.changeSrc}
+                            loadingStart={this.props.loadingStart}
+                            loadingStop={this.props.loadingStop}
+                            addAlert={this.props.addAlert}
                         />
                         <Selector
                             id="overlay-position"
