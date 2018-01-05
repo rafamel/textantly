@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import classnames from 'classnames';
-import { InputLabel } from 'material-ui/Input';
+import FreeLabel from '../FreeLabel';
 import RCSlider, { createSliderWithTooltip } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
@@ -47,12 +47,6 @@ const styles = (theme) => {
             ...body1,
             color: '#fff',
             lineHeight: 1.2
-        },
-        label: {
-            textAlign: 'left',
-            transformOrigin: 'top left',
-            transform: 'scale(0.75)',
-            marginBottom: 6
         }
     };
 };
@@ -71,6 +65,7 @@ class Slider extends React.Component {
         onChange: PropTypes.func,
         onAfterChange: PropTypes.func,
         className: PropTypes.string,
+        style: PropTypes.object,
         // JSS
         classes: PropTypes.object.isRequired
     };
@@ -87,19 +82,16 @@ class Slider extends React.Component {
         );
     };
     render() {
-        const { classes, className, label } = this.props;
-        const sliderLabel = (!label)
-            ? null
-            : (
-                <div className={classes.label}>
-                    <InputLabel>{label}</InputLabel>
-                </div>
-            );
+        const { classes, className, style, label } = this.props;
         return (
             <div
                 className={ classnames(classes.root, className) }
+                style={style}
             >
-                {sliderLabel}
+                <FreeLabel
+                    label={label}
+                    style={{ marginBottom: 6 }}
+                />
                 <SliderWithTooltip
                     id={this.props.id}
                     value={this.props.value}

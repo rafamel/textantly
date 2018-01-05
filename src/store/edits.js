@@ -7,18 +7,20 @@ const { types: t, actions } = typesActions({
     types: [
         'RESET',
         'BACKWARDS',
-        'HARD_BACKWARDS',
         'FORWARDS',
+        'TEMP_FORGET',
         'CHANGE_TEXT',
         'CHANGE_TEXT_TEMP',
-        'CHANGE_SRC'
+        'CHANGE_SRC',
+        'CHANGE_SRC_TEMP'
     ]
 });
 
 const initialState = {
     src: {
         name: config.defaults.src.name,
-        src: config.defaults.src.src
+        src: config.defaults.src.src,
+        from: false
     },
     text: {
         textString: config.defaults.text.textString,
@@ -46,6 +48,16 @@ function changeText(state, payload) {
     };
 }
 
+function changeSrc(state, payload) {
+    return {
+        ...state,
+        src: {
+            ...state.src,
+            ...payload
+        }
+    };
+}
+
 const history = diffHistory('_history');
 
 function reducer(state = initialState, { type, payload }) {
@@ -56,6 +68,8 @@ function reducer(state = initialState, { type, payload }) {
         return history.backwards(state);
     case t.FORWARDS:
         return history.forwards(state);
+    case t.TEMP_FORGET:
+        return history.tempForget(state);
     case t.CHANGE_TEXT:
         return history.insert(
             state,
@@ -67,13 +81,15 @@ function reducer(state = initialState, { type, payload }) {
             changeText(state, payload)
         );
     case t.CHANGE_SRC:
-        return history.insert(state, {
-            ...state,
-            src: {
-                ...state.src,
-                ...payload
-            }
-        });
+        return history.insert(
+            state,
+            changeSrc(state, payload)
+        );
+    case t.CHANGE_SRC_TEMP:
+        return history.tempInsert(
+            state,
+            changeSrc(state, payload)
+        );
     default:
         return state;
     }

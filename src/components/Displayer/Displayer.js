@@ -6,11 +6,12 @@ import config from 'config';
 
 const connector = connect(
     (state) => ({
-        src: state.edits.src.src,
+        src: state.edits.src,
         textString: state.edits.text.textString
             || config.defaults.text.textString
     }), {
-        backwards: actions.edits.backwards,
+        tempForget: actions.edits.tempForget,
+        changeSrc: actions.edits.changeSrc,
         addAlert: actions.alerts.add
     }
 );
@@ -18,10 +19,11 @@ const connector = connect(
 class Displayer extends React.Component {
     static propTypes = {
         // State
-        src: PropTypes.any.isRequired,
+        src: PropTypes.object.isRequired,
         textString: PropTypes.string.isRequired,
         // Actions
-        backwards: PropTypes.func.isRequired,
+        changeSrc: PropTypes.func.isRequired,
+        tempForget: PropTypes.func.isRequired,
         addAlert: PropTypes.func.isRequired
     };
     state = {
@@ -34,18 +36,19 @@ class Displayer extends React.Component {
         this.loadImage(nextProps.src);
     }
     loadImage = (src) => {
-        if (src === this.state.src) return;
+        if (src.src === this.state.src) return;
 
         const img = new Image();
-        img.src = src;
+        img.src = src.src;
         img.onload = () => {
             // Load success
-            this.setState({ src: src });
+            this.setState({ src: src.src });
+            this.props.changeSrc(src);
         };
         img.onerror = () => {
             // Load fail
             this.props.addAlert('Image could not be loaded');
-            this.props.backwards('hard');
+            this.props.tempForget();
         };
     };
     render() {

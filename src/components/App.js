@@ -25,7 +25,7 @@ const theme = createMuiTheme({
     typography: {
     // Use the system font.
         fontFamily: '"Roboto","Helvetica Neue",-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif',
-        htmlFontSize: '18'
+        htmlFontSize: '17'
     }
 });
 

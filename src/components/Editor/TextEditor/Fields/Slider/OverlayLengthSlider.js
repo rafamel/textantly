@@ -19,7 +19,8 @@ class OverlayLengthSlider extends React.Component {
             step: 2,
             className: this.props.className,
             onChange: this.props.onChange,
-            onAfterChange: this.props.onAfterChange
+            onAfterChange: this.props.onAfterChange,
+            style: { marginBottom: 4 }
         };
         const overlayPosition = this.props.overlayPosition;
         return (overlayPosition === 'top' || overlayPosition === 'bottom')

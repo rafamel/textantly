@@ -6,7 +6,7 @@ import { actions } from 'store';
 import { withStyles } from 'material-ui/styles';
 import config from 'config';
 import fontData from 'services/font-data';
-import Row from './Row';
+import EqualWidthRow from './EqualWidthRow';
 import Selector, { WeightSelector, ImageSelector } from './Fields/Selector';
 import TextInput from './Fields/TextInput';
 import { OverlayLengthSlider } from './Fields/Slider';
@@ -22,11 +22,13 @@ const styles = (theme) => ({
 
 const connector = connect(
     (state) => ({
-        text: state.edits.text
+        text: state.edits.text,
+        srcFrom: state.edits.src.from
     }), {
         changeText: actions.edits.changeText,
         changeTextTemp: actions.edits.changeTextTemp,
-        changeSrc: actions.edits.changeSrc,
+        changeSrcTemp: actions.edits.changeSrcTemp,
+        tempForget: actions.edits.tempForget,
         loadingStart: actions._loading.start,
         loadingStop: actions._loading.stop,
         addAlert: actions.alerts.add
@@ -39,15 +41,32 @@ class TextEditor extends React.Component {
         className: PropTypes.string,
         // State
         text: PropTypes.object.isRequired,
+        srcFrom: PropTypes
+            .oneOfType([PropTypes.string, PropTypes.bool])
+            .isRequired,
         // Actions
         changeText: PropTypes.func.isRequired,
         changeTextTemp: PropTypes.func.isRequired,
-        changeSrc: PropTypes.func.isRequired,
+        changeSrcTemp: PropTypes.func.isRequired,
+        tempForget: PropTypes.func.isRequired,
         loadingStart: PropTypes.func.isRequired,
         loadingStop: PropTypes.func.isRequired,
         addAlert: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
+    };
+    state = {
+        rowMode: 'columns'
+    };
+    setRowHasColumns(val) {
+        if (val !== this.state.rowHasColumns) {
+            this.setState({
+                rowHasColumns: val
+            });
+        }
+    }
+    onRowModeChange = (mode) => {
+        this.setState({ rowMode: mode });
     };
     handleChange = (e) => {
         this.props.changeText({
@@ -61,16 +80,31 @@ class TextEditor extends React.Component {
     };
     render() {
         const { classes, text, className } = this.props;
+        const imageSelector = (
+            <ImageSelector
+                changeSrcTemp={this.props.changeSrcTemp}
+                tempForget={this.props.tempForget}
+                srcFrom={this.props.srcFrom}
+                loadingStart={this.props.loadingStart}
+                loadingStop={this.props.loadingStop}
+                addAlert={this.props.addAlert}
+                className={classes.textField}
+            />
+        );
         return (
             <form
                 className={className}
                 noValidate
                 autoComplete="off"
             >
-                <Row
+                <EqualWidthRow
                     lateralSeparation={30}
+                    colMinWidth={450}
+                    onModeChange={this.onRowModeChange}
                 >
                     <div>
+                        { (this.state.rowMode === 'columns')
+                            ? null : imageSelector }
                         <TextInput
                             id="text-string"
                             name="textString"
@@ -119,12 +153,8 @@ class TextEditor extends React.Component {
                         />
                     </div>
                     <div>
-                        <ImageSelector
-                            changeSrc={this.props.changeSrc}
-                            loadingStart={this.props.loadingStart}
-                            loadingStop={this.props.loadingStop}
-                            addAlert={this.props.addAlert}
-                        />
+                        { (this.state.rowMode !== 'columns')
+                            ? null : imageSelector }
                         <Selector
                             id="overlay-position"
                             name="overlayPosition"
@@ -160,7 +190,7 @@ class TextEditor extends React.Component {
                             ]}
                         />
                     </div>
-                </Row>
+                </EqualWidthRow>
             </form>
         );
     }

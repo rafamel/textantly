@@ -69,6 +69,12 @@ export default function (key) {
         return updated;
     }
 
+    function tempForget(current) {
+        const history = current[key];
+        if (history.temp) return history.temp;
+        return current;
+    }
+
     function backwards(current) {
         const history = current[key];
         if (!history || !history.can.backwards) return current;
@@ -101,6 +107,7 @@ export default function (key) {
     return {
         insert,
         tempInsert,
+        tempForget,
         backwards,
         forwards
     };
