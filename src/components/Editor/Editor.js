@@ -7,27 +7,30 @@ import { withStyles } from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
-import SwipeableViews from 'react-swipeable-views';
+import ResponsiveSwipeable from './ResponsiveSwipeable';
 import EditText from 'material-ui-icons/TextFormat';
 import EditImage from 'material-ui-icons/Image';
 import TextEditor from './TextEditor/TextEditor';
 
 const styles = (theme) => ({
-    paper: {
+    root: {
         maxWidth: '1100px',
-        margin: '0 auto'
+        margin: '0 auto 32px'
+    },
+    appBar: {
+        marginBottom: 25
     },
     nomax: {
         maxWidth: 'none'
     },
     editor: {
-        margin: '14px 22px 18px'
+        padding: '14px 22px 18px'
     }
 });
 
 const connector = connect(
     (state) => ({
-        activeIndex: (state._activeEditor === 'text') ? 0 : 1,
+        activeEditor: state._activeEditor,
         historyCan: {
             backwards: state.edits._history.can.backwards,
             forwards: state.edits._history.can.forwards
@@ -40,10 +43,10 @@ const connector = connect(
     }
 );
 
-class Navigation extends React.Component {
+class Editor extends React.Component {
     static propTypes = {
         // State
-        activeIndex: PropTypes.number.isRequired,
+        activeEditor: PropTypes.string.isRequired,
         historyCan: PropTypes.object.isRequired,
         // Actions
         changeEditor: PropTypes.func.isRequired,
@@ -51,21 +54,24 @@ class Navigation extends React.Component {
         backwards: PropTypes.func.isRequired,
         forwards: PropTypes.func.isRequired,
         // JSS
-        classes: PropTypes.object.isRequired,
-        theme: PropTypes.object.isRequired
+        classes: PropTypes.object.isRequired
+    };
+    tabDict = {
+        toIndex: { text: 0, image: 1 },
+        toString: { 0: 'text', 1: 'image' }
     };
     handleChange = (index) => {
-        this.props.changeEditor({
-            to: (index === 0) ? 'text' : 'image'
-        });
+        const editor = this.tabDict.toString[index];
+        this.props.changeEditor(editor);
     };
     handleChangeEvent = (event, value) => {
         this.handleChange(value);
     };
     render() {
-        const { classes, theme } = this.props;
+        const { classes, activeEditor } = this.props;
+        const activeIndex = this.tabDict.toIndex[activeEditor];
         return (
-            <Paper className={classes.paper}>
+            <div className={classes.root}>
                 <button
                     onClick={this.props.backwards}
                     disabled={!this.props.historyCan.backwards}
@@ -81,38 +87,45 @@ class Navigation extends React.Component {
                 >
                     FORWARDS
                 </button>
-                <AppBar position="static" color="inherit">
+                <AppBar
+                    className={classes.appBar}
+                    position="static"
+                    color="inherit"
+                >
                     <Tabs
-                        value={this.props.activeIndex}
+                        value={activeIndex}
                         onChange={this.handleChangeEvent}
-                        fullWidth
                         indicatorColor="primary"
                         textColor="primary"
+                        fullWidth
                     >
                         <Tab
                             className={classes.nomax}
                             label="Text"
-                            icon={<EditText />} />
+                            icon={<EditText />}
+                        />
                         <Tab
                             className={classes.nomax}
                             label="Edit Image"
-                            icon={<EditImage />} />
+                            icon={<EditImage />}
+                        />
                     </Tabs>
                 </AppBar>
-                <SwipeableViews
-                    axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                    index={this.props.activeIndex}
-                    onChangeIndex={this.handleChange}
-                >
-                    <TextEditor className={classes.editor} />
-                    <TextEditor className={classes.editor} />
-                </SwipeableViews>
-            </Paper>
+                <Paper>
+                    <ResponsiveSwipeable
+                        index={activeIndex}
+                        onChangeIndex={this.handleChange}
+                    >
+                        <TextEditor className={classes.editor} />
+                        <TextEditor className={classes.editor} />
+                    </ResponsiveSwipeable>
+                </Paper>
+            </div>
         );
     }
 }
 
 export default compose(
-    withStyles(styles, { withTheme: true }),
+    withStyles(styles),
     connector
-)(Navigation);
+)(Editor);

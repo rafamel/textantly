@@ -14,7 +14,7 @@ function reducer(state = initialState, { type, payload }) {
             ? 'image'
             : 'text';
     case t.CHANGE:
-        return payload.to;
+        return payload;
     default:
         return state;
     }

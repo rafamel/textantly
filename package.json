@@ -33,6 +33,7 @@
     "react-jss": "^8.2.0",
     "react-redux": "^5.0.6",
     "react-swipeable-views": "^0.12.12",
+    "react-transition-group": "^2.2.1",
     "redux": "^3.7.2",
     "resize-observer-polyfill": "^1.5.0",
     "typeface-playfair-display-sc": "0.0.45",
