@@ -37,7 +37,7 @@ const connector = connect(
 class SnackBar extends React.Component {
     static propTypes = {
         // State
-        current: PropTypes.string,
+        current: PropTypes.object,
         // Actions
         closeCurrent: PropTypes.func.isRequired,
         // JSS
@@ -64,6 +64,7 @@ class SnackBar extends React.Component {
     }
     render() {
         const { classes, current } = this.props;
+        if (!this.state._isOpen) return null;
         return (
             <Snackbar
                 className={classes.root}
@@ -81,7 +82,7 @@ class SnackBar extends React.Component {
                     'aria-describedby': 'message-id'
                 }}
                 transition={(props) => <Slide direction="up" {...props} />}
-                message={<span id="message-id">{current}</span>}
+                message={<span id="message-id">{current.alert}</span>}
                 action={[
                     <IconButton
                         key="close"

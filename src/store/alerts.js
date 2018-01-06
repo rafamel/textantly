@@ -1,5 +1,12 @@
 import typesActions from './types-actions';
 
+class Alert {
+    constructor(string) {
+        this.alert = string;
+        this.timestamp = Date.now();
+    }
+}
+
 const { types: t, actions } = typesActions({
     pre: 'ALERTS',
     types: ['CLOSE_CURRENT', 'ADD']
@@ -13,15 +20,16 @@ const initialState = {
 function reducer(state = initialState, { type, payload }) {
     switch (type) {
     case t.ADD:
+        const alert = new Alert(payload);
         if (!state.current) {
             return {
                 ...state,
-                current: payload
+                current: alert
             };
         }
         return {
             ...state,
-            stack: state.stack.concat([payload])
+            stack: state.stack.concat([alert])
         };
     case t.CLOSE_CURRENT:
         if (!state.stack.length) {
