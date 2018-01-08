@@ -6,11 +6,12 @@ import { actions } from 'store';
 import { withStyles } from 'material-ui/styles';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
-import { TextFormat, Image } from 'material-ui-icons';
+import TextFormat from 'material-ui-icons/TextFormat';
+import Image from 'material-ui-icons/Image';
 
 const styles = {
     root: {
-        marginBottom: 20
+        marginBottom: 16
     },
     tab: {
         flexGrow: 1,

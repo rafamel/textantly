@@ -12,8 +12,7 @@ import Navigation from '../Navigation/Navigation';
 
 const styles = {
     root: {
-        maxWidth: '1100px',
-        margin: '0 auto 32px'
+        marginBottom: 48
     },
     editor: {
         padding: '14px 22px 18px'

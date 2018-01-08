@@ -80,6 +80,9 @@ class TextEditor extends React.Component {
             [e.target.name]: e.target.value
         });
     };
+    onSubmit = (e) => {
+        e.preventDefault();
+    };
     render() {
         const { classes, text, className } = this.props;
         const imageSelector = (
@@ -98,6 +101,7 @@ class TextEditor extends React.Component {
                 className={className}
                 noValidate
                 autoComplete="off"
+                onSubmit={this.onSubmit}
             >
                 <EqualWidthRow
                     lateralSeparation={30}

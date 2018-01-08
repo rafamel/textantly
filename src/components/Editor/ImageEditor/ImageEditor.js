@@ -4,12 +4,10 @@ import { connect } from 'react-redux';
 import { actions } from 'store';
 import VerticalTabs, { VerticalTab } from 'components/Elements/VerticalTabs';
 import { Collapse } from 'react-collapse';
-import {
-    Crop,
-    Flip,
-    Rotate90DegreesCcw,
-    PhotoSizeSelectLarge
-} from 'material-ui-icons';
+import Crop from 'material-ui-icons/Crop';
+import Flip from 'material-ui-icons/Flip';
+import Rotate90DegreesCcw from 'material-ui-icons/Rotate90DegreesCcw';
+import PhotoSizeSelectLarge from 'material-ui-icons/PhotoSizeSelectLarge';
 import CropEditor from './CropEditor';
 import RotateEditor from './RotateEditor';
 
@@ -42,17 +40,21 @@ class ImageEditor extends React.Component {
         activeIndex: 0
     };
     tabDict = {
-        toIndex: { crop: 0, rotate: 1, resize: 2, flip: 3 },
-        toString: { 0: 'crop', 1: 'rotate', 2: 'resize', 3: 'flip' }
+        toIndex: { crop: 0, rotate: 1, resize: 2, flip: 3, null: false },
+        toString: { 0: 'crop', 1: 'rotate', 2: 'resize', 3: 'flip', false: null }
     };
     setActiveIndex = (props = this.props) => {
-        const imageIndex = this.tabDict.toIndex[props.imageView] || 0;
+        const imageIndex = this.tabDict.toIndex[props.imageView];
         if (imageIndex === this.state.activeIndex) return;
         this.setState({ activeIndex: imageIndex });
     };
     doFlip = () => {
         this.setState({ activeIndex: this.tabDict.toIndex.flip });
         setTimeout(this.setActiveIndex, 400);
+
+        this.props.changeImage({
+            flip: !this.props.image.flip
+        });
     };
     handleChange = (e, index) => {
         const view = this.tabDict.toString[index];
@@ -62,8 +64,11 @@ class ImageEditor extends React.Component {
     componentWillReceiveProps(nextProps) {
         this.setActiveIndex(nextProps);
     }
+    componentWillMount() {
+        this.setActiveIndex();
+    }
     render() {
-        const activeView = this.props.imageView || this.tabDict.toString[0];
+        const activeView = this.props.imageView;
         const isOpen = (name) => activeView === name;
         return (
             <VerticalTabs

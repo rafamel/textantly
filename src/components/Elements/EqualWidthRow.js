@@ -2,21 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import ResizeObserver from 'resize-observer-polyfill';
-import attachStyles from 'utils/attach-styles';
+import { jss } from 'react-jss';
+
+function attachStyles(styles, updateObj) {
+    let sheet = jss.createStyleSheet(styles);
+    if (updateObj) sheet = sheet.update(updateObj);
+    return sheet.attach();
+};
 
 const fullWidthStyles = {
-    root: {
-        display: 'block'
-    },
-    column: {
-        width: '100%'
-    }
+    root: { display: 'block' },
+    column: { width: '100%' }
 };
 
 const columnStyles = {
-    root: {
-        display: 'flex'
-    },
+    root: { display: 'flex' },
     column: {
         width: ({n}) => `${100 / (n)}%`,
         padding: ({separation}) => `0 ${separation / 2 }px`,
@@ -39,8 +39,8 @@ class EqualWidthRow extends React.Component {
             ? (props.colMinWidth * n) + (separation * (n - 1))
             : 0;
         this.classes = {
-            fullWidth: attachStyles(fullWidthStyles),
-            columns: attachStyles(columnStyles, { n, separation })
+            fullWidth: attachStyles(fullWidthStyles).classes,
+            columns: attachStyles(columnStyles, { n, separation }).classes
         };
     }
     static propTypes = {

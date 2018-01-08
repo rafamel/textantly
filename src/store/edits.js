@@ -35,7 +35,8 @@ const initialState = {
         colorScheme: config.defaults.text.colorScheme
     },
     image: {
-        rotate: 0
+        rotate: 0,
+        flip: false
     },
     _history: defaultHistoryValues
 };

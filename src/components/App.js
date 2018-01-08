@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import { MuiThemeProvider } from 'material-ui/styles';
 import { Provider, connect } from 'react-redux';
 import store, { actions } from 'store';
 import { compose } from 'redux';
@@ -10,24 +10,8 @@ import Editor from './Editor/Editor';
 import Displayer from './Displayer/Displayer';
 import LoadingBar from './LoadingBar';
 import SnackBar from './SnackBar';
-
-// CSS
-import './App.css';
-// Colors
-import teal from 'material-ui/colors/teal';
-import blueGrey from 'material-ui/colors/blueGrey';
-
-const theme = createMuiTheme({
-    palette: {
-        primary: teal,
-        secondary: blueGrey
-    },
-    typography: {
-    // Use the system font.
-        fontFamily: '"Roboto","Helvetica Neue",-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif',
-        htmlFontSize: '17'
-    }
-});
+import { classes as appClasses } from 'styles';
+import theme from '../theme';
 
 const connector = connect(
     null,
@@ -61,7 +45,7 @@ class App extends React.Component {
         const hideUntilLoaded = (!this.state.hasLoaded)
             ? { opacity: 0 } : {};
         return (
-            <div className="App">
+            <div className={appClasses.container}>
                 <LoadingBar />
                 <div style={hideUntilLoaded} >
                     <Header />
@@ -76,14 +60,12 @@ class App extends React.Component {
 
 const wrapApp = (App) => function AppWrapper() {
     return (
-        <div>
-            <Reboot />
-            <Provider store={store}>
-                <MuiThemeProvider theme={theme}>
-                    <App />
-                </MuiThemeProvider>
-            </Provider>
-        </div>
+        <Provider store={store}>
+            <MuiThemeProvider theme={theme}>
+                <Reboot />
+                <App />
+            </MuiThemeProvider>
+        </Provider>
     );
 };
 

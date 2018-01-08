@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Tab } from 'material-ui/Tabs';
 import classnames from 'classnames';
-import attachStyles from 'utils/attach-styles';
+import { jss } from 'react-jss';
 
 const IconLabel = (props) => {
     const { label, icon } = props;
@@ -32,7 +32,9 @@ class VerticalTab extends React.Component {
         ...IconLabel.propTypes,
         classes: PropTypes.object
     };
-    classes = attachStyles(styles);
+    classes = jss.createStyleSheet(styles)
+        .attach()
+        .classes;
     render() {
         let { label, icon, classes } = this.props;
         if (!classes) classes = {};

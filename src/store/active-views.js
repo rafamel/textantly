@@ -7,7 +7,7 @@ const { types: t, actions } = typesActions({
 
 const initialState = {
     main: 'text',
-    image: 'crop',
+    image: null,
     crop: 'free'
 };
 
@@ -16,6 +16,7 @@ function reducer(state = initialState, { type, payload }) {
     case t.CHANGE_MAIN:
         return {
             ...state,
+            image: initialState.image,
             main: payload
         };
     case t.CHANGE_IMAGE:

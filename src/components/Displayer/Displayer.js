@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { actions } from 'store';
 import config from 'config';
-import TextDisplayer from './TextDisplayer';
+import TextDisplayer from './TextDisplayer/TextDisplayer';
 import ImageDisplayer from './ImageDisplayer/ImageDisplayer';
 
 const connector = connect(
@@ -58,7 +58,7 @@ class Displayer extends React.Component {
     render() {
         if (!this.state.src) return null;
         const mainView = this.props.mainView;
-        return (!mainView || mainView === 'text')
+        const displayer = (!mainView || mainView === 'text')
             ? (
                 <TextDisplayer
                     src={this.state.src}
@@ -70,6 +70,11 @@ class Displayer extends React.Component {
                     mainView={this.props.mainView}
                 />
             );
+        return (
+            <div style={{ textAlign: 'center' }}>
+                { displayer }
+            </div>
+        );
     }
 };
 
