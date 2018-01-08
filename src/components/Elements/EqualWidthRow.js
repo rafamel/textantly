@@ -1,13 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { jss } from 'react-jss';
+import classnames from 'classnames';
 import ResizeObserver from 'resize-observer-polyfill';
-
-function attachStyles(styles, updateObj) {
-    let sheet = jss.createStyleSheet(styles);
-    if (updateObj) sheet = sheet.update(updateObj);
-    return sheet.attach().classes;
-}
+import attachStyles from 'utils/attach-styles';
 
 const fullWidthStyles = {
     root: {
@@ -51,6 +46,8 @@ class EqualWidthRow extends React.Component {
     static propTypes = {
         // Props
         children: PropTypes.array.isRequired,
+        className: PropTypes.string,
+        style: PropTypes.object,
         lateralSeparation: PropTypes.number,
         colMinWidth: PropTypes.number,
         onModeChange: PropTypes.func
@@ -89,8 +86,9 @@ class EqualWidthRow extends React.Component {
         return (
             <div
                 ref={this.setRootNode}
-                className={classes.root}
+                className={classnames(this.props.className, classes.root)}
                 style={{
+                    ...this.props.style,
                     opacity: (this.state.mode === 'none') ? 0 : 1
                 }}
             >

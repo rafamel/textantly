@@ -2,23 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import SwipeableViews from 'react-swipeable-views';
-import Transition from 'react-transition-group/Transition';
 import ResizeObserver from 'resize-observer-polyfill';
-
-const duration = 300;
 
 const styles = {
     root: {
-        overflow: 'hidden',
-        transition: `max-height linear ${duration}ms`
+        overflow: 'hidden'
     }
-};
-
-const getTransitionStyle = (previous = 'none', updated = 'none') => {
-    return {
-        entering: { maxHeight: previous },
-        entered: { maxHeight: updated }
-    };
 };
 
 class ResponsiveSwipeable extends React.Component {
@@ -35,10 +24,7 @@ class ResponsiveSwipeable extends React.Component {
     state = {
         activeIndex: this.props.index || 0,
         observer: null,
-        maxHeight: {
-            previous: 'none',
-            updated: 'none'
-        }
+        maxHeight: 'none'
     };
     setNode = (key) => (ref) => { this.nodes[key] = ref; };
     observer = new ResizeObserver((entries) => {
@@ -47,13 +33,12 @@ class ResponsiveSwipeable extends React.Component {
         } catch (e) { this.measureActive(); }
     });
     measureActive = (height) => {
-        const updated = height
+        const maxHeight = height
             || this.nodes[this.state.activeIndex].clientHeight
             || 'none';
-        const previous = this.state.maxHeight.updated || 'none';
 
-        if (updated === previous) return;
-        this.setState({ maxHeight: { previous, updated } });
+        if (maxHeight === this.state.maxHeight) return;
+        this.setState({ maxHeight });
     };
     handleChange = (index) => {
         const previousIndex = this.state.activeIndex;
@@ -79,35 +64,29 @@ class ResponsiveSwipeable extends React.Component {
     }
     render() {
         const { theme, classes, children } = this.props;
-        const { previous, updated } = this.state.maxHeight;
-        const transitionStyle = getTransitionStyle(previous, updated);
         return (
-            <Transition in={true} timeout={duration}>
-                {(state) => (
-                    <div
-                        className={classes.root}
-                        style={transitionStyle[state]}
-                    >
-                        <SwipeableViews
-                            axis={
-                                (theme.direction === 'rtl') ? 'x-reverse' : 'x'
-                            }
-                            index={this.state.activeIndex}
-                            animateHeight={false}
-                            onChangeIndex={this.swipeableChange}
+            <div
+                className={classes.root}
+                style={{ maxHeight: this.state.maxHeight }}
+            >
+                <SwipeableViews
+                    axis={
+                        (theme.direction === 'rtl') ? 'x-reverse' : 'x'
+                    }
+                    index={this.state.activeIndex}
+                    animateHeight={false}
+                    onChangeIndex={this.swipeableChange}
+                >
+                    {children.map((child, i) => (
+                        <div
+                            ref={this.setNode(i)}
+                            key={`${classes.root}_${i}`}
                         >
-                            {children.map((child, i) => (
-                                <div
-                                    ref={this.setNode(i)}
-                                    key={`${classes.root}_${i}`}
-                                >
-                                    {child}
-                                </div>
-                            ))}
-                        </SwipeableViews>
-                    </div>
-                )}
-            </Transition>
+                            {child}
+                        </div>
+                    ))}
+                </SwipeableViews>
+            </div>
         );
     }
 }

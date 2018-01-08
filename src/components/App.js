@@ -59,8 +59,7 @@ class App extends React.Component {
     }
     render() {
         const hideUntilLoaded = (!this.state.hasLoaded)
-            ? { display: 'none' }
-            : {};
+            ? { opacity: 0 } : {};
         return (
             <div className="App">
                 <LoadingBar />

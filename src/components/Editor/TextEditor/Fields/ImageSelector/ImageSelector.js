@@ -6,7 +6,7 @@ import Tabs, { Tab } from 'material-ui/Tabs';
 import FolderOpen from 'material-ui-icons/FolderOpen';
 import Public from 'material-ui-icons/Public';
 import UrlDialog from './UrlDialog';
-import FreeLabel from '../../FreeLabel';
+import FreeLabel from 'components/Elements/Fields/FreeLabel';
 
 const styles = (theme) => ({
     root: {

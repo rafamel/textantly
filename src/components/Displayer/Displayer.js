@@ -3,10 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { actions } from 'store';
 import config from 'config';
+import TextDisplayer from './TextDisplayer';
+import ImageDisplayer from './ImageDisplayer/ImageDisplayer';
 
 const connector = connect(
     (state) => ({
         src: state.edits.src,
+        mainView: state._activeViews.main,
         textString: state.edits.text.textString
             || config.defaults.text.textString
     }), {
@@ -20,6 +23,7 @@ class Displayer extends React.Component {
     static propTypes = {
         // State
         src: PropTypes.object.isRequired,
+        mainView: PropTypes.string,
         textString: PropTypes.string.isRequired,
         // Actions
         changeSrc: PropTypes.func.isRequired,
@@ -52,35 +56,20 @@ class Displayer extends React.Component {
         };
     };
     render() {
-        const image = (!this.state.src)
-            ? null
-            : (
-                <img
+        if (!this.state.src) return null;
+        const mainView = this.props.mainView;
+        return (!mainView || mainView === 'text')
+            ? (
+                <TextDisplayer
                     src={this.state.src}
-                    id="main-canvas"
-                    alt="Main"
+                    textString={this.props.textString}
+                />
+            ) : (
+                <ImageDisplayer
+                    src={this.state.src}
+                    mainView={this.props.mainView}
                 />
             );
-        return (
-            <div id="displayer">
-                <div className="container">
-                    <div id="img-container"
-                        style={
-                            (!this.state.src) ? { opacity: 0 } : {}
-                        }
-                    >
-                        { image }
-                        <div id="text-container" className="left horizontal-bars">
-                            <div>
-                                <div>
-                                    <p>{this.props.textString}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
     }
 };
 

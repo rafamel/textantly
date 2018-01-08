@@ -9,10 +9,12 @@ const { types: t, actions } = typesActions({
         'BACKWARDS',
         'FORWARDS',
         'TEMP_FORGET',
+        'CHANGE_SRC',
+        'CHANGE_SRC_TEMP',
         'CHANGE_TEXT',
         'CHANGE_TEXT_TEMP',
-        'CHANGE_SRC',
-        'CHANGE_SRC_TEMP'
+        'CHANGE_IMAGE',
+        'CHANGE_IMAGE_TEMP'
     ]
 });
 
@@ -33,10 +35,21 @@ const initialState = {
         colorScheme: config.defaults.text.colorScheme
     },
     image: {
-        some: 'nice'
+        rotate: 0
     },
     _history: defaultHistoryValues
 };
+
+function changeSrc(state, payload) {
+    return {
+        ...state,
+        image: initialState.image,
+        src: {
+            ...state.src,
+            ...payload
+        }
+    };
+}
 
 function changeText(state, payload) {
     return {
@@ -48,11 +61,11 @@ function changeText(state, payload) {
     };
 }
 
-function changeSrc(state, payload) {
+function changeImage(state, payload) {
     return {
         ...state,
-        src: {
-            ...state.src,
+        image: {
+            ...state.image,
             ...payload
         }
     };
@@ -70,26 +83,18 @@ function reducer(state = initialState, { type, payload }) {
         return history.forwards(state);
     case t.TEMP_FORGET:
         return history.tempForget(state);
-    case t.CHANGE_TEXT:
-        return history.insert(
-            state,
-            changeText(state, payload)
-        );
-    case t.CHANGE_TEXT_TEMP:
-        return history.tempInsert(
-            state,
-            changeText(state, payload)
-        );
     case t.CHANGE_SRC:
-        return history.insert(
-            state,
-            changeSrc(state, payload)
-        );
+        return history.insert(state, changeSrc(state, payload));
     case t.CHANGE_SRC_TEMP:
-        return history.tempInsert(
-            state,
-            changeSrc(state, payload)
-        );
+        return history.tempInsert(state, changeSrc(state, payload));
+    case t.CHANGE_TEXT:
+        return history.insert(state, changeText(state, payload));
+    case t.CHANGE_TEXT_TEMP:
+        return history.tempInsert(state, changeText(state, payload));
+    case t.CHANGE_IMAGE:
+        return history.insert(state, changeImage(state, payload));
+    case t.CHANGE_IMAGE_TEMP:
+        return history.tempInsert(state, changeImage(state, payload));
     default:
         return state;
     }

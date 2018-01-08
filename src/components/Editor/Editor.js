@@ -5,54 +5,35 @@ import { connect } from 'react-redux';
 import { actions } from 'store';
 import { withStyles } from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
-import AppBar from 'material-ui/AppBar';
-import Tabs, { Tab } from 'material-ui/Tabs';
-import ResponsiveSwipeable from './ResponsiveSwipeable';
-import EditText from 'material-ui-icons/TextFormat';
-import EditImage from 'material-ui-icons/Image';
+import ResponsiveSwipeable from 'components/Elements/ResponsiveSwipeable';
 import TextEditor from './TextEditor/TextEditor';
+import ImageEditor from './ImageEditor/ImageEditor';
+import Navigation from '../Navigation/Navigation';
 
-const styles = (theme) => ({
+const styles = {
     root: {
         maxWidth: '1100px',
         margin: '0 auto 32px'
     },
-    appBar: {
-        marginBottom: 25
-    },
-    nomax: {
-        maxWidth: 'none'
-    },
     editor: {
         padding: '14px 22px 18px'
     }
-});
+};
 
 const connector = connect(
     (state) => ({
-        activeEditor: state._activeEditor,
-        historyCan: {
-            backwards: state.edits._history.can.backwards,
-            forwards: state.edits._history.can.forwards
-        }
+        mainView: state._activeViews.main
     }), {
-        changeEditor: actions._activeEditor.change,
-        reset: actions.edits.reset,
-        backwards: actions.edits.backwards,
-        forwards: actions.edits.forwards
+        changeMainView: actions._activeViews.changeMain
     }
 );
 
 class Editor extends React.Component {
     static propTypes = {
         // State
-        activeEditor: PropTypes.string.isRequired,
-        historyCan: PropTypes.object.isRequired,
+        mainView: PropTypes.string,
         // Actions
-        changeEditor: PropTypes.func.isRequired,
-        reset: PropTypes.func.isRequired,
-        backwards: PropTypes.func.isRequired,
-        forwards: PropTypes.func.isRequired,
+        changeMainView: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };
@@ -60,64 +41,23 @@ class Editor extends React.Component {
         toIndex: { text: 0, image: 1 },
         toString: { 0: 'text', 1: 'image' }
     };
-    handleChange = (index) => {
-        const editor = this.tabDict.toString[index];
-        this.props.changeEditor(editor);
-    };
-    handleChangeEvent = (event, value) => {
-        this.handleChange(value);
-    };
+    handleChange(index) {
+        const view = this.tabDict.toString[index];
+        this.props.changeMainView(view);
+    }
     render() {
-        const { classes, activeEditor } = this.props;
-        const activeIndex = this.tabDict.toIndex[activeEditor];
+        const { classes, mainView } = this.props;
+        const viewIndex = this.tabDict.toIndex[mainView] || 0;
         return (
             <div className={classes.root}>
-                <button
-                    onClick={this.props.backwards}
-                    disabled={!this.props.historyCan.backwards}
-                >
-                    BACKWARDS
-                </button>
-                <button onClick={this.props.reset}>
-                    RESET
-                </button>
-                <button
-                    onClick={this.props.forwards}
-                    disabled={!this.props.historyCan.forwards}
-                >
-                    FORWARDS
-                </button>
-                <AppBar
-                    className={classes.appBar}
-                    position="static"
-                    color="inherit"
-                >
-                    <Tabs
-                        value={activeIndex}
-                        onChange={this.handleChangeEvent}
-                        indicatorColor="primary"
-                        textColor="primary"
-                        fullWidth
-                    >
-                        <Tab
-                            className={classes.nomax}
-                            label="Text"
-                            icon={<EditText />}
-                        />
-                        <Tab
-                            className={classes.nomax}
-                            label="Edit Image"
-                            icon={<EditImage />}
-                        />
-                    </Tabs>
-                </AppBar>
+                <Navigation />
                 <Paper>
                     <ResponsiveSwipeable
-                        index={activeIndex}
+                        index={viewIndex}
                         onChangeIndex={this.handleChange}
                     >
                         <TextEditor className={classes.editor} />
-                        <TextEditor className={classes.editor} />
+                        <ImageEditor />
                     </ResponsiveSwipeable>
                 </Paper>
             </div>

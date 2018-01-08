@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import classnames from 'classnames';
-import FreeLabel from '../FreeLabel';
+import FreeLabel from './FreeLabel';
 import RCSlider, { createSliderWithTooltip } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
@@ -61,7 +61,6 @@ class Slider extends React.Component {
         min: PropTypes.number,
         max: PropTypes.number,
         step: PropTypes.number,
-        height: PropTypes.number,
         onChange: PropTypes.func,
         onAfterChange: PropTypes.func,
         className: PropTypes.string,
@@ -82,21 +81,33 @@ class Slider extends React.Component {
         );
     };
     render() {
-        const { classes, className, style, label } = this.props;
+        const {
+            id,
+            label,
+            value,
+            min,
+            max,
+            className,
+            style,
+            classes
+        } = this.props;
+        const freeLabel = (!label) ? null : (
+            <FreeLabel
+                label={label}
+                style={{ marginBottom: 6 }}
+            />
+        );
         return (
             <div
                 className={ classnames(classes.root, className) }
                 style={style}
             >
-                <FreeLabel
-                    label={label}
-                    style={{ marginBottom: 6 }}
-                />
+                { freeLabel }
                 <SliderWithTooltip
-                    id={this.props.id}
-                    value={this.props.value}
-                    min={0}
-                    max={100}
+                    id={id}
+                    value={value || 0}
+                    min={min || 0}
+                    max={max || 100}
                     step={2}
                     onChange={this.onChange}
                     onAfterChange={this.onAfterChange}

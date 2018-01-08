@@ -6,10 +6,12 @@ import { actions } from 'store';
 import { withStyles } from 'material-ui/styles';
 import config from 'config';
 import fontData from 'services/font-data';
-import EqualWidthRow from './EqualWidthRow';
-import Selector, { WeightSelector, ImageSelector } from './Fields/Selector';
-import TextInput from './Fields/TextInput';
-import { OverlayLengthSlider } from './Fields/Slider';
+import EqualWidthRow from 'components/Elements/EqualWidthRow';
+import Selector from 'components/Elements/Fields/Selector';
+import TextInput from 'components/Elements/Fields/TextInput';
+import WeightSelector from './Fields/WeightSelector';
+import ImageSelector from './Fields/ImageSelector/ImageSelector';
+import OverlayLengthSlider from './Fields/OverlayLengthSlider';
 
 const fontFamilies = Object.keys(fontData);
 

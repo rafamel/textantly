@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Selector from './Selector';
+import Selector from 'components/Elements/Fields/Selector';
 
 const weightsDict = {
     100: 'Thin',
