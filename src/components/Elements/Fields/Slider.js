@@ -87,6 +87,7 @@ class Slider extends React.Component {
             value,
             min,
             max,
+            step,
             className,
             style,
             classes
@@ -108,7 +109,7 @@ class Slider extends React.Component {
                     value={value || 0}
                     min={min || 0}
                     max={max || 100}
-                    step={2}
+                    step={step || 1}
                     onChange={this.onChange}
                     onAfterChange={this.onAfterChange}
                     tipFormatter={value => (

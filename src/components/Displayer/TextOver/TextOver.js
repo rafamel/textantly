@@ -11,8 +11,12 @@ class TextOver extends React.Component {
     static propTypes = {
         // Props
         children: PropTypes.element.isRequired,
+        isActive: PropTypes.bool,
         // State (Props)
-        text: PropTypes.object.isRequired
+        textEdits: PropTypes.object.isRequired
+    };
+    static defaultProps = {
+        isActive: true
     };
     state = {
         fontSize: 100
@@ -23,45 +27,64 @@ class TextOver extends React.Component {
     // JSS
     styleSheet = jss.createStyleSheet(styles, { link: true });
     classes = this.styleSheet.classes;
-    stylesUpdate = (updateObj = this.props.text) => {
+    stylesUpdate = (updateObj = this.props.textEdits) => {
         this.styleSheet.update(updateObj).attach();
     };
-    // Font Size
-    fontResize = fontResize.bind(this);
+    // Font Reize
+    observer = {
+        active: false,
+        obj: new ResizeObserver(() => { this.fontResize(); })
+    };
+    setObserver = (props = this.props) => {
+        if (props.isActive) {
+            if (this.observer.active) return;
+            this.observer.active = true
+            this.observer.obj.observe(this.nodes.child);
+            this.observer.obj.observe(this.nodes.parent);
+        } else {
+            if (!this.observer.active) return;
+            this.observer.active = false;
+            this.observer.obj.unobserve(this.nodes.child);
+            this.observer.obj.unobserve(this.nodes.parent);
+        }
+    };
+    fontResize = () => {
+        if (this.props.isActive) fontResize.call(this);
+    };
     // Lifecycle
     componentWillReceiveProps(nextProps) {
-        if (nextProps.text) this.stylesUpdate(nextProps.text);
+        if (nextProps.textEdits) {
+            this.stylesUpdate(nextProps.textEdits);
+        }
+        this.setObserver(nextProps);
     }
     componentDidUpdate() {
         this.fontResize();
     }
     componentWillMount() {
-        this.stylesUpdate();
+        if (this.props.isActive) this.stylesUpdate();
     }
     componentDidMount() {
-        const observer = new ResizeObserver(() => { this.fontResize(); });
-        observer.observe(this.nodes.child);
-        observer.observe(this.nodes.parent);
+        this.setObserver();
         this.fontResize();
     }
     render() {
         const classes = this.classes;
-        const { text, children } = this.props;
-        const textString = text.textString
+        const { textEdits, children } = this.props;
+        const textString = textEdits.textString
             || config.defaults.text.textString;
 
-        const position = text.overlayPosition;
-        const length = (position === 'top' || position === 'bottom')
-            ? { height: `${text.overlayHeight}%` }
-            : { width: `${text.overlayWidth}%` };
-
+        const position = textEdits.overlayPosition;
+        const overlayStyle = (position === 'top' || position === 'bottom')
+            ? { height: `${textEdits.overlayHeight}%` }
+            : { width: `${textEdits.overlayWidth}%` };
         return (
             <div className={classes.root}>
                 <div
                     className={
                         classnames(classes.overlay, classes.overlayPosition)
                     }
-                    style={length}
+                    style={overlayStyle}
                 >
                     <div
                         ref={this.setNode('parent')}

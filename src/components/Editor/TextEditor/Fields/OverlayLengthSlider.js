@@ -16,7 +16,7 @@ class OverlayLengthSlider extends React.Component {
         const commonProps = {
             min: 0,
             max: 100,
-            step: 2,
+            step: 1,
             className: this.props.className,
             onChange: this.props.onChange,
             onAfterChange: this.props.onAfterChange,

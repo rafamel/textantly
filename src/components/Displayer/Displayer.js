@@ -3,13 +3,14 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { actions } from 'store';
 import TextOver from './TextOver/TextOver';
-import ShowImage from './ShowImage';
+import ImageDisplayer from './ImageDisplayer/ImageDisplayer';
 
 const connector = connect(
     (state) => ({
         src: state.edits.src,
         mainView: state._activeViews.main,
-        text: state.edits.text
+        textEdits: state.edits.text,
+        imageEdits: state.edits.image
     }), {
         tempForget: actions.edits.tempForget,
         changeSrc: actions.edits.changeSrc,
@@ -22,33 +23,36 @@ class Displayer extends React.Component {
         // State
         src: PropTypes.object.isRequired,
         mainView: PropTypes.string,
-        text: PropTypes.object.isRequired,
+        textEdits: PropTypes.object.isRequired,
+        imageEdits: PropTypes.object.isRequired,
         // Actions
         changeSrc: PropTypes.func.isRequired,
         tempForget: PropTypes.func.isRequired,
         addAlert: PropTypes.func.isRequired
     };
     render() {
+        const mainView = this.props.mainView;
         const image = (
-            <ShowImage
+            <ImageDisplayer
                 src={this.props.src}
+                imageEdits={this.props.imageEdits}
                 changeSrc={this.props.changeSrc}
                 tempForget={this.props.tempForget}
                 addAlert={this.props.addAlert}
             />
         );
-
-        const mainView = this.props.mainView;
-        const display = (mainView && mainView === 'image')
-            ? image
-            : (
-                <TextOver text={this.props.text}>
-                    { image }
-                </TextOver>
-            );
         return (
             <div style={{ textAlign: 'center' }}>
-                { display }
+                {
+                    (!mainView || mainView !== 'image')
+                        ? (
+                            <TextOver
+                                textEdits={this.props.textEdits}
+                            >
+                                {image}
+                            </TextOver>
+                        ) : image
+                }
             </div>
         );
     }

@@ -22,6 +22,7 @@
     "caman": "^4.1.2",
     "classnames": "^2.2.5",
     "deep-diff": "^0.3.8",
+    "dom4": "^2.0.0",
     "font-awesome": "^4.7.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.isequal": "^4.5.0",

@@ -5,6 +5,7 @@ import registerServiceWorker from './registerServiceWorker';
 
 // Polyfills
 import 'babel-polyfill';
+import 'dom4';
 
 import 'typeface-playfair-display-sc';
 import 'typeface-roboto';

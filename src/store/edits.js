@@ -42,9 +42,12 @@ const initialState = {
 };
 
 function changeSrc(state, payload) {
+    const image = (payload.src && state.src.src !== payload.src)
+        ? initialState.image
+        : state.image;
     return {
         ...state,
-        image: initialState.image,
+        image,
         src: {
             ...state.src,
             ...payload
