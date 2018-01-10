@@ -13,7 +13,7 @@ function getDimensions() {
             height: nodes.child.clientHeight
         }
     };
-    const anyEmpty = !dimensions.child.width || !dimensions.child.height
+    const anyEmpty = (!dimensions.child.width && !dimensions.child.height)
         || dimensions.parent.width <= 1 || dimensions.parent.height <= 1;
     if (anyEmpty) return;
 
@@ -43,8 +43,11 @@ function setEndState(dimensions) {
 }
 
 function newFontSize(dimensions) {
+    const minSize = 1;
     const currentSize = this.state.fontSize;
-    const sizePhase2 = () => currentSize + ((state.up) ? 1 : -1);
+    const sizePhase2 = () => Math.max(
+        minSize, currentSize + ((state.up) ? 1 : -1)
+    );
     if (state.phase === 2) return sizePhase2();
     else {
         const alpha = 0.1;
@@ -57,7 +60,7 @@ function newFontSize(dimensions) {
             state.lock = false;
             return sizePhase2();
         }
-        return currentSize + ((state.up) ? diff : -diff);
+        return Math.max(minSize, currentSize + ((state.up) ? diff : -diff));
     }
 }
 
@@ -71,7 +74,10 @@ function runResize(dimensions) {
         if (state.up) {
             if (state.phase === 2) state.endOnNext = true;
             else return initPhase2();
+        } else if (child.height <= 2 || child.width <= 2) {
+            return setEndState(dimensions);
         }
+
         state.up = false;
         state.lock = false;
         this.setState({ fontSize: newFontSize.call(this, dimensions) });
