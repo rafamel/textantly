@@ -2,16 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { actions } from 'store';
-import config from 'config';
-import TextDisplayer from './TextDisplayer/TextDisplayer';
-import ImageDisplayer from './ImageDisplayer/ImageDisplayer';
+import TextOver from './TextOver/TextOver';
+import ShowImage from './ShowImage';
 
 const connector = connect(
     (state) => ({
         src: state.edits.src,
         mainView: state._activeViews.main,
-        textString: state.edits.text.textString
-            || config.defaults.text.textString
+        text: state.edits.text
     }), {
         tempForget: actions.edits.tempForget,
         changeSrc: actions.edits.changeSrc,
@@ -24,55 +22,33 @@ class Displayer extends React.Component {
         // State
         src: PropTypes.object.isRequired,
         mainView: PropTypes.string,
-        textString: PropTypes.string.isRequired,
+        text: PropTypes.object.isRequired,
         // Actions
         changeSrc: PropTypes.func.isRequired,
         tempForget: PropTypes.func.isRequired,
         addAlert: PropTypes.func.isRequired
     };
-    state = {
-        src: null
-    };
-    componentDidMount() {
-        this.loadImage(this.props.src);
-    }
-    componentWillReceiveProps(nextProps) {
-        this.loadImage(nextProps.src);
-    }
-    loadImage = (src) => {
-        if (src.src === this.state.src) return;
-
-        const img = new Image();
-        img.src = src.src;
-        img.onload = () => {
-            // Load success
-            this.setState({ src: src.src });
-            this.props.changeSrc(src);
-        };
-        img.onerror = () => {
-            // Load fail
-            this.props.addAlert('Image could not be loaded');
-            this.props.tempForget();
-        };
-    };
     render() {
-        if (!this.state.src) return null;
+        const image = (
+            <ShowImage
+                src={this.props.src}
+                changeSrc={this.props.changeSrc}
+                tempForget={this.props.tempForget}
+                addAlert={this.props.addAlert}
+            />
+        );
+
         const mainView = this.props.mainView;
-        const displayer = (!mainView || mainView === 'text')
-            ? (
-                <TextDisplayer
-                    src={this.state.src}
-                    textString={this.props.textString}
-                />
-            ) : (
-                <ImageDisplayer
-                    src={this.state.src}
-                    mainView={this.props.mainView}
-                />
+        const display = (mainView && mainView === 'image')
+            ? image
+            : (
+                <TextOver text={this.props.text}>
+                    { image }
+                </TextOver>
             );
         return (
             <div style={{ textAlign: 'center' }}>
-                { displayer }
+                { display }
             </div>
         );
     }

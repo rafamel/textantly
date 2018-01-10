@@ -3,9 +3,9 @@ import theme from './theme';
 
 const styles = {
     container: {
-        margin: '30px auto 50px',
+        margin: '0 auto',
         maxWidth: 1200,
-        padding: '0 15px'
+        padding: '30px 15px 50px'
     },
     h1: {
         ...theme.typography.body2,
