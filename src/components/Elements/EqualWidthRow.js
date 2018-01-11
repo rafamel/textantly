@@ -55,9 +55,12 @@ class EqualWidthRow extends React.Component {
     state = {
         mode: 'none'
     };
-    setRootNode = (ref) => {
-        this.rootNode = ref;
-    };
+    rootNode = null;
+    observer = new ResizeObserver((entries) => {
+        try {
+            this.measure(entries[0].contentRect.width);
+        } catch (e) { this.measure(); }
+    });
     measure = (width) => {
         const clientWidth = width || this.rootNode.clientWidth;
         if (clientWidth === 0) return;
@@ -71,13 +74,11 @@ class EqualWidthRow extends React.Component {
         if (this.props.onModeChange) this.props.onModeChange(mode);
     };
     componentDidMount() {
+        this.observer.observe(this.rootNode);
         this.measure();
-        const ro = new ResizeObserver((entries) => {
-            try {
-                this.measure(entries[0].contentRect.width);
-            } catch (e) { this.measure(); }
-        });
-        ro.observe(this.rootNode);
+    }
+    componentWillUnmount() {
+        this.observer.unobserve(this.rootNode);
     }
     render() {
         const classes = (this.state.mode === 'fullWidth')
@@ -85,7 +86,7 @@ class EqualWidthRow extends React.Component {
             : this.classes.columns;
         return (
             <div
-                ref={this.setRootNode}
+                ref={(ref) => { this.rootNode = ref; }}
                 className={classnames(this.props.className, classes.root)}
                 style={{
                     ...this.props.style,

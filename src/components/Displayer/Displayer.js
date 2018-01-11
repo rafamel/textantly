@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import TextLayer from './TextLayer/TextLayer';
-import ImageRender from './ImageRender/ImageRender';
-import RotateDisplay from './RotateDisplay';
+import TextView from './TextView/TextView';
+import ImageView from './ImageView/ImageView';
 
 const connector = connect(
     (state) => ({
@@ -22,22 +21,19 @@ class Displayer extends React.Component {
     };
     render() {
         const { activeViews, textEdits, imageEdits } = this.props;
-        const display = (() => {
-            if (!activeViews.main || activeViews.main !== 'image') {
-                return (
-                    <TextLayer textEdits={textEdits} />
-                );
-            }
-            switch (activeViews.image) {
-            case 'rotate':
-                return (<RotateDisplay rotate={imageEdits.rotate}/>);
-            default:
-                return (<ImageRender />);
-            }
-        })();
+        const view = (activeViews.main && activeViews.main === 'image')
+            ? (
+                <ImageView
+                    activeViews={activeViews}
+                    imageEdits={imageEdits}
+                />
+            ) : (
+                <TextView textEdits={textEdits} />
+            );
+
         return (
             <div style={{ textAlign: 'center' }}>
-                { display }
+                { view }
             </div>
         );
     }

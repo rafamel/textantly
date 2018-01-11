@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import ImageRender from './ImageRender/ImageRender';
 import ResizeObserver from 'resize-observer-polyfill';
-import { rotateDimensions } from './ImageRender/engine/rotate';
+import ImageRender from '../ImageRender';
+import { rotateDimensions } from 'engine/rotate';
 
 const styles = {
     root: {
@@ -28,10 +28,11 @@ const styles = {
     }
 };
 
-class RotateDisplay extends React.Component {
+class RotateView extends React.Component {
     static propTypes = {
         // State (Props)
         rotate: PropTypes.number,
+        dimensions: PropTypes.object.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };
@@ -104,6 +105,7 @@ class RotateDisplay extends React.Component {
     };
     componentWillReceiveProps(nextProps) {
         this.setComputed(nextProps.rotate);
+        this.setImage(nextProps.dimensions);
     }
     componentDidMount() {
         this.observer.observe(this.node);
@@ -111,6 +113,9 @@ class RotateDisplay extends React.Component {
             width: this.node.clientWidth,
             height: this.node.clientHeight
         });
+    }
+    componentWillUnmount() {
+        this.observer.unobserve(this.node);
     }
     render() {
         const { classes, rotate } = this.props;
@@ -131,9 +136,7 @@ class RotateDisplay extends React.Component {
                                 ? `rotate(${rotate}deg)` : 'none'
                         }}
                     >
-                        <ImageRender
-                            getDimensions={this.setImage}
-                        />
+                        <ImageRender />
                     </div>
                 </div>
             </div>
@@ -141,4 +144,4 @@ class RotateDisplay extends React.Component {
     }
 };
 
-export default withStyles(styles)(RotateDisplay);
+export default withStyles(styles)(RotateView);

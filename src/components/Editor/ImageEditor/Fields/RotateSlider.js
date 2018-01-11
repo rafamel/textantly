@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Slider from 'components/Elements/Fields/Slider';
 
-class RotateEditor extends React.Component {
+class RotateSlider extends React.Component {
     static propTypes = {
         // State (Props)
         value: PropTypes.number.isRequired,
@@ -28,7 +28,7 @@ class RotateEditor extends React.Component {
                 value={this.props.value}
                 min={-180}
                 max={180}
-                step={2}
+                step={1}
                 onChange={this.handleTempChange}
                 onAfterChange={this.handleChange}
             />
@@ -36,4 +36,4 @@ class RotateEditor extends React.Component {
     }
 }
 
-export default RotateEditor;
+export default RotateSlider;

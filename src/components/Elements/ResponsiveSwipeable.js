@@ -59,8 +59,11 @@ class ResponsiveSwipeable extends React.Component {
     };
     componentWillReceiveProps(nextProps) { this.handleChange(nextProps.index); }
     componentDidMount() {
-        this.measureActive();
         this.observer.observe(this.nodes[this.state.activeIndex]);
+        this.measureActive();
+    }
+    componentWillUnmount() {
+        this.observer.unobserve(this.nodes[this.state.activeIndex]);
     }
     render() {
         const { theme, classes, children } = this.props;

@@ -4,19 +4,14 @@ import { jss } from 'react-jss';
 import classnames from 'classnames';
 import ResizeObserver from 'resize-observer-polyfill';
 import config from 'config';
-import ImageRender from '../ImageRender/ImageRender';
-import styles from './TextLayer.styles';
+import ImageRender from '../ImageRender';
+import styles from './TextView.styles';
 import fontResize from './font-resize';
 
-class TextOver extends React.Component {
+class TextView extends React.Component {
     static propTypes = {
-        // Props
-        isActive: PropTypes.bool,
         // State (Props)
         textEdits: PropTypes.object.isRequired
-    };
-    static defaultProps = {
-        isActive: true
     };
     state = {
         fontSize: 100
@@ -35,38 +30,40 @@ class TextOver extends React.Component {
         active: false,
         obj: new ResizeObserver(() => { this.fontResize(); })
     };
-    setObserver = (props = this.props) => {
-        if (props.isActive) {
-            if (this.observer.active) return;
-            this.observer.active = true;
-            this.observer.obj.observe(this.nodes.child);
-            this.observer.obj.observe(this.nodes.parent);
-        } else {
+    setObserver = ({ unobserve } = {}) => {
+        if (unobserve) {
             if (!this.observer.active) return;
             this.observer.active = false;
             this.observer.obj.unobserve(this.nodes.child);
             this.observer.obj.unobserve(this.nodes.parent);
+        } else {
+            if (this.observer.active) return;
+            this.observer.active = true;
+            this.observer.obj.observe(this.nodes.child);
+            this.observer.obj.observe(this.nodes.parent);
         }
     };
     fontResize = () => {
-        if (this.props.isActive) fontResize.call(this);
+        fontResize.call(this);
     };
     // Lifecycle
     componentWillReceiveProps(nextProps) {
         if (nextProps.textEdits) {
             this.stylesUpdate(nextProps.textEdits);
         }
-        this.setObserver(nextProps);
     }
     componentDidUpdate() {
         this.fontResize();
     }
     componentWillMount() {
-        if (this.props.isActive) this.stylesUpdate();
+        this.stylesUpdate();
     }
     componentDidMount() {
         this.setObserver();
         this.fontResize();
+    }
+    componentWillUnmount() {
+        this.setObserver({ unobserve: true });
     }
     render() {
         const classes = this.classes;
@@ -111,4 +108,4 @@ class TextOver extends React.Component {
     }
 };
 
-export default TextOver;
+export default TextView;

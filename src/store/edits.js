@@ -9,8 +9,8 @@ const { types: t, actions } = typesActions({
         'BACKWARDS',
         'FORWARDS',
         'TEMP_FORGET',
-        'CHANGE_SRC',
-        'CHANGE_SRC_TEMP',
+        'CHANGE_SOURCE',
+        'CHANGE_SOURCE_TEMP',
         'CHANGE_TEXT',
         'CHANGE_TEXT_TEMP',
         'CHANGE_IMAGE',
@@ -19,9 +19,10 @@ const { types: t, actions } = typesActions({
 });
 
 const initialState = {
-    src: {
+    source: {
         name: config.defaults.src.name,
         src: config.defaults.src.src,
+        image: null,
         from: false
     },
     text: {
@@ -36,20 +37,21 @@ const initialState = {
     },
     image: {
         rotate: 0,
+        resize: { width: null, height: null },
         flip: false
     },
     _history: defaultHistoryValues
 };
 
-function changeSrc(state, payload) {
-    const image = (payload.src && state.src.src !== payload.src)
+function changeSource(state, payload) {
+    const image = (payload.src && state.source.src !== payload.src)
         ? initialState.image
         : state.image;
     return {
         ...state,
         image,
-        src: {
-            ...state.src,
+        source: {
+            ...state.source,
             ...payload
         }
     };
@@ -87,10 +89,10 @@ function reducer(state = initialState, { type, payload }) {
         return history.forwards(state);
     case t.TEMP_FORGET:
         return history.tempForget(state);
-    case t.CHANGE_SRC:
-        return history.insert(state, changeSrc(state, payload));
-    case t.CHANGE_SRC_TEMP:
-        return history.tempInsert(state, changeSrc(state, payload));
+    case t.CHANGE_SOURCE:
+        return history.insert(state, changeSource(state, payload));
+    case t.CHANGE_SOURCE_TEMP:
+        return history.tempInsert(state, changeSource(state, payload));
     case t.CHANGE_TEXT:
         return history.insert(state, changeText(state, payload));
     case t.CHANGE_TEXT_TEMP:

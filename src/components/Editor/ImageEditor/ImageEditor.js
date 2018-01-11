@@ -8,17 +8,16 @@ import Crop from 'material-ui-icons/Crop';
 import Flip from 'material-ui-icons/Flip';
 import Rotate90DegreesCcw from 'material-ui-icons/Rotate90DegreesCcw';
 import PhotoSizeSelectLarge from 'material-ui-icons/PhotoSizeSelectLarge';
-import CropEditor from './CropEditor';
-import RotateEditor from './RotateEditor';
+import CropSelector from './Fields/CropSelector';
+import RotateSlider from './Fields/RotateSlider';
 
 const connector = connect(
     (state) => ({
-        imageView: state._activeViews.image,
-        cropView: state._activeViews.crop,
-        image: state.edits.image
+        image: state.edits.image,
+        imageViews: state._activeViews.image,
+        canvasDimensions: state._activeViews.dimensions.canvas
     }), {
-        changeImageView: actions._activeViews.changeImage,
-        changeCropView: actions._activeViews.changeCrop,
+        changeImageViews: actions._activeViews.changeImage,
         changeImage: actions.edits.changeImage,
         changeImageTemp: actions.edits.changeImageTemp
     }
@@ -27,39 +26,44 @@ const connector = connect(
 class ImageEditor extends React.Component {
     static propTypes = {
         // State
-        imageView: PropTypes.string,
-        cropView: PropTypes.string,
         image: PropTypes.object,
+        imageViews: PropTypes.object.isRequired,
         // Actions
-        changeImageView: PropTypes.func.isRequired,
-        changeCropView: PropTypes.func.isRequired,
+        changeImageViews: PropTypes.func.isRequired,
         changeImage: PropTypes.func.isRequired,
         changeImageTemp: PropTypes.func.isRequired
     };
     state = {
         activeIndex: 0
     };
+    lockIndex = false;
     tabDict = {
         toIndex: { crop: 0, rotate: 1, resize: 2, flip: 3, null: false },
         toString: { 0: 'crop', 1: 'rotate', 2: 'resize', 3: 'flip', false: null }
     };
     setActiveIndex = (props = this.props) => {
-        const imageIndex = this.tabDict.toIndex[props.imageView];
+        if (this.lockIndex) return;
+        const imageIndex = this.tabDict.toIndex[props.imageViews.main];
         if (imageIndex === this.state.activeIndex) return;
         this.setState({ activeIndex: imageIndex });
     };
     doFlip = () => {
+        this.lockIndex = true;
         this.setState({ activeIndex: this.tabDict.toIndex.flip });
-        setTimeout(this.setActiveIndex, 400);
 
         this.props.changeImage({
             flip: !this.props.image.flip
         });
+
+        setTimeout(() => {
+            this.lockIndex = false;
+            this.setActiveIndex();
+        }, 400);
     };
     handleChange = (e, index) => {
         const view = this.tabDict.toString[index];
         if (view === 'flip') return this.doFlip();
-        this.props.changeImageView(view);
+        this.props.changeImageViews({ main: view });
     };
     componentWillReceiveProps(nextProps) {
         this.setActiveIndex(nextProps);
@@ -68,7 +72,7 @@ class ImageEditor extends React.Component {
         this.setActiveIndex();
     }
     render() {
-        const activeView = this.props.imageView;
+        const activeView = this.props.imageViews.main;
         const isOpen = (name) => activeView === name;
         return (
             <VerticalTabs
@@ -80,9 +84,9 @@ class ImageEditor extends React.Component {
                     icon={<Crop />}
                 />
                 <Collapse isOpened={isOpen('crop')}>
-                    <CropEditor
-                        cropView={this.props.cropView}
-                        changeCropView={this.props.changeCropView}
+                    <CropSelector
+                        cropView={this.props.imageViews.crop}
+                        changeImageViews={this.props.changeImageViews}
                     />
                 </Collapse>
                 <VerticalTab
@@ -90,7 +94,7 @@ class ImageEditor extends React.Component {
                     icon={<Rotate90DegreesCcw />}
                 />
                 <Collapse isOpened={isOpen('rotate')}>
-                    <RotateEditor
+                    <RotateSlider
                         value={this.props.image.rotate}
                         changeImage={this.props.changeImage}
                         changeImageTemp={this.props.changeImageTemp}

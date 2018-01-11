@@ -20,17 +20,17 @@ const styles = {
     }
 };
 
-class CropEditor extends React.Component {
+class CropSelector extends React.Component {
     static propTypes = {
         // State (Props)
         cropView: PropTypes.string,
         // Actions (Props)
-        changeCropView: PropTypes.func.isRequired,
+        changeImageViews: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };
     handleChange = (event, value) => {
-        this.props.changeCropView(value);
+        this.props.changeImageViews({ crop: value });
     };
     render() {
         const { classes, cropView } = this.props;
@@ -80,4 +80,4 @@ class CropEditor extends React.Component {
     }
 }
 
-export default withStyles(styles)(CropEditor);
+export default withStyles(styles)(CropSelector);

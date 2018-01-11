@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withStyles } from 'material-ui/styles';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { actions } from 'store';
-import { withStyles } from 'material-ui/styles';
-import drawCanvas from './engine';
+import isEqual from 'lodash.isequal';
+import engine from 'engine';
 
 const styles = {
     root: {
@@ -23,11 +24,12 @@ const styles = {
 
 const connector = connect(
     (state) => ({
-        src: state.edits.src,
+        source: state.edits.source,
         imageEdits: state.edits.image,
         activeViews: state._activeViews
     }), {
-        changeSrc: actions.edits.changeSrc,
+        changeSource: actions.edits.changeSource,
+        changeDimensions: actions._activeViews.changeDimensions,
         tempForget: actions.edits.tempForget,
         addAlert: actions.alerts.add
     }
@@ -35,14 +37,13 @@ const connector = connect(
 
 class ImageRender extends React.Component {
     static propTypes = {
-        // Props
-        getDimensions: PropTypes.func,
         // State
-        src: PropTypes.object.isRequired,
+        source: PropTypes.object.isRequired,
         imageEdits: PropTypes.object.isRequired,
         activeViews: PropTypes.object.isRequired,
         // Actions
-        changeSrc: PropTypes.func.isRequired,
+        changeSource: PropTypes.func.isRequired,
+        changeDimensions: PropTypes.func.isRequired,
         tempForget: PropTypes.func.isRequired,
         addAlert: PropTypes.func.isRequired,
         // JSS
@@ -53,18 +54,53 @@ class ImageRender extends React.Component {
         loading: null
     };
     rootNode = null;
-    drawCanvas = drawCanvas.bind(this);
-    loadImage = (src) => {
+    drawn = {
+        image: null,
+        for: null
+    };
+    drawCanvas = ({ image, force, props }) => {
+        if (!props) props = this.props;
+        if (!image) image = this.drawn.image;
+        else this.drawn.image = image;
+
+        const rootNode = this.rootNode;
+        if (!rootNode || !image) return;
+
+        const { main: mainView, image: imageViews } = props.activeViews;
+        const imageEdits = (mainView !== 'image' || !imageViews.main)
+            ? props.imageEdits
+            : {
+                ...props.imageEdits,
+                [imageViews.main]: undefined
+            };
+
+        if (
+            !force
+            && this.drawn.for
+            && isEqual(imageEdits, this.drawn.for)
+        ) {
+            return;
+        }
+
+        const canvas = engine(image, { imageEdits });
+        props.changeDimensions({
+            canvas: { width: canvas.width, height: canvas.height }
+        });
+        rootNode.prepend(canvas);
+        if (rootNode.children[1]) rootNode.children[1].remove();
+        this.drawn.for = imageEdits;
+    };
+    loadImage = (source) => {
         const loadFailed = () => {
             this.src.loading = null;
             this.props.addAlert('Image could not be loaded');
             this.props.tempForget();
         };
         if (!this.rootNode) return;
-        this.src.loading = src.src;
+        this.src.loading = source.src;
 
         const img = new Image();
-        img.src = src.src;
+        img.src = source.src;
         img.onerror = () => {
             // Load fail
             loadFailed();
@@ -72,35 +108,32 @@ class ImageRender extends React.Component {
         img.onload = () => {
             // Load success
             this.src.loading = null;
-            this.src.current = src.src;
-            if (this.props.getDimensions) {
-                this.props.getDimensions({
-                    width: img.naturalWidth,
-                    height: img.naturalHeight
-                });
-            }
+            this.src.current = source.src;
             this.drawCanvas({
                 image: img,
                 force: true
             });
-            this.props.changeSrc(src);
+            this.props.changeSource({
+                ...source,
+                image: img
+            });
         };
         setTimeout(() => {
-            if (this.src.loading === src.src) {
+            if (this.src.loading === source.src) {
                 loadFailed();
             }
         }, 5000);
     };
     componentWillReceiveProps(nextProps) {
-        if (nextProps.src.src !== this.src.current
-            && nextProps.src.src !== this.src.loading) {
-            this.loadImage(nextProps.src);
+        if (nextProps.source.src !== this.src.current
+            && nextProps.source.src !== this.src.loading) {
+            this.loadImage(nextProps.source);
         } else {
             this.drawCanvas({ props: nextProps });
         }
     }
     componentDidMount() {
-        this.loadImage(this.props.src);
+        this.loadImage(this.props.source);
     }
     componentDidUpdate() {
         const rootNode = this.rootNode;

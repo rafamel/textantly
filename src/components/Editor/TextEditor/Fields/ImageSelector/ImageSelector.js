@@ -47,11 +47,11 @@ class ImageSelector extends React.Component {
         className: PropTypes.string,
         style: PropTypes.object,
         // Props (Store)
-        srcFrom: PropTypes
+        sourceFrom: PropTypes
             .oneOfType([PropTypes.string, PropTypes.bool])
             .isRequired,
         // Props (Actions)
-        changeSrcTemp: PropTypes.func.isRequired,
+        changeSourceTemp: PropTypes.func.isRequired,
         tempForget: PropTypes.func.isRequired,
         loadingStart: PropTypes.func.isRequired,
         loadingStop: PropTypes.func.isRequired,
@@ -64,7 +64,7 @@ class ImageSelector extends React.Component {
     };
     handleTabChange = (event, value) => {
         const tab = this.tabDict.toString(value);
-        this.props.changeSrcTemp({ from: tab });
+        this.props.changeSourceTemp({ from: tab });
 
         if (this.openTimeout) {
             clearTimeout(this.openTimeout);
@@ -90,7 +90,7 @@ class ImageSelector extends React.Component {
         }
 
         const imageName = (str) => str.split('/').slice(-1)[0];
-        this.props.changeSrcTemp({
+        this.props.changeSourceTemp({
             name: imageName(url),
             src: url,
             from: 'url'
@@ -113,7 +113,7 @@ class ImageSelector extends React.Component {
             const fileReader = new FileReader();
             fileReader.addEventListener('load', () => {
                 this.props.loadingStop();
-                this.props.changeSrcTemp({
+                this.props.changeSourceTemp({
                     name,
                     src: fileReader.result,
                     from: 'file'
@@ -125,8 +125,8 @@ class ImageSelector extends React.Component {
         this.props.tempForget();
     };
     render() {
-        const { classes, className, style, srcFrom } = this.props;
-        const tabIndex = this.tabDict.toIndex(srcFrom);
+        const { classes, className, style, sourceFrom } = this.props;
+        const tabIndex = this.tabDict.toIndex(sourceFrom);
         return (
             <div
                 className={classnames(classes.root, className)}

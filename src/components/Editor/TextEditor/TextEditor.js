@@ -25,11 +25,11 @@ const styles = (theme) => ({
 const connector = connect(
     (state) => ({
         text: state.edits.text,
-        srcFrom: state.edits.src.from
+        sourceFrom: state.edits.source.from
     }), {
         changeText: actions.edits.changeText,
         changeTextTemp: actions.edits.changeTextTemp,
-        changeSrcTemp: actions.edits.changeSrcTemp,
+        changeSourceTemp: actions.edits.changeSourceTemp,
         tempForget: actions.edits.tempForget,
         loadingStart: actions._loading.start,
         loadingStop: actions._loading.stop,
@@ -43,13 +43,13 @@ class TextEditor extends React.Component {
         className: PropTypes.string,
         // State
         text: PropTypes.object.isRequired,
-        srcFrom: PropTypes
+        sourceFrom: PropTypes
             .oneOfType([PropTypes.string, PropTypes.bool])
             .isRequired,
         // Actions
         changeText: PropTypes.func.isRequired,
         changeTextTemp: PropTypes.func.isRequired,
-        changeSrcTemp: PropTypes.func.isRequired,
+        changeSourceTemp: PropTypes.func.isRequired,
         tempForget: PropTypes.func.isRequired,
         loadingStart: PropTypes.func.isRequired,
         loadingStop: PropTypes.func.isRequired,
@@ -87,9 +87,9 @@ class TextEditor extends React.Component {
         const { classes, text, className } = this.props;
         const imageSelector = (
             <ImageSelector
-                changeSrcTemp={this.props.changeSrcTemp}
+                changeSourceTemp={this.props.changeSourceTemp}
                 tempForget={this.props.tempForget}
-                srcFrom={this.props.srcFrom}
+                sourceFrom={this.props.sourceFrom}
                 loadingStart={this.props.loadingStart}
                 loadingStop={this.props.loadingStop}
                 addAlert={this.props.addAlert}
