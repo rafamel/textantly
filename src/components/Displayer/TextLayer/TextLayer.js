@@ -4,13 +4,13 @@ import { jss } from 'react-jss';
 import classnames from 'classnames';
 import ResizeObserver from 'resize-observer-polyfill';
 import config from 'config';
-import styles from './TextOver.styles';
+import ImageRender from '../ImageRender/ImageRender';
+import styles from './TextLayer.styles';
 import fontResize from './font-resize';
 
 class TextOver extends React.Component {
     static propTypes = {
         // Props
-        children: PropTypes.element.isRequired,
         isActive: PropTypes.bool,
         // State (Props)
         textEdits: PropTypes.object.isRequired
@@ -38,7 +38,7 @@ class TextOver extends React.Component {
     setObserver = (props = this.props) => {
         if (props.isActive) {
             if (this.observer.active) return;
-            this.observer.active = true
+            this.observer.active = true;
             this.observer.obj.observe(this.nodes.child);
             this.observer.obj.observe(this.nodes.parent);
         } else {
@@ -70,7 +70,7 @@ class TextOver extends React.Component {
     }
     render() {
         const classes = this.classes;
-        const { textEdits, children } = this.props;
+        const textEdits = this.props.textEdits;
         const textString = textEdits.textString
             || config.defaults.text.textString;
 
@@ -105,7 +105,7 @@ class TextOver extends React.Component {
                         </div>
                     </div>
                 </div>
-                { children }
+                <ImageRender />
             </div>
         );
     }

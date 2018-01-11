@@ -12,7 +12,7 @@ import config from 'config';
 
 const styles = theme => ({
     root: {
-        width: '100',
+        width: '100%',
         left: 0,
         right: 0,
         transform: 'none',
