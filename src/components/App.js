@@ -10,6 +10,7 @@ import Displayer from './Displayer/Displayer';
 import LoadingBar from './LoadingBar';
 import SnackBar from './SnackBar';
 import Navigation from './Navigation';
+import HistoryButtons from './HistoryButtons';
 import { classes as appClasses } from 'styles';
 import theme from '../theme';
 
@@ -46,6 +47,7 @@ class App extends React.Component {
             <div>
                 <LoadingBar />
                 <div style={hideUntilLoaded} >
+                    <HistoryButtons />
                     <div className={appClasses.container}>
                         <Header />
                         <Navigation />
