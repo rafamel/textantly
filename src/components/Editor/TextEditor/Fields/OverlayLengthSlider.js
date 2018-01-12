@@ -4,7 +4,6 @@ import Slider from 'components/Elements/Fields/Slider';
 
 class OverlayLengthSlider extends React.Component {
     static propTypes = {
-        // Props
         overlayPosition: PropTypes.string.isRequired,
         overlayWidth: PropTypes.number.isRequired,
         overlayHeight: PropTypes.number.isRequired,

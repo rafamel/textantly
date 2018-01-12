@@ -1,4 +1,5 @@
-import typesActions from './types-actions';
+import PropTypes from 'prop-types';
+import { typesActions } from './utils';
 
 const { types: t, actions } = typesActions({
     pre: 'ACTIVE_VIEWS',
@@ -10,6 +11,14 @@ const initialState = {
     image: {
         main: null,
         crop: 'free'
+    }
+};
+
+const propTypes = {
+    main: PropTypes.string.isRequired,
+    image: {
+        main: PropTypes.string,
+        crop: PropTypes.string.isRequired
     }
 };
 
@@ -38,6 +47,7 @@ function reducer(state = initialState, { type, payload }) {
 }
 
 export default {
+    propTypes,
     reducer,
     actions,
     types: t

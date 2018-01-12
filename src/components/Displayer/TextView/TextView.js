@@ -10,7 +10,6 @@ import styles from './TextView.styles';
 
 class TextView extends React.Component {
     static propTypes = {
-        // State (Props)
         textEdits: PropTypes.object.isRequired
     };
     state = {

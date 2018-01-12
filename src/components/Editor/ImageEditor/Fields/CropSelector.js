@@ -2,11 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import BottomNavigation, { BottomNavigationAction } from 'material-ui/BottomNavigation';
-import {
-    CropSquare,
-    CropFree
-} from 'material-ui-icons';
 import Icon from 'material-ui/Icon';
+import CropSquare from 'material-ui-icons/CropSquare';
+import CropFree from 'material-ui-icons/CropFree';
 
 const styles = {
     root: {
@@ -22,9 +20,7 @@ const styles = {
 
 class CropSelector extends React.Component {
     static propTypes = {
-        // State (Props)
         cropView: PropTypes.string,
-        // Actions (Props)
         changeImageViews: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired

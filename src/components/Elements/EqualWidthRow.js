@@ -44,7 +44,6 @@ class EqualWidthRow extends React.Component {
         };
     }
     static propTypes = {
-        // Props
         children: PropTypes.array.isRequired,
         className: PropTypes.string,
         style: PropTypes.object,

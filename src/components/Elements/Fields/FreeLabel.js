@@ -15,7 +15,6 @@ const styles = {
 
 class FreeLabel extends React.Component {
     static propTypes = {
-        // Props
         label: PropTypes.string,
         className: PropTypes.string,
         style: PropTypes.object,

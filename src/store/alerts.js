@@ -1,4 +1,5 @@
-import typesActions from './types-actions';
+import PropTypes from 'prop-types';
+import { typesActions } from './utils';
 
 class Alert {
     constructor(string) {
@@ -15,6 +16,10 @@ const { types: t, actions } = typesActions({
 const initialState = {
     current: null,
     stack: []
+};
+
+const propTypes = {
+    current: PropTypes.instanceOf(Alert)
 };
 
 function reducer(state = initialState, { type, payload }) {
@@ -48,6 +53,7 @@ function reducer(state = initialState, { type, payload }) {
 }
 
 export default {
+    propTypes,
     reducer,
     actions,
     types: t

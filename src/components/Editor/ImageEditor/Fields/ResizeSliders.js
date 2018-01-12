@@ -4,10 +4,8 @@ import Slider from 'components/Elements/Fields/Slider';
 
 class ResizeSliders extends React.Component {
     static propTypes = {
-        // State (Props)
         value: PropTypes.object.isRequired,
         dimensions: PropTypes.object.isRequired,
-        // Actions (Props)
         changeImage: PropTypes.func.isRequired,
         changeImageTemp: PropTypes.func.isRequired
     };

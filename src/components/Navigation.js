@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { actions } from 'store';
+import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
@@ -20,31 +18,20 @@ const styles = {
     }
 };
 
-const connector = connect(
+const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        mainView: state._activeViews.main,
-        historyCan: {
-            backwards: state.edits._history.can.backwards,
-            forwards: state.edits._history.can.forwards
-        }
-    }), {
+        mainView: state._activeViews.main
+    }), (actions) => ({
         changeMainView: actions._activeViews.changeMain,
         reset: actions.edits.reset,
         backwards: actions.edits.backwards,
         forwards: actions.edits.forwards
-    }
+    })
 );
 
 class Navigation extends React.Component {
     static propTypes = {
-        // State
-        mainView: PropTypes.string,
-        historyCan: PropTypes.object.isRequired,
-        // Actions
-        changeMainView: PropTypes.func.isRequired,
-        reset: PropTypes.func.isRequired,
-        backwards: PropTypes.func.isRequired,
-        forwards: PropTypes.func.isRequired,
+        ...storeTypes,
         // JSS
         classes: PropTypes.object.isRequired
     };

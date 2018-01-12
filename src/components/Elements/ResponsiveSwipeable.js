@@ -12,7 +12,6 @@ const styles = {
 
 class ResponsiveSwipeable extends React.Component {
     static propTypes = {
-        // Props
         children: PropTypes.array.isRequired,
         index: PropTypes.number,
         onChangeIndex: PropTypes.func,

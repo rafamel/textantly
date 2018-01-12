@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { diff, diffBackwards, diffForwards } from './diff';
 
 function addCan(history) {
@@ -31,9 +32,19 @@ const defaultHistoryValues = {
     }
 };
 
-export { defaultHistoryValues };
+const propTypes = {
+    index: PropTypes.number.isRequired,
+    arr: PropTypes.array.isRequired,
+    temp: PropTypes.object,
+    can: PropTypes.shape({
+        forwards: PropTypes.bool.isRequired,
+        backwards: PropTypes.bool.isRequired
+    }).isRequired
+};
 
-export default function (key) {
+export { defaultHistoryValues, propTypes };
+
+export default function history(key) {
     function insert(previous, updated) {
         if (previous[key].temp) {
             return insert(previous[key].temp, updated);

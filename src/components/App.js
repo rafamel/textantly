@@ -1,9 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { MuiThemeProvider } from 'material-ui/styles';
-import { Provider, connect } from 'react-redux';
-import store, { actions } from 'store';
-import { compose } from 'redux';
+import { Provider } from 'react-redux';
+import store from 'store/_store';
+import { withState, compose } from 'store/utils';
 import Reboot from 'material-ui/Reboot';
 import Header from './Header';
 import Editor from './Editor/Editor';
@@ -14,28 +13,26 @@ import Navigation from './Navigation';
 import { classes as appClasses } from 'styles';
 import theme from '../theme';
 
-const connector = connect(
+const { connector, propTypes: storeTypes } = withState(
     null,
-    {
+    (actions) => ({
         startLoading: actions._loading.start,
         stopLoading: actions._loading.stop
-    }
+    })
 );
+
 class App extends React.Component {
     static propTypes = {
-        // Actions
-        startLoading: PropTypes.func.isRequired,
-        stopLoading: PropTypes.func.isRequired
+        ...storeTypes
     };
     state = {
         hasLoaded: false
     };
     componentDidMount() {
         this.props.startLoading();
-        let count = -50;
+        const startAt = Date.now();
         const interval = setInterval(() => {
-            count += 50;
-            if (document.readyState === 'complete' || count > 5000) {
+            if (document.readyState === 'complete' || (Date.now() - startAt) > 7500) {
                 this.setState({ hasLoaded: true });
                 this.props.stopLoading();
                 clearInterval(interval);

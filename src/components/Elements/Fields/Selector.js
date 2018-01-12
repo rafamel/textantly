@@ -6,7 +6,6 @@ import Select from 'material-ui/Select';
 
 class Selector extends React.Component {
     static propTypes = {
-        // Props
         id: PropTypes.string,
         name: PropTypes.string,
         label: PropTypes.string,

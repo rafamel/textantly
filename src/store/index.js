@@ -1,17 +1,15 @@
-import { createStore, combineReducers } from 'redux';
+import { combineReducers } from 'redux';
 import loading from './loading';
 import activeViews from './active-views';
 import edits from './edits';
 import alerts from './alerts';
 
-const store = createStore(
-    combineReducers({
-        _loading: loading.reducer,
-        _activeViews: activeViews.reducer,
-        edits: edits.reducer,
-        alerts: alerts.reducer
-    })
-);
+const reducer = combineReducers({
+    _loading: loading.reducer,
+    _activeViews: activeViews.reducer,
+    edits: edits.reducer,
+    alerts: alerts.reducer
+});
 
 const actions = {
     _loading: loading.actions,
@@ -20,7 +18,15 @@ const actions = {
     alerts: alerts.actions
 };
 
+const propTypes = {
+    _loading: loading.propTypes,
+    _activeViews: activeViews.propTypes,
+    edits: edits.propTypes,
+    alerts: alerts.propTypes
+};
+
 export {
-    store as default,
-    actions
+    reducer,
+    actions,
+    propTypes
 };

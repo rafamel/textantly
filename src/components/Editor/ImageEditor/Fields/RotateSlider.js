@@ -4,9 +4,7 @@ import Slider from 'components/Elements/Fields/Slider';
 
 class RotateSlider extends React.Component {
     static propTypes = {
-        // State (Props)
         value: PropTypes.number.isRequired,
-        // Actions (Props)
         changeImage: PropTypes.func.isRequired,
         changeImageTemp: PropTypes.func.isRequired
     };

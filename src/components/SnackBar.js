@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { actions } from 'store';
+import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
 import Snackbar from 'material-ui/Snackbar';
 import Slide from 'material-ui/transitions/Slide';
@@ -26,20 +24,17 @@ const styles = theme => ({
     }
 });
 
-const connector = connect(
+const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         current: state.alerts.current
-    }), {
+    }), (actions) => ({
         closeCurrent: actions.alerts.closeCurrent
-    }
+    })
 );
 
 class SnackBar extends React.Component {
     static propTypes = {
-        // State
-        current: PropTypes.object,
-        // Actions
-        closeCurrent: PropTypes.func.isRequired,
+        ...storeTypes,
         // JSS
         classes: PropTypes.object.isRequired
     };

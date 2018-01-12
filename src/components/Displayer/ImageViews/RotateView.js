@@ -30,7 +30,6 @@ const styles = {
 
 class RotateView extends React.Component {
     static propTypes = {
-        // State (Props)
         rotate: PropTypes.number,
         // JSS
         classes: PropTypes.object.isRequired

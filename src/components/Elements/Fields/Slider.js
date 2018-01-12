@@ -53,7 +53,6 @@ const styles = (theme) => {
 
 class Slider extends React.Component {
     static propTypes = {
-        // Props
         id: PropTypes.string,
         name: PropTypes.string.isRequired,
         label: PropTypes.string,

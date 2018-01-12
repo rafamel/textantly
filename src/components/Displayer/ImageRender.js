@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { actions } from 'store';
+import { withState, compose } from 'store/utils';
 import isEqual from 'lodash.isequal';
 import engine from 'engine';
 
@@ -22,29 +20,22 @@ const styles = {
     }
 };
 
-const connector = connect(
+const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         source: state.edits.source,
         imageEdits: state.edits.image
-    }), {
+    }), (actions) => ({
         changeSource: actions.edits.changeSource,
         tempForget: actions.edits.tempForget,
         addAlert: actions.alerts.add
-    }
+    })
 );
 
 class ImageRender extends React.Component {
     static propTypes = {
-        // Props
+        ...storeTypes,
         exclude: PropTypes.string,
         getDimensions: PropTypes.func,
-        // State
-        source: PropTypes.object.isRequired,
-        imageEdits: PropTypes.object.isRequired,
-        // Actions
-        changeSource: PropTypes.func.isRequired,
-        tempForget: PropTypes.func.isRequired,
-        addAlert: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };

@@ -1,5 +1,9 @@
-import typesActions from './types-actions';
-import diffHistory, { defaultHistoryValues } from './diff-history';
+import PropTypes from 'prop-types';
+import { typesActions } from './utils';
+import historyUtil, {
+    defaultHistoryValues,
+    propTypes as historyTypes
+} from './history';
 import config from 'config';
 
 const { types: t, actions } = typesActions({
@@ -19,28 +23,58 @@ const { types: t, actions } = typesActions({
 });
 
 const initialState = {
+    _history: defaultHistoryValues,
     source: {
-        name: config.defaults.src.name,
-        src: config.defaults.src.src,
+        ...config.defaults.src,
         from: false,
-        dimensions: { width: 0, height: 0 }
+        dimensions: { width: 668, height: 367 }
     },
     text: {
-        textString: config.defaults.text.textString,
-        fontFamily: config.defaults.text.fontFamily,
-        fontWeight: config.defaults.text.fontWeight,
-        alignment: config.defaults.text.alignment,
-        overlayPosition: config.defaults.text.overlayPosition,
-        overlayWidth: config.defaults.text.overlayWidth,
-        overlayHeight: config.defaults.text.overlayHeight,
-        colorScheme: config.defaults.text.colorScheme
+        ...config.defaults.text
     },
     image: {
         rotate: 0,
         resize: { width: null, height: null },
         flip: false
+    }
+};
+
+const propTypes = {
+    _history: historyTypes,
+    source: {
+        name: PropTypes.string.isRequired,
+        src: PropTypes.string.isRequired,
+        from: PropTypes.oneOfType([
+            PropTypes.bool,
+            PropTypes.string
+        ]).isRequired,
+        dimensions: {
+            width: PropTypes.number.isRequired,
+            height: PropTypes.number.isRequired
+        }
     },
-    _history: defaultHistoryValues
+    text: {
+        textString: PropTypes.string.isRequired,
+        fontFamily: PropTypes.string.isRequired,
+        fontWeight: PropTypes
+            .oneOfType([
+                PropTypes.string,
+                PropTypes.number
+            ]).isRequired,
+        alignment: PropTypes.string.isRequired,
+        overlayPosition: PropTypes.string.isRequired,
+        overlayWidth: PropTypes.number.isRequired,
+        overlayHeight: PropTypes.number.isRequired,
+        colorScheme: PropTypes.string.isRequired
+    },
+    image: {
+        rotate: PropTypes.number.isRequired,
+        resize: {
+            width: PropTypes.number,
+            height: PropTypes.number
+        },
+        flip: PropTypes.bool.isRequired
+    }
 };
 
 function changeSource(state, payload) {
@@ -77,7 +111,7 @@ function changeImage(state, payload) {
     };
 }
 
-const history = diffHistory('_history');
+const history = historyUtil('_history');
 
 function reducer(state = initialState, { type, payload }) {
     switch (type) {
@@ -107,6 +141,7 @@ function reducer(state = initialState, { type, payload }) {
 }
 
 export default {
+    propTypes,
     reducer,
     actions,
     types: t

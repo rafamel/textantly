@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
+import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
 import { LinearProgress } from 'material-ui/Progress';
 
@@ -19,7 +18,7 @@ const styles = {
     }
 };
 
-const connector = connect(
+const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         _loading: state._loading
     })
@@ -27,8 +26,7 @@ const connector = connect(
 
 class LoadingBar extends React.Component {
     static propTypes = {
-        // State
-        _loading: PropTypes.bool.isRequired,
+        ...storeTypes,
         // JSS
         classes: PropTypes.object.isRequired
     };

@@ -1,4 +1,5 @@
-import typesActions from './types-actions';
+import PropTypes from 'prop-types';
+import { typesActions } from './utils';
 
 const { types: t, actions } = typesActions({
     pre: 'LOADING',
@@ -6,6 +7,7 @@ const { types: t, actions } = typesActions({
 });
 
 const initialState = true;
+const propTypes = PropTypes.bool.isRequired;
 
 function reducer(state = initialState, { type }) {
     switch (type) {
@@ -19,6 +21,7 @@ function reducer(state = initialState, { type }) {
 }
 
 export default {
+    propTypes,
     reducer,
     actions,
     types: t

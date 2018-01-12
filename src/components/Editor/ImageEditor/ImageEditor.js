@@ -1,7 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { actions } from 'store';
+import { withState } from 'store/utils';
 import VerticalTabs, { VerticalTab } from 'components/Elements/VerticalTabs';
 import { Collapse } from 'react-collapse';
 import Crop from 'material-ui-icons/Crop';
@@ -13,28 +11,21 @@ import RotateSlider from './Fields/RotateSlider';
 import ResizeSliders from './Fields/ResizeSliders';
 import engine from 'engine';
 
-const connector = connect(
+const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         imageEdits: state.edits.image,
         imageViews: state._activeViews.image,
         sourceDimensions: state.edits.source.dimensions
-    }), {
+    }), (actions) => ({
         changeImageViews: actions._activeViews.changeImage,
         changeImage: actions.edits.changeImage,
         changeImageTemp: actions.edits.changeImageTemp
-    }
+    })
 );
 
 class ImageEditor extends React.Component {
     static propTypes = {
-        // State
-        imageEdits: PropTypes.object,
-        imageViews: PropTypes.object.isRequired,
-        sourceDimensions: PropTypes.object.isRequired,
-        // Actions
-        changeImageViews: PropTypes.func.isRequired,
-        changeImage: PropTypes.func.isRequired,
-        changeImageTemp: PropTypes.func.isRequired
+        ...storeTypes
     };
     state = {
         activeIndex: 0

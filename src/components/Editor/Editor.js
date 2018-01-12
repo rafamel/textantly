@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { actions } from 'store';
+import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
 import Paper from 'material-ui/Paper';
 import ResponsiveSwipeable from 'components/Elements/ResponsiveSwipeable';
@@ -18,20 +16,17 @@ const styles = {
     }
 };
 
-const connector = connect(
+const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         mainView: state._activeViews.main
-    }), {
+    }), (actions) => ({
         changeMainView: actions._activeViews.changeMain
-    }
+    })
 );
 
 class Editor extends React.Component {
     static propTypes = {
-        // State
-        mainView: PropTypes.string,
-        // Actions
-        changeMainView: PropTypes.func.isRequired,
+        ...storeTypes,
         // JSS
         classes: PropTypes.object.isRequired
     };

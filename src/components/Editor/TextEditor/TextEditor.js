@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { actions } from 'store';
+import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
 import config from 'config';
 import fontData from 'services/font-data';
@@ -22,11 +20,11 @@ const styles = (theme) => ({
     }
 });
 
-const connector = connect(
+const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         text: state.edits.text,
         sourceFrom: state.edits.source.from
-    }), {
+    }), (actions) => ({
         changeText: actions.edits.changeText,
         changeTextTemp: actions.edits.changeTextTemp,
         changeSourceTemp: actions.edits.changeSourceTemp,
@@ -34,26 +32,13 @@ const connector = connect(
         loadingStart: actions._loading.start,
         loadingStop: actions._loading.stop,
         addAlert: actions.alerts.add
-    }
+    })
 );
 
 class TextEditor extends React.Component {
     static propTypes = {
-        // Props
+        ...storeTypes,
         className: PropTypes.string,
-        // State
-        text: PropTypes.object.isRequired,
-        sourceFrom: PropTypes
-            .oneOfType([PropTypes.string, PropTypes.bool])
-            .isRequired,
-        // Actions
-        changeText: PropTypes.func.isRequired,
-        changeTextTemp: PropTypes.func.isRequired,
-        changeSourceTemp: PropTypes.func.isRequired,
-        tempForget: PropTypes.func.isRequired,
-        loadingStart: PropTypes.func.isRequired,
-        loadingStop: PropTypes.func.isRequired,
-        addAlert: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };

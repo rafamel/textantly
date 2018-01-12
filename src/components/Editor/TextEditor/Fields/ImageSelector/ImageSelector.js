@@ -43,14 +43,11 @@ class ImageSelector extends React.Component {
         };
     }
     static propTypes = {
-        // Props
         className: PropTypes.string,
         style: PropTypes.object,
-        // Props (Store)
         sourceFrom: PropTypes
             .oneOfType([PropTypes.string, PropTypes.bool])
             .isRequired,
-        // Props (Actions)
         changeSourceTemp: PropTypes.func.isRequired,
         tempForget: PropTypes.func.isRequired,
         loadingStart: PropTypes.func.isRequired,

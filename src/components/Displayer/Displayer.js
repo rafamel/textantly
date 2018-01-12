@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
+import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
 import ViewSwitcher from './ViewSwitcher';
 import ImageRender from './ImageRender';
@@ -15,7 +14,7 @@ const styles = {
     }
 };
 
-const connector = connect(
+const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         activeViews: state._activeViews,
         textEdits: state.edits.text,
@@ -25,10 +24,7 @@ const connector = connect(
 
 class Displayer extends React.Component {
     static propTypes = {
-        // State
-        activeViews: PropTypes.object.isRequired,
-        textEdits: PropTypes.object.isRequired,
-        imageEdits: PropTypes.object.isRequired,
+        ...storeTypes,
         // JSS
         classes: PropTypes.object
     };

@@ -18,8 +18,9 @@ const styles = () => ({
 
 class ViewSwitcher extends React.Component {
     static propTypes = {
-        // Props
-        children: PropTypes.arrayOf(PropTypes.element).isRequired,
+        children: PropTypes
+            .arrayOf(PropTypes.element)
+            .isRequired,
         active: PropTypes.oneOfType([
             PropTypes.string,
             PropTypes.number
