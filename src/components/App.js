@@ -10,6 +10,7 @@ import Editor from './Editor/Editor';
 import Displayer from './Displayer/Displayer';
 import LoadingBar from './LoadingBar';
 import SnackBar from './SnackBar';
+import Navigation from './Navigation';
 import { classes as appClasses } from 'styles';
 import theme from '../theme';
 
@@ -45,13 +46,16 @@ class App extends React.Component {
         const hideUntilLoaded = (!this.state.hasLoaded)
             ? { opacity: 0 } : {};
         return (
-            <div className={appClasses.container}>
+            <div>
                 <LoadingBar />
                 <div style={hideUntilLoaded} >
-                    <Header />
-                    <Editor />
-                    <Displayer />
-                    <SnackBar />
+                    <div className={appClasses.container}>
+                        <Header />
+                        <Navigation />
+                        <Editor />
+                        <Displayer />
+                        <SnackBar />
+                    </div>
                 </div>
             </div>
         );

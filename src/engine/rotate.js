@@ -7,7 +7,7 @@ const trig = (angleA, bLength) => {
     return [length(A), length(C)];
 };
 
-function rotateDimensions(degrees = 0, width = 0, height = 0) {
+function getDimensions({ width, height }, degrees = 0) {
     let angle = degrees % 360;
     if (!degrees || !width || !height) return { angle, width, height };
 
@@ -29,13 +29,12 @@ function rotateDimensions(degrees = 0, width = 0, height = 0) {
         ans.height = heightA + heightB;
     }
     return ans;
-};
+}
 
-export { rotateDimensions };
-export default function rotate(canvas, degrees) {
+function draw(canvas, degrees) {
     if (!degrees) return canvas;
-    const { angle, width, height } = rotateDimensions(
-        degrees, canvas.width, canvas.height
+    const { angle, width, height } = getDimensions(
+        { width: canvas.width, height: canvas.height }, degrees
     );
     if (angle === 0) return canvas;
 
@@ -48,4 +47,9 @@ export default function rotate(canvas, degrees) {
     ctx.drawImage(canvas, -canvas.width / 2,
         -canvas.height / 2, canvas.width, canvas.height);
     return rotCanvas;
+}
+
+export default {
+    getDimensions,
+    draw
 };

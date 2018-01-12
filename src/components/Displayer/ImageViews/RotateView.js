@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import ResizeObserver from 'resize-observer-polyfill';
 import ImageRender from '../ImageRender';
-import { rotateDimensions } from 'engine/rotate';
+import rotateEngine from 'engine/rotate';
 
 const styles = {
     root: {
@@ -32,7 +32,6 @@ class RotateView extends React.Component {
     static propTypes = {
         // State (Props)
         rotate: PropTypes.number,
-        dimensions: PropTypes.object.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };
@@ -69,8 +68,8 @@ class RotateView extends React.Component {
     };
     setComputed = (degrees = this.props.rotate) => {
         const { image, available } = this.dimensions;
-        const rotated = rotateDimensions(
-            degrees, image.width, image.height
+        const rotated = rotateEngine.getDimensions(
+            { width: image.width, height: image.height }, degrees
         );
 
         if (available.width === 0 || available.height === 0) {
@@ -105,7 +104,6 @@ class RotateView extends React.Component {
     };
     componentWillReceiveProps(nextProps) {
         this.setComputed(nextProps.rotate);
-        this.setImage(nextProps.dimensions);
     }
     componentDidMount() {
         this.observer.observe(this.node);
@@ -136,7 +134,10 @@ class RotateView extends React.Component {
                                 ? `rotate(${rotate}deg)` : 'none'
                         }}
                     >
-                        <ImageRender />
+                        <ImageRender
+                            exclude="rotate"
+                            getDimensions={this.setImage}
+                        />
                     </div>
                 </div>
             </div>

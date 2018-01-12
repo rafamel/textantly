@@ -23,7 +23,6 @@ class ResponsiveSwipeable extends React.Component {
     nodes = {};
     state = {
         activeIndex: this.props.index || 0,
-        observer: null,
         maxHeight: 'none'
     };
     setNode = (key) => (ref) => { this.nodes[key] = ref; };

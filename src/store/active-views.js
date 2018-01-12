@@ -2,7 +2,7 @@ import typesActions from './types-actions';
 
 const { types: t, actions } = typesActions({
     pre: 'ACTIVE_VIEWS',
-    types: ['CHANGE_MAIN', 'CHANGE_IMAGE', 'CHANGE_DIMENSIONS']
+    types: ['CHANGE_MAIN', 'CHANGE_IMAGE']
 });
 
 const initialState = {
@@ -10,9 +10,6 @@ const initialState = {
     image: {
         main: null,
         crop: 'free'
-    },
-    dimensions: {
-        canvas: { width: 0, height: 0 }
     }
 };
 
@@ -32,14 +29,6 @@ function reducer(state = initialState, { type, payload }) {
             ...state,
             image: {
                 ...state.image,
-                ...payload
-            }
-        };
-    case t.CHANGE_DIMENSIONS:
-        return {
-            ...state,
-            dimensions: {
-                ...state.dimensions,
                 ...payload
             }
         };

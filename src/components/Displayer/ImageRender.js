@@ -25,11 +25,9 @@ const styles = {
 const connector = connect(
     (state) => ({
         source: state.edits.source,
-        imageEdits: state.edits.image,
-        activeViews: state._activeViews
+        imageEdits: state.edits.image
     }), {
         changeSource: actions.edits.changeSource,
-        changeDimensions: actions._activeViews.changeDimensions,
         tempForget: actions.edits.tempForget,
         addAlert: actions.alerts.add
     }
@@ -37,13 +35,14 @@ const connector = connect(
 
 class ImageRender extends React.Component {
     static propTypes = {
+        // Props
+        exclude: PropTypes.string,
+        getDimensions: PropTypes.func,
         // State
         source: PropTypes.object.isRequired,
         imageEdits: PropTypes.object.isRequired,
-        activeViews: PropTypes.object.isRequired,
         // Actions
         changeSource: PropTypes.func.isRequired,
-        changeDimensions: PropTypes.func.isRequired,
         tempForget: PropTypes.func.isRequired,
         addAlert: PropTypes.func.isRequired,
         // JSS
@@ -66,12 +65,11 @@ class ImageRender extends React.Component {
         const rootNode = this.rootNode;
         if (!rootNode || !image) return;
 
-        const { main: mainView, image: imageViews } = props.activeViews;
-        const imageEdits = (mainView !== 'image' || !imageViews.main)
+        const imageEdits = (!props.exclude)
             ? props.imageEdits
             : {
                 ...props.imageEdits,
-                [imageViews.main]: undefined
+                [props.exclude]: undefined
             };
 
         if (
@@ -82,12 +80,12 @@ class ImageRender extends React.Component {
             return;
         }
 
-        const canvas = engine(image, { imageEdits });
-        props.changeDimensions({
-            canvas: { width: canvas.width, height: canvas.height }
-        });
+        const canvas = engine.draw(image, { imageEdits });
         rootNode.prepend(canvas);
         if (rootNode.children[1]) rootNode.children[1].remove();
+        if (props.getDimensions) {
+            props.getDimensions({ width: canvas.width, height: canvas.height });
+        }
         this.drawn.for = imageEdits;
     };
     loadImage = (source) => {
@@ -115,7 +113,10 @@ class ImageRender extends React.Component {
             });
             this.props.changeSource({
                 ...source,
-                image: img
+                dimensions: {
+                    width: img.naturalWidth,
+                    height: img.naturalHeight
+                }
             });
         };
         setTimeout(() => {

@@ -8,7 +8,6 @@ import Paper from 'material-ui/Paper';
 import ResponsiveSwipeable from 'components/Elements/ResponsiveSwipeable';
 import TextEditor from './TextEditor/TextEditor';
 import ImageEditor from './ImageEditor/ImageEditor';
-import Navigation from '../Navigation/Navigation';
 
 const styles = {
     root: {
@@ -49,7 +48,6 @@ class Editor extends React.Component {
         const viewIndex = this.tabDict.toIndex[mainView] || 0;
         return (
             <div className={classes.root}>
-                <Navigation />
                 <Paper>
                     <ResponsiveSwipeable
                         index={viewIndex}

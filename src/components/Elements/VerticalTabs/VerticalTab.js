@@ -9,7 +9,7 @@ const IconLabel = (props) => {
     return (
         <div style={{ display: 'flex', flexDirection: 'row' }}>
             { icon }
-            <span style={{ margin: 'auto 0 auto 5px' }}>
+            <span style={{ margin: 'auto 0 auto 10px' }}>
                 { label }
             </span>
         </div>

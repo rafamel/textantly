@@ -22,8 +22,8 @@ const initialState = {
     source: {
         name: config.defaults.src.name,
         src: config.defaults.src.src,
-        image: null,
-        from: false
+        from: false,
+        dimensions: { width: 0, height: 0 }
     },
     text: {
         textString: config.defaults.text.textString,

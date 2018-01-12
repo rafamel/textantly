@@ -15,7 +15,7 @@ export default {
             : 'rgba(255,255,255,0.3)'
     },
     outer: {
-        overflowX: 'hidden',
+        overflow: 'hidden',
         position: 'absolute',
         display: 'flex',
         flexDirection: 'column',

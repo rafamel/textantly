@@ -14,10 +14,3 @@ import './index.css';
 
 ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker();
-
-// import Canvaser from './engine';
-
-// const Textantly = new Canvaser('#main-canvas');
-// Textantly.load('static/default.png').then(() => {
-//     global.Textantly = Textantly;
-// });

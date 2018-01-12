@@ -10,12 +10,14 @@ import Rotate90DegreesCcw from 'material-ui-icons/Rotate90DegreesCcw';
 import PhotoSizeSelectLarge from 'material-ui-icons/PhotoSizeSelectLarge';
 import CropSelector from './Fields/CropSelector';
 import RotateSlider from './Fields/RotateSlider';
+import ResizeSliders from './Fields/ResizeSliders';
+import engine from 'engine';
 
 const connector = connect(
     (state) => ({
-        image: state.edits.image,
+        imageEdits: state.edits.image,
         imageViews: state._activeViews.image,
-        canvasDimensions: state._activeViews.dimensions.canvas
+        sourceDimensions: state.edits.source.dimensions
     }), {
         changeImageViews: actions._activeViews.changeImage,
         changeImage: actions.edits.changeImage,
@@ -26,8 +28,9 @@ const connector = connect(
 class ImageEditor extends React.Component {
     static propTypes = {
         // State
-        image: PropTypes.object,
+        imageEdits: PropTypes.object,
         imageViews: PropTypes.object.isRequired,
+        sourceDimensions: PropTypes.object.isRequired,
         // Actions
         changeImageViews: PropTypes.func.isRequired,
         changeImage: PropTypes.func.isRequired,
@@ -52,7 +55,7 @@ class ImageEditor extends React.Component {
         this.setState({ activeIndex: this.tabDict.toIndex.flip });
 
         this.props.changeImage({
-            flip: !this.props.image.flip
+            flip: !this.props.imageEdits.flip
         });
 
         setTimeout(() => {
@@ -72,8 +75,15 @@ class ImageEditor extends React.Component {
         this.setActiveIndex();
     }
     render() {
-        const activeView = this.props.imageViews.main;
-        const isOpen = (name) => activeView === name;
+        const {
+            imageViews,
+            changeImageViews,
+            imageEdits,
+            changeImage,
+            changeImageTemp,
+            sourceDimensions
+        } = this.props;
+        const isOpen = (name) => imageViews.main === name;
         return (
             <VerticalTabs
                 value={this.state.activeIndex}
@@ -85,8 +95,8 @@ class ImageEditor extends React.Component {
                 />
                 <Collapse isOpened={isOpen('crop')}>
                     <CropSelector
-                        cropView={this.props.imageViews.crop}
-                        changeImageViews={this.props.changeImageViews}
+                        cropView={imageViews.crop}
+                        changeImageViews={changeImageViews}
                     />
                 </Collapse>
                 <VerticalTab
@@ -95,15 +105,26 @@ class ImageEditor extends React.Component {
                 />
                 <Collapse isOpened={isOpen('rotate')}>
                     <RotateSlider
-                        value={this.props.image.rotate}
-                        changeImage={this.props.changeImage}
-                        changeImageTemp={this.props.changeImageTemp}
+                        value={imageEdits.rotate}
+                        changeImage={changeImage}
+                        changeImageTemp={changeImageTemp}
                     />
                 </Collapse>
                 <VerticalTab
                     label="Resize"
                     icon={<PhotoSizeSelectLarge />}
                 />
+                <Collapse isOpened={isOpen('resize')}>
+                    <ResizeSliders
+                        value={imageEdits.resize}
+                        dimensions={engine.getDimensions(
+                            sourceDimensions,
+                            { ...imageEdits, resize: undefined }
+                        )}
+                        changeImage={changeImage}
+                        changeImageTemp={changeImageTemp}
+                    />
+                </Collapse>
                 <VerticalTab
                     label="Flip"
                     icon={<Flip />}

@@ -1,4 +1,4 @@
-export default function flip(canvas, flip) {
+function draw(canvas, flip) {
     if (!flip) return canvas;
 
     const newCanvas = document.createElement('canvas');
@@ -9,4 +9,8 @@ export default function flip(canvas, flip) {
     ctx.scale(-1, 1);
     ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
     return newCanvas;
+}
+
+export default {
+    draw
 };

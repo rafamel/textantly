@@ -5,8 +5,8 @@ import classnames from 'classnames';
 import ResizeObserver from 'resize-observer-polyfill';
 import config from 'config';
 import ImageRender from '../ImageRender';
-import styles from './TextView.styles';
 import fontResize from './font-resize';
+import styles from './TextView.styles';
 
 class TextView extends React.Component {
     static propTypes = {
