@@ -21,47 +21,43 @@ const styles = (theme) => ({
     }
 });
 
-function dict(x, type, obj) {
-    // eslint-disable-next-line
-    if (typeof x !== type) return false;
-    const ans = obj[x];
-    return (ans === undefined) ? false : ans;
-}
-
 class ImageSelector extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.openTimeout = null;
-        this.tabDict = {
-            toIndex: (x) => dict(x, 'string', {
-                file: 0, url: 1
-            }),
-            toString: (x) => dict(x, 'number', {
-                0: 'file', 1: 'url'
-            })
-        };
-    }
     static propTypes = {
+        // Style
         className: PropTypes.string,
         style: PropTypes.object,
+        // State & Actions
         sourceFrom: PropTypes
             .oneOfType([PropTypes.string, PropTypes.bool])
             .isRequired,
-        changeSourceTemp: PropTypes.func.isRequired,
-        tempForget: PropTypes.func.isRequired,
-        loadingStart: PropTypes.func.isRequired,
-        loadingStop: PropTypes.func.isRequired,
+        setLoading: PropTypes.func.isRequired,
+        setRendering: PropTypes.func.isRequired,
+        setSourceTemp: PropTypes.func.isRequired,
         addAlert: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };
     state = {
+        tab: { current: false, lock: false },
         _urlDialogIsOpen: false
     };
+    openTimeout = null;
+    tabDict = {
+        toIndex: { file: 0, url: 1 },
+        toString: { 0: 'file', 1: 'url' }
+    };
+    unlockSyncTab = (props = this.props) => {
+        this.setState({
+            tab: { current: props.sourceFrom, lock: false }
+        });
+    };
+    setImage = (obj) => {
+        // this.props.setRendering(true);
+        this.props.setSourceTemp(obj);
+    };
     handleTabChange = (event, value) => {
-        const tab = this.tabDict.toString(value);
-        this.props.changeSourceTemp({ from: tab });
+        const tab = this.tabDict.toString[value];
+        this.setState({ tab: { current: tab, lock: true } });
 
         if (this.openTimeout) {
             clearTimeout(this.openTimeout);
@@ -82,12 +78,13 @@ class ImageSelector extends React.Component {
     readUrl = (url) => {
         this.setState({ _urlDialogIsOpen: false });
         if (!url) {
-            this.props.tempForget();
+            this.unlockSyncTab();
             return;
         }
 
         const imageName = (str) => str.split('/').slice(-1)[0];
-        this.props.changeSourceTemp({
+        this.setState({ tab: { current: 'url', lock: false } });
+        this.setImage({
             name: imageName(url),
             src: url,
             from: 'url'
@@ -106,11 +103,12 @@ class ImageSelector extends React.Component {
                 return;
             }
 
-            this.props.loadingStart();
             const fileReader = new FileReader();
+            this.props.setLoading(true);
             fileReader.addEventListener('load', () => {
-                this.props.loadingStop();
-                this.props.changeSourceTemp({
+                this.props.setLoading(false);
+                this.setState({ tab: { current: 'file', lock: false } });
+                this.setImage({
                     name,
                     src: fileReader.result,
                     from: 'file'
@@ -119,11 +117,21 @@ class ImageSelector extends React.Component {
             fileReader.readAsDataURL(file);
         };
         input.click();
-        this.props.tempForget();
+        this.unlockSyncTab();
     };
+    componentWillReceiveProps(nextProps) {
+        const tab = this.state.tab;
+        if (!tab.lock && tab.current !== nextProps.sourceFrom) {
+            this.unlockSyncTab(nextProps);
+        }
+    }
+    componentWillMount() {
+        this.unlockSyncTab();
+    }
     render() {
-        const { classes, className, style, sourceFrom } = this.props;
-        const tabIndex = this.tabDict.toIndex(sourceFrom);
+        const { classes, className, style } = this.props;
+        let tabIndex = this.tabDict.toIndex[this.state.tab.current];
+        if (tabIndex == null) tabIndex = false;
         return (
             <div
                 className={classnames(classes.root, className)}

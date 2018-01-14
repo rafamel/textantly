@@ -1,9 +1,9 @@
 export default {
     root: {
+        fontSize: 0,
         position: 'relative',
         display: 'inline-block',
-        margin: 'auto',
-        fontSize: 0
+        margin: 'auto'
     },
     overlay: {
         position: 'absolute',

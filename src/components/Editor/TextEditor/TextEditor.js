@@ -25,12 +25,12 @@ const { connector, propTypes: storeTypes } = withState(
         text: state.edits.text,
         sourceFrom: state.edits.source.from
     }), (actions) => ({
-        changeText: actions.edits.changeText,
-        changeTextTemp: actions.edits.changeTextTemp,
-        changeSourceTemp: actions.edits.changeSourceTemp,
+        setTextHard: actions.edits.setTextHard,
+        setTextTemp: actions.edits.setTextTemp,
+        setSourceTemp: actions.edits.setSourceTemp,
         tempForget: actions.edits.tempForget,
-        loadingStart: actions._loading.start,
-        loadingStop: actions._loading.stop,
+        setLoading: actions._loading.setLoading,
+        setRendering: actions._loading.setRendering,
         addAlert: actions.alerts.add
     })
 );
@@ -56,12 +56,12 @@ class TextEditor extends React.Component {
         this.setState({ rowMode: mode });
     };
     handleChange = (e) => {
-        this.props.changeText({
+        this.props.setTextHard({
             [e.target.name]: e.target.value
         });
     };
     handleChangeTemp = (e) => {
-        this.props.changeTextTemp({
+        this.props.setTextTemp({
             [e.target.name]: e.target.value
         });
     };
@@ -72,11 +72,10 @@ class TextEditor extends React.Component {
         const { classes, text, className } = this.props;
         const imageSelector = (
             <ImageSelector
-                changeSourceTemp={this.props.changeSourceTemp}
-                tempForget={this.props.tempForget}
+                setSourceTemp={this.props.setSourceTemp}
                 sourceFrom={this.props.sourceFrom}
-                loadingStart={this.props.loadingStart}
-                loadingStop={this.props.loadingStop}
+                setLoading={this.props.setLoading}
+                setRendering={this.props.setRendering}
                 addAlert={this.props.addAlert}
                 className={classes.textField}
             />

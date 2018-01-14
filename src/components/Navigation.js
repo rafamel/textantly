@@ -2,19 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
-import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import TextFormat from 'material-ui-icons/TextFormat';
 import Image from 'material-ui-icons/Image';
 
 const styles = {
-    root: {
-        marginBottom: 16
-    },
     tab: {
         flexGrow: 1,
         maxWidth: 'none',
-        minWidth: 90
+        minWidth: 90,
+        height: 64
+    },
+    label: {
+        paddingTop: 4,
+        paddingBottom: 4
     }
 };
 
@@ -32,6 +33,7 @@ const { connector, propTypes: storeTypes } = withState(
 class Navigation extends React.Component {
     static propTypes = {
         ...storeTypes,
+        classname: PropTypes.string,
         // JSS
         classes: PropTypes.object.isRequired
     };
@@ -44,35 +46,30 @@ class Navigation extends React.Component {
         this.props.changeMainView(view);
     };
     render() {
-        const { classes, mainView } = this.props;
+        const { classes, mainView, className } = this.props;
         const viewIndex = this.tabDict.toIndex[mainView] || 0;
-        const tabsProps = {
-            indicatorColor: 'primary',
-            textColor: 'primary'
+        const tabClasses = {
+            root: classes.tab,
+            labelContainer: classes.label
         };
         return (
-            <AppBar
-                className={classes.root}
-                position="static"
-                color="inherit"
+            <Tabs
+                classes={{ root: className }}
+                value={viewIndex}
+                indicatorColor="rgba(255, 255, 255, 0.6)"
+                onChange={this.handleChange}
             >
-                <Tabs
-                    {...tabsProps}
-                    value={viewIndex}
-                    onChange={this.handleChange}
-                >
-                    <Tab
-                        className={classes.tab}
-                        label="Text"
-                        icon={<TextFormat />}
-                    />
-                    <Tab
-                        className={classes.tab}
-                        label="Edit Image"
-                        icon={<Image />}
-                    />
-                </Tabs>
-            </AppBar>
+                <Tab
+                    classes={tabClasses}
+                    label="Text"
+                    icon={<TextFormat />}
+                />
+                <Tab
+                    classes={tabClasses}
+                    label="Edit Image"
+                    icon={<Image />}
+                />
+            </Tabs>
         );
     }
 }

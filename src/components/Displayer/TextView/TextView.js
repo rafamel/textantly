@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { jss } from 'react-jss';
+import withBroadcast from 'utils/withBroadcast';
 import classnames from 'classnames';
 import ResizeObserver from 'resize-observer-polyfill';
 import config from 'config';
@@ -8,8 +9,11 @@ import ImageRender from '../ImageRender';
 import fontResize from './font-resize';
 import styles from './TextView.styles';
 
+const broadcaster = withBroadcast('freeze');
+
 class TextView extends React.Component {
     static propTypes = {
+        freeze: PropTypes.bool,
         textEdits: PropTypes.object.isRequired
     };
     state = {
@@ -47,9 +51,7 @@ class TextView extends React.Component {
     };
     // Lifecycle
     componentWillReceiveProps(nextProps) {
-        if (nextProps.textEdits) {
-            this.stylesUpdate(nextProps.textEdits);
-        }
+        if (!nextProps.freeze) this.stylesUpdate(nextProps.textEdits);
     }
     componentDidUpdate() {
         this.fontResize();
@@ -64,6 +66,9 @@ class TextView extends React.Component {
     componentWillUnmount() {
         this.setObserver({ unobserve: true });
     }
+    shouldComponentUpdate(nextProps) {
+        return !nextProps.freeze;
+    }
     render() {
         const classes = this.classes;
         const textEdits = this.props.textEdits;
@@ -74,6 +79,7 @@ class TextView extends React.Component {
         const overlayStyle = (position === 'top' || position === 'bottom')
             ? { height: `${textEdits.overlayHeight}%` }
             : { width: `${textEdits.overlayWidth}%` };
+        // overlayStyle.opacity = (this.props.isRendering) ? 0 : 1;
         return (
             <div className={classes.root}>
                 <div
@@ -107,4 +113,4 @@ class TextView extends React.Component {
     }
 };
 
-export default TextView;
+export default broadcaster(TextView);

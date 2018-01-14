@@ -9,7 +9,8 @@ import Restore from 'material-ui-icons/SettingsBackupRestore';
 
 const styles = theme => ({
     root: {
-        display: 'flex'
+        display: 'flex',
+        minHeight: 40
     },
     button: {
         margin: 0,

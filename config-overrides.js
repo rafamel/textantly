@@ -1,5 +1,5 @@
 const merge = require('lodash.merge');
-const babelRewire = require('./util/babel-rewire');
+const babelRewire = require('./utils/babel-rewire');
 const rewireEslint = require('react-app-rewire-eslint');
 
 function babel(config, env) {

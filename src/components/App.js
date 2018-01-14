@@ -5,20 +5,16 @@ import store from 'store/_store';
 import { withState, compose } from 'store/utils';
 import Reboot from 'material-ui/Reboot';
 import Header from './Header';
-import Editor from './Editor/Editor';
-import Displayer from './Displayer/Displayer';
 import LoadingBar from './LoadingBar';
 import SnackBar from './SnackBar';
-import Navigation from './Navigation';
-import HistoryButtons from './HistoryButtons';
+import DesktopUI from './DesktopUI/DesktopUI';
 import { classes as appClasses } from 'styles';
 import theme from '../theme';
 
 const { connector, propTypes: storeTypes } = withState(
     null,
     (actions) => ({
-        startLoading: actions._loading.start,
-        stopLoading: actions._loading.stop
+        setLoading: actions._loading.setLoading
     })
 );
 
@@ -30,12 +26,12 @@ class App extends React.Component {
         hasLoaded: false
     };
     componentDidMount() {
-        this.props.startLoading();
+        this.props.setLoading(true);
         const startAt = Date.now();
         const interval = setInterval(() => {
             if (document.readyState === 'complete' || (Date.now() - startAt) > 7500) {
                 this.setState({ hasLoaded: true });
-                this.props.stopLoading();
+                this.props.setLoading(false);
                 clearInterval(interval);
             }
         }, 50);
@@ -46,15 +42,19 @@ class App extends React.Component {
         return (
             <div>
                 <LoadingBar />
-                <div style={hideUntilLoaded} >
-                    <HistoryButtons />
-                    <div className={appClasses.container}>
+                <div style={{
+                    ...hideUntilLoaded,
+                    height: '100vh',
+                    width: '100%'
+                }}>
+                    <DesktopUI />
+                    {/* <div className={appClasses.container}>
                         <Header />
                         <Navigation />
                         <Editor />
-                        <Displayer />
+
                         <SnackBar />
-                    </div>
+                    </div> */}
                 </div>
             </div>
         );

@@ -22,7 +22,7 @@ function addCan(history) {
     return history;
 }
 
-const defaultHistoryValues = {
+const defaultValues = {
     index: -1,
     arr: [],
     temp: null,
@@ -42,7 +42,7 @@ const propTypes = {
     }).isRequired
 };
 
-export { defaultHistoryValues, propTypes };
+export { defaultValues, propTypes };
 
 export default function history(key) {
     function insert(previous, updated) {

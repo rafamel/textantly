@@ -5,16 +5,16 @@ import Slider from 'components/Elements/Fields/Slider';
 class RotateSlider extends React.Component {
     static propTypes = {
         value: PropTypes.number.isRequired,
-        changeImage: PropTypes.func.isRequired,
-        changeImageTemp: PropTypes.func.isRequired
+        setImageHard: PropTypes.func.isRequired,
+        setImageTemp: PropTypes.func.isRequired
     };
     handleTempChange = (e) => {
-        this.props.changeImageTemp({
+        this.props.setImageTemp({
             rotate: e.target.value
         });
     };
     handleChange = (e) => {
-        this.props.changeImage({
+        this.props.setImageHard({
             rotate: e.target.value
         });
     };

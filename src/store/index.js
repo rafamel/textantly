@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { createLogicMiddleware } from 'redux-logic';
 import loading from './loading';
 import activeViews from './active-views';
 import edits from './edits';
@@ -10,6 +11,10 @@ const reducer = combineReducers({
     edits: edits.reducer,
     alerts: alerts.reducer
 });
+
+const logic = createLogicMiddleware([
+    ...edits.logic
+]);
 
 const actions = {
     _loading: loading.actions,
@@ -27,6 +32,7 @@ const propTypes = {
 
 export {
     reducer,
+    logic,
     actions,
     propTypes
 };

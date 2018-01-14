@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
+import { Broadcast } from 'react-broadcast';
 
 const styles = () => ({
     root: {
@@ -18,6 +19,7 @@ const styles = () => ({
 
 class ViewSwitcher extends React.Component {
     static propTypes = {
+        isRendering: PropTypes.bool,
         children: PropTypes
             .arrayOf(PropTypes.element)
             .isRequired,
@@ -25,12 +27,8 @@ class ViewSwitcher extends React.Component {
             PropTypes.string,
             PropTypes.number
         ]),
-        changeOn: PropTypes.func,
         // JSS
         classes: PropTypes.object.isRequired
-    };
-    static defaultProps = {
-        changeOn: (element, ms) => (element.clientHeight || ms > 750)
     };
     state = {
         previous: null,
@@ -38,6 +36,14 @@ class ViewSwitcher extends React.Component {
     };
     currentNode = null;
     interval = null;
+    changeOn = (newEl, ms) => {
+        if (ms > 750) return true;
+
+        const canvases = document.querySelectorAll(('canvas'));
+        for (let canvas of canvases) {
+            if (newEl.contains(canvas)) return true;
+        }
+    };
     updateCurrent = (props = this.props) => {
         if (props.active === this.state.current) return;
 
@@ -62,8 +68,8 @@ class ViewSwitcher extends React.Component {
         const startAt = Date.now();
         this.interval = setInterval(() => {
             if (!this.currentNode) return;
-            const shouldChange = props.changeOn(
-                this.currentNode, (Date.now() - startAt)
+            const shouldChange = this.changeOn(
+                this.currentNode, Date.now() - startAt
             );
             if (shouldChange) {
                 clearInterval(this.interval);
@@ -78,23 +84,25 @@ class ViewSwitcher extends React.Component {
         this.updateCurrent();
     }
     render() {
-        const { classes, children } = this.props;
+        const { classes, children, isRendering } = this.props;
         const { current, previous } = this.state;
 
         const activeChildren = children.map((child, i) => {
             const isActive = current === i || previous === i;
+            const isFrozen = previous === i || isRendering;
+            const setRef = (ref) => {
+                if (current === i) this.currentNode = ref;
+            };
             return (!isActive)
                 ? null
                 : (
-                    <div
-                        ref={(ref) => {
-                            if (current === i) this.currentNode = ref;
-                        }}
-                        key={`${classes.root}_${i}`}
-                        className={classes.inner}
-                    >
-                        { (isActive) ? child : null }
-                    </div>
+                    <React.Fragment key={`view-${i}`}>
+                        <Broadcast channel="freeze" value={isFrozen}>
+                            <div ref={setRef} className={classes.inner}>
+                                { (isActive) ? child : null }
+                            </div>
+                        </Broadcast>
+                    </React.Fragment>
                 );
         });
         const flexDirection = (previous == null || current >= previous)

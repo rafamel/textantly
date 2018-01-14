@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
-import Paper from 'material-ui/Paper';
 import ResponsiveSwipeable from 'components/Elements/ResponsiveSwipeable';
 import TextEditor from './TextEditor/TextEditor';
 import ImageEditor from './ImageEditor/ImageEditor';
@@ -12,7 +11,7 @@ const styles = {
         marginBottom: 48
     },
     editor: {
-        padding: '14px 22px 18px'
+        padding: '0 20px'
     }
 };
 
@@ -43,15 +42,13 @@ class Editor extends React.Component {
         const viewIndex = this.tabDict.toIndex[mainView] || 0;
         return (
             <div className={classes.root}>
-                <Paper>
-                    <ResponsiveSwipeable
-                        index={viewIndex}
-                        onChangeIndex={this.handleChange}
-                    >
-                        <TextEditor className={classes.editor} />
-                        <ImageEditor />
-                    </ResponsiveSwipeable>
-                </Paper>
+                <ResponsiveSwipeable
+                    index={viewIndex}
+                    onChangeIndex={this.handleChange}
+                >
+                    <TextEditor className={classes.editor} />
+                    <ImageEditor />
+                </ResponsiveSwipeable>
             </div>
         );
     }

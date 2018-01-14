@@ -1,4 +1,5 @@
-import { createStore } from 'redux';
-import { reducer } from './index';
+import { createStore, applyMiddleware } from 'redux';
+import { reducer, logic } from './index';
 
-export default createStore(reducer);
+const middleware = applyMiddleware(logic);
+export default createStore(reducer, middleware);

@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
 import { withStyles } from 'material-ui/styles';
+import withBroadcast from 'utils/withBroadcast';
 import ResizeObserver from 'resize-observer-polyfill';
 import ImageRender from '../ImageRender';
 import rotateEngine from 'engine/rotate';
@@ -28,8 +30,11 @@ const styles = {
     }
 };
 
+const broadcaster = withBroadcast('freeze');
+
 class RotateView extends React.Component {
     static propTypes = {
+        freeze: PropTypes.bool,
         rotate: PropTypes.number,
         // JSS
         classes: PropTypes.object.isRequired
@@ -114,6 +119,9 @@ class RotateView extends React.Component {
     componentWillUnmount() {
         this.observer.unobserve(this.node);
     }
+    shouldComponentUpdate(nextProps) {
+        return !nextProps.freeze;
+    }
     render() {
         const { classes, rotate } = this.props;
         return (
@@ -134,7 +142,7 @@ class RotateView extends React.Component {
                         }}
                     >
                         <ImageRender
-                            exclude="rotate"
+                            exclude='rotate'
                             getDimensions={this.setImage}
                         />
                     </div>
@@ -144,4 +152,7 @@ class RotateView extends React.Component {
     }
 };
 
-export default withStyles(styles)(RotateView);
+export default compose(
+    broadcaster,
+    withStyles(styles)
+)(RotateView);

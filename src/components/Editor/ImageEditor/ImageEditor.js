@@ -18,8 +18,8 @@ const { connector, propTypes: storeTypes } = withState(
         sourceDimensions: state.edits.source.dimensions
     }), (actions) => ({
         changeImageViews: actions._activeViews.changeImage,
-        changeImage: actions.edits.changeImage,
-        changeImageTemp: actions.edits.changeImageTemp
+        setImageHard: actions.edits.setImageHard,
+        setImageTemp: actions.edits.setImageTemp
     })
 );
 
@@ -45,7 +45,7 @@ class ImageEditor extends React.Component {
         this.lockIndex = true;
         this.setState({ activeIndex: this.tabDict.toIndex.flip });
 
-        this.props.changeImage({
+        this.props.setImageHard({
             flip: !this.props.imageEdits.flip
         });
 
@@ -70,8 +70,8 @@ class ImageEditor extends React.Component {
             imageViews,
             changeImageViews,
             imageEdits,
-            changeImage,
-            changeImageTemp,
+            setImageHard,
+            setImageTemp,
             sourceDimensions
         } = this.props;
         const isOpen = (name) => imageViews.main === name;
@@ -97,8 +97,8 @@ class ImageEditor extends React.Component {
                 <Collapse isOpened={isOpen('rotate')}>
                     <RotateSlider
                         value={imageEdits.rotate}
-                        changeImage={changeImage}
-                        changeImageTemp={changeImageTemp}
+                        setImageHard={setImageHard}
+                        setImageTemp={setImageTemp}
                     />
                 </Collapse>
                 <VerticalTab
@@ -112,8 +112,8 @@ class ImageEditor extends React.Component {
                             sourceDimensions,
                             { ...imageEdits, resize: undefined }
                         )}
-                        changeImage={changeImage}
-                        changeImageTemp={changeImageTemp}
+                        setImageHard={setImageHard}
+                        setImageTemp={setImageTemp}
                     />
                 </Collapse>
                 <VerticalTab

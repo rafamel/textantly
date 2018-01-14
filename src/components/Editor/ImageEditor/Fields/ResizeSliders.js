@@ -6,8 +6,8 @@ class ResizeSliders extends React.Component {
     static propTypes = {
         value: PropTypes.object.isRequired,
         dimensions: PropTypes.object.isRequired,
-        changeImage: PropTypes.func.isRequired,
-        changeImageTemp: PropTypes.func.isRequired
+        setImageHard: PropTypes.func.isRequired,
+        setImageTemp: PropTypes.func.isRequired
     };
     handleTempChange = (key) => (e) => {
         // this.props.changeImageTemp({

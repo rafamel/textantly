@@ -11,16 +11,18 @@ const styles = {
         top: 0,
         left: 0,
         right: 0,
-        transition: 'opacity linear .75s'
+        transition: 'opacity linear .75s',
+        zIndex: 9999
     },
     bar: {
-        height: '3px'
+        height: '2.5px'
     }
 };
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        _loading: state._loading
+        loading: state._loading.loading,
+        rendering: state._loading.rendering
     })
 );
 
@@ -36,7 +38,7 @@ class LoadingBar extends React.Component {
         timeout: null
     };
     componentWillReceiveProps(nextProps) {
-        const _opacity = Number(nextProps._loading);
+        const _opacity = Number(nextProps.loading || nextProps.rendering);
         if (_opacity === this.state._opacity) return;
 
         if (this.state.timeout) clearTimeout(this.state.timeout);
@@ -68,6 +70,7 @@ class LoadingBar extends React.Component {
                 style={style}
             >
                 <LinearProgress
+                    color="accent"
                     className={classes.bar}
                 />
             </div>

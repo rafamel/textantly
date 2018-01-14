@@ -1,29 +1,15 @@
 import PropTypes from 'prop-types';
-import { typesActions } from './utils';
-import historyUtil, {
-    defaultHistoryValues,
-    propTypes as historyTypes
-} from './history';
+import { createLogic } from 'redux-logic';
+import typesActions, { typeInTypes, values } from './utils/types-actions';
+import Historian, {
+    defaultValues as historianDefaults,
+    propTypes as historianTypes
+} from './historian';
 import config from 'config';
-
-const { types: t, actions } = typesActions({
-    pre: `PERM_EDITS`,
-    types: [
-        'RESET',
-        'BACKWARDS',
-        'FORWARDS',
-        'TEMP_FORGET',
-        'CHANGE_SOURCE',
-        'CHANGE_SOURCE_TEMP',
-        'CHANGE_TEXT',
-        'CHANGE_TEXT_TEMP',
-        'CHANGE_IMAGE',
-        'CHANGE_IMAGE_TEMP'
-    ]
-});
+import loading from './loading';
 
 const initialState = {
-    _history: defaultHistoryValues,
+    _history: historianDefaults,
     source: {
         ...config.defaults.src,
         from: false,
@@ -40,14 +26,15 @@ const initialState = {
 };
 
 const propTypes = {
-    _history: historyTypes,
+    _history: historianTypes,
     source: {
         name: PropTypes.string.isRequired,
         src: PropTypes.string.isRequired,
-        from: PropTypes.oneOfType([
-            PropTypes.bool,
-            PropTypes.string
-        ]).isRequired,
+        from: PropTypes
+            .oneOfType([
+                PropTypes.bool,
+                PropTypes.string
+            ]).isRequired,
         dimensions: {
             width: PropTypes.number.isRequired,
             height: PropTypes.number.isRequired
@@ -77,72 +64,135 @@ const propTypes = {
     }
 };
 
-function changeSource(state, payload) {
-    const image = (payload.src && state.source.src !== payload.src)
-        ? initialState.image
-        : state.image;
-    return {
-        ...state,
-        image,
-        source: {
-            ...state.source,
-            ...payload
-        }
-    };
-}
-
-function changeText(state, payload) {
-    return {
-        ...state,
-        text: {
-            ...state.text,
-            ...payload
-        }
-    };
-}
-
-function changeImage(state, payload) {
-    return {
-        ...state,
-        image: {
-            ...state.image,
-            ...payload
-        }
-    };
-}
-
-const history = historyUtil('_history');
+const typesPre = 'EDITS';
+const FULL_OVERWRITE = `${typesPre}_FULL_OVERWRITE`;
+const historian = Historian('_history');
 
 function reducer(state = initialState, { type, payload }) {
     switch (type) {
-    case t.RESET:
-        return history.insert(state, initialState);
-    case t.BACKWARDS:
-        return history.backwards(state);
-    case t.FORWARDS:
-        return history.forwards(state);
-    case t.TEMP_FORGET:
-        return history.tempForget(state);
-    case t.CHANGE_SOURCE:
-        return history.insert(state, changeSource(state, payload));
-    case t.CHANGE_SOURCE_TEMP:
-        return history.tempInsert(state, changeSource(state, payload));
-    case t.CHANGE_TEXT:
-        return history.insert(state, changeText(state, payload));
-    case t.CHANGE_TEXT_TEMP:
-        return history.tempInsert(state, changeText(state, payload));
-    case t.CHANGE_IMAGE:
-        return history.insert(state, changeImage(state, payload));
-    case t.CHANGE_IMAGE_TEMP:
-        return history.tempInsert(state, changeImage(state, payload));
+    case FULL_OVERWRITE:
+        return payload;
     default:
         return state;
     }
 }
 
+function setRendering({ state, payload }, dispatch) {
+    if (state.source.src !== payload.source.src) {
+        dispatch(loading.actions.setRendering(true));
+    }
+}
+
+const main = typesActions({
+    pre: typesPre,
+    types: ['SET_SOURCE', 'SET_TEXT', 'SET_IMAGE'],
+    post: ['HARD', 'TEMP']
+});
+main.logic = createLogic({
+    type: values(main.types),
+    transform({ getState, action }, next) {
+        let payload = action.payload;
+        payload = (() => {
+            const state = getState().edits;
+            const is = typeInTypes(action.type);
+
+            switch (true) {
+            case is(main.typesBy.type.SET_SOURCE):
+                return {
+                    ...state,
+                    image: (payload.src && payload.src !== state.source.src)
+                        ? initialState.image
+                        : state.image,
+                    source: { ...state.source, ...payload }
+                };
+            case is(main.typesBy.type.SET_TEXT):
+                return {
+                    ...state,
+                    text: { ...state.text, ...payload }
+                };
+            case is(main.typesBy.type.SET_IMAGE):
+                return {
+                    ...state,
+                    image: { ...state.image, ...payload }
+                };
+            default:
+                return state;
+            }
+        })();
+        next({ type: action.type, payload });
+    },
+    process({ getState, action }, dispatch, done) {
+        let payload = action.payload;
+        payload = (() => {
+            const state = getState().edits;
+            const is = typeInTypes(action.type);
+
+            switch (true) {
+            case is(main.typesBy.type.SET_SOURCE):
+                setRendering({ state, payload }, dispatch);
+                // eslint-disable-next-line
+            case is(main.typesBy.post.HARD):
+                return historian.insert(state, payload);
+            case is(main.typesBy.post.TEMP):
+                return historian.tempInsert(state, payload);
+            default:
+                return state;
+            }
+        })();
+
+        dispatch({ type: FULL_OVERWRITE, payload });
+        done();
+    }
+});
+
+const history = typesActions({
+    pre: `${typesPre}_HISTORY`,
+    types: ['RESET', 'BACKWARDS', 'FORWARDS', 'TEMP_FORGET']
+});
+
+history.logic = createLogic({
+    type: values(history.types),
+    transform({ getState, action }, next) {
+        const state = getState().edits;
+        const payload = (() => {
+            switch (action.type) {
+            case history.types.RESET:
+                return historian.insert(state, initialState);
+            case history.types.BACKWARDS:
+                return historian.backwards(state);
+            case history.types.FORWARDS:
+                return historian.forwards(state);
+            case history.types.TEMP_FORGET:
+                return historian.forwards(state);
+            default:
+                return state;
+            }
+        })();
+        next({ type: action.type, payload });
+    },
+    process({ getState, action }, dispatch, done) {
+        const state = getState().edits;
+        const payload = action.payload;
+
+        setRendering({ state, payload }, dispatch);
+        dispatch({ type: FULL_OVERWRITE, payload });
+        done();
+    }
+});
+
 export default {
     propTypes,
     reducer,
-    actions,
-    types: t
+    logic: [
+        main.logic,
+        history.logic
+    ],
+    actions: {
+        ...main.actions,
+        ...history.actions
+    },
+    types: {
+        ...main.types,
+        ...history.types
+    }
 };

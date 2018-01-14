@@ -2,16 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { withState, compose } from 'store/utils';
+import withBroadcast from 'utils/withBroadcast';
 import isEqual from 'lodash.isequal';
 import engine from 'engine';
 
 const styles = {
     root: {
-        maxWidth: '100%',
         textAlign: 'center',
         '& canvas': {
             display: 'none',
             maxWidth: '100%',
+            maxHeight: '100%',
             margin: '0 auto',
             '&:last-child': {
                 display: 'block'
@@ -20,12 +21,15 @@ const styles = {
     }
 };
 
+const broadcaster = withBroadcast('freeze');
+
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         source: state.edits.source,
         imageEdits: state.edits.image
     }), (actions) => ({
-        changeSource: actions.edits.changeSource,
+        setRendering: actions._loading.setRendering,
+        setSourceHard: actions.edits.setSourceHard,
         tempForget: actions.edits.tempForget,
         addAlert: actions.alerts.add
     })
@@ -35,6 +39,7 @@ class ImageRender extends React.Component {
     static propTypes = {
         ...storeTypes,
         exclude: PropTypes.string,
+        freeze: PropTypes.bool,
         getDimensions: PropTypes.func,
         // JSS
         classes: PropTypes.object.isRequired
@@ -74,6 +79,7 @@ class ImageRender extends React.Component {
         const canvas = engine.draw(image, { imageEdits });
         rootNode.prepend(canvas);
         if (rootNode.children[1]) rootNode.children[1].remove();
+        props.setRendering(false);
         if (props.getDimensions) {
             props.getDimensions({ width: canvas.width, height: canvas.height });
         }
@@ -102,7 +108,7 @@ class ImageRender extends React.Component {
                 image: img,
                 force: true
             });
-            this.props.changeSource({
+            this.props.setSourceHard({
                 ...source,
                 dimensions: {
                     width: img.naturalWidth,
@@ -120,19 +126,15 @@ class ImageRender extends React.Component {
         if (nextProps.source.src !== this.src.current
             && nextProps.source.src !== this.src.loading) {
             this.loadImage(nextProps.source);
-        } else {
+        } else if (!nextProps.freeze) {
             this.drawCanvas({ props: nextProps });
         }
     }
     componentDidMount() {
         this.loadImage(this.props.source);
     }
-    componentDidUpdate() {
-        const rootNode = this.rootNode;
-        if (!rootNode) return;
-        if (!rootNode.innerHTML) {
-            this.drawCanvas({ force: true });
-        }
+    shouldComponentUpdate() {
+        return false;
     }
     render() {
         const classes = this.props.classes;
@@ -148,5 +150,6 @@ class ImageRender extends React.Component {
 
 export default compose(
     withStyles(styles),
+    broadcaster,
     connector
 )(ImageRender);
