@@ -22,8 +22,8 @@ class VerticalTabs extends React.Component {
         return (
             <div>
                 {
-                    children.map((child) => {
-                        if (!child.type || child.type.name !== 'VerticalTab') {
+                    React.Children.map(children, (child) => {
+                        if (!child.type || !child.type._isVerticalTab) {
                             return child;
                         }
                         i++;
@@ -33,8 +33,6 @@ class VerticalTabs extends React.Component {
                                 indicatorColor="primary"
                                 textColor="primary"
                                 {...this.props}
-                                // eslint-disable-next-line
-                                children={undefined}
                                 value={isActive(i)}
                                 onChange={this.handleChange(i)}
                                 fullWidth

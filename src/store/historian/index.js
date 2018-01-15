@@ -33,10 +33,10 @@ const defaultValues = {
 };
 
 const propTypes = {
-    index: PropTypes.number.isRequired,
-    arr: PropTypes.array.isRequired,
-    temp: PropTypes.object,
-    can: PropTypes.shape({
+    index: () => PropTypes.number.isRequired,
+    arr: () => PropTypes.array.isRequired,
+    temp: () => PropTypes.object,
+    can: () => PropTypes.shape({
         forwards: PropTypes.bool.isRequired,
         backwards: PropTypes.bool.isRequired
     }).isRequired

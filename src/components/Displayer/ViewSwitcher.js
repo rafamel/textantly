@@ -49,7 +49,8 @@ class ViewSwitcher extends React.Component {
 
         let active = props.active;
         if (typeof props.active === 'string') {
-            active = props.children.map(x => x.key).indexOf(props.active);
+            active = React.Children.map(props.children, x => x.key)
+                .indexOf(props.active);
             if (active === -1) active = null;
             if (active === this.state.current) return;
         }

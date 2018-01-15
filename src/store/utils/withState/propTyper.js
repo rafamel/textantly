@@ -1,22 +1,19 @@
 import PropTypes from 'prop-types';
 
-function isPropType(obj) {
-    return Boolean(obj && obj.name === 'bound checkType');
-}
-
-function getType(obj, firstKey) {
+function getType(obj, firstKey, actions) {
     // eslint-disable-next-line
     const errorMsg = () => console.error(
         `Some type could not be retrieved on key "${firstKey}" for withState()`
     );
     if (!obj) return errorMsg();
-    if (isPropType(obj)) return obj;
+    if (typeof obj === 'function') {
+        if (actions) return PropTypes.func.isRequired;
+        else return obj();
+    }
 
     const keys = Object.keys(obj);
-    if (!keys.length) {
-        if (typeof obj !== 'function') return errorMsg();
-        else return PropTypes.func.isRequired;
-    }
+    if (!keys.length)  return errorMsg();
+
     const ans = {};
     keys.forEach(key => {
         ans[key] = getType(obj[key], firstKey);
@@ -24,17 +21,12 @@ function getType(obj, firstKey) {
     return PropTypes.shape(ans).isRequired;
 }
 
-function propTyper(obj) {
-    return (process.env.NODE_ENV === 'production')
-        ? {}
-        : Object.keys(obj)
-            .reduce((acc, key) => {
-                acc[key] = getType(obj[key], key);
-                return acc;
-            }, {});
+function propTyper(obj, actions = false) {
+    return Object.keys(obj)
+        .reduce((acc, key) => {
+            acc[key] = getType(obj[key], key, actions);
+            return acc;
+        }, {});
 }
 
-export {
-    propTyper as default,
-    isPropType
-};
+export default propTyper;

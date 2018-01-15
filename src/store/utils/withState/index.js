@@ -14,9 +14,9 @@ export default function withState(...args) {
             args[1] = args[1](actions);
         }
         if (typeof args[1] === 'function') {
-            Object.assign(types, propTyper(args[1](() => {})));
+            Object.assign(types, propTyper(args[1](() => {}), true));
         } else {
-            Object.assign(types, propTyper(args[1]));
+            Object.assign(types, propTyper(args[1], true));
         }
     }
 

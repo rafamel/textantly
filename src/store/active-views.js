@@ -16,14 +16,14 @@ const initialState = {
 };
 
 const propTypes = {
-    main: PropTypes.string.isRequired,
+    main: () => PropTypes.string.isRequired,
     image: {
-        main: PropTypes.string,
-        crop: PropTypes.string.isRequired
+        main: () => PropTypes.string,
+        crop: () => PropTypes.string.isRequired
     },
     dimensions: {
-        width: PropTypes.number.isRequired,
-        height: PropTypes.number.isRequired
+        width: () => PropTypes.number.isRequired,
+        height: () => PropTypes.number.isRequired
     }
 };
 

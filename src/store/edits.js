@@ -28,39 +28,39 @@ const initialState = {
 const propTypes = {
     _history: historianTypes,
     source: {
-        name: PropTypes.string.isRequired,
-        src: PropTypes.string.isRequired,
-        from: PropTypes
+        name: () => PropTypes.string.isRequired,
+        src: () => PropTypes.string.isRequired,
+        from: () => PropTypes
             .oneOfType([
                 PropTypes.bool,
                 PropTypes.string
             ]).isRequired,
         dimensions: {
-            width: PropTypes.number.isRequired,
-            height: PropTypes.number.isRequired
+            width: () => PropTypes.number.isRequired,
+            height: () => PropTypes.number.isRequired
         }
     },
     text: {
-        textString: PropTypes.string.isRequired,
-        fontFamily: PropTypes.string.isRequired,
-        fontWeight: PropTypes
+        textString: () => PropTypes.string.isRequired,
+        fontFamily: () => PropTypes.string.isRequired,
+        fontWeight: () => PropTypes
             .oneOfType([
                 PropTypes.string,
                 PropTypes.number
             ]).isRequired,
-        alignment: PropTypes.string.isRequired,
-        overlayPosition: PropTypes.string.isRequired,
-        overlayWidth: PropTypes.number.isRequired,
-        overlayHeight: PropTypes.number.isRequired,
-        colorScheme: PropTypes.string.isRequired
+        alignment: () => PropTypes.string.isRequired,
+        overlayPosition: () => PropTypes.string.isRequired,
+        overlayWidth: () => PropTypes.number.isRequired,
+        overlayHeight: () => PropTypes.number.isRequired,
+        colorScheme: () => PropTypes.string.isRequired
     },
     image: {
-        rotate: PropTypes.number.isRequired,
+        rotate: () => PropTypes.number.isRequired,
         resize: {
-            width: PropTypes.number,
-            height: PropTypes.number
+            width: () => PropTypes.number,
+            height: () => PropTypes.number
         },
-        flip: PropTypes.bool.isRequired
+        flip: () => PropTypes.bool.isRequired
     }
 };
 
