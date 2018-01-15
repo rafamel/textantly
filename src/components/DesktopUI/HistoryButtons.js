@@ -16,7 +16,8 @@ const styles = theme => ({
         margin: 0,
         flexGrow: 1,
         borderRadius: 0,
-        boxShadow: 'none'
+        boxShadow: 'none',
+        minWidth: 60
     },
     leftIcon: {
         marginRight: theme.spacing.unit

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Slider from 'components/Elements/Fields/Slider';
+import isEqual from 'lodash.isequal';
 
 class RotateSlider extends React.Component {
     static propTypes = {
@@ -18,6 +19,9 @@ class RotateSlider extends React.Component {
             rotate: e.target.value
         });
     };
+    shouldComponentUpdate(nextProps) {
+        return !isEqual(this.props, nextProps);
+    }
     render() {
         return (
             <Slider

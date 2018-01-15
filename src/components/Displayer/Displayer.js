@@ -18,16 +18,18 @@ const styles = {
         textAlign: 'center'
     },
     view: {
+        width: '100%',
         margin: 'auto'
     }
 };
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        isRendering: state._loading.rendering,
-        activeViews: state._activeViews,
-        textEdits: state.edits.text,
-        imageEdits: state.edits.image
+        mainView: state._activeViews.main,
+        imageView: state._activeViews.image,
+        isRendering: state._loading.rendering
+    }), (actions) => ({
+        setDimensions: actions._activeViews.setDimensions
     })
 );
 
@@ -41,24 +43,24 @@ class Displayer extends React.Component {
     rootNode = null;
     observer = new ResizeObserver((entries) => {
         const { width, height } = entries[0].contentRect;
-
+        this.props.setDimensions({ width, height });
     });
+    componentDidMount() {
+        this.observer.observe(this.rootNode);
+    }
+    componentWillUnmount() {
+        this.observer.unobserve(this.rootNode);
+    }
     render() {
-        const {
-            classes,
-            textEdits,
-            imageEdits,
-            className,
-            isRendering
-        } = this.props;
+        const { classes, className, isRendering } = this.props;
 
         const activeView = () => {
-            const { main, image } = this.props.activeViews;
-            if (!main || main !== 'image') {
+            const { mainView, imageView } = this.props;
+            if (!mainView || mainView !== 'image') {
                 return 'text-view';
             }
             // Image Views
-            switch (image.main) {
+            switch (imageView.main) {
             case 'rotate':
                 return 'rotate-view';
             default:
@@ -73,20 +75,12 @@ class Displayer extends React.Component {
             >
                 <div className={classes.view}>
                     <ViewSwitcher
+                        broadFreeze={isRendering}
                         active={activeView()}
-                        isRendering={isRendering}
                     >
-                        <TextView
-                            key="text-view"
-                            textEdits={textEdits}
-                        />
-                        <RotateView
-                            key="rotate-view"
-                            rotate={imageEdits.rotate}
-                        />
-                        <ImageRender
-                            key="image-render-view"
-                        />
+                        <TextView key="text-view" />
+                        <RotateView key="rotate-view" />
+                        <ImageRender key="image-render-view" />
                     </ViewSwitcher>
                 </div>
             </main>

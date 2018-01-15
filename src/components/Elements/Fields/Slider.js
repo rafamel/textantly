@@ -5,11 +5,12 @@ import classnames from 'classnames';
 import FreeLabel from './FreeLabel';
 import RCSlider, { createSliderWithTooltip } from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import isEqual from 'lodash.isequal';
 
 const SliderWithTooltip = createSliderWithTooltip(RCSlider);
 
 const styles = (theme) => {
-    const primary = theme.palette.primary['500'];
+    const primary = theme.palette.primary.main;
     const body1 = theme.typography.body1;
     return {
         root: {
@@ -53,7 +54,6 @@ const styles = (theme) => {
 
 class Slider extends React.Component {
     static propTypes = {
-        id: PropTypes.string,
         name: PropTypes.string.isRequired,
         label: PropTypes.string,
         value: PropTypes.number,
@@ -79,36 +79,30 @@ class Slider extends React.Component {
             { target: { name: this.props.name, value: val } }
         );
     };
+    shouldComponentUpdate(nextProps) {
+        return !isEqual(this.props, nextProps);
+    }
     render() {
-        const {
-            id,
-            label,
-            value,
-            min,
-            max,
-            step,
-            className,
-            style,
-            classes
-        } = this.props;
-        const freeLabel = (!label) ? null : (
+        const props = this.props;
+        const classes = props.classes;
+
+        const freeLabel = (!props.label) ? null : (
             <FreeLabel
-                label={label}
+                label={props.label}
                 style={{ marginBottom: 6 }}
             />
         );
         return (
             <div
-                className={ classnames(classes.root, className) }
-                style={style}
+                className={ classnames(classes.root, props.className) }
+                style={props.style}
             >
                 { freeLabel }
                 <SliderWithTooltip
-                    id={id}
-                    value={value || 0}
-                    min={min || 0}
-                    max={max || 100}
-                    step={step || 1}
+                    value={props.value || 0}
+                    min={props.min || 0}
+                    max={props.max || 100}
+                    step={props.step || 1}
                     onChange={this.onChange}
                     onAfterChange={this.onAfterChange}
                     tipFormatter={value => (

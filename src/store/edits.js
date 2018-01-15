@@ -123,14 +123,14 @@ main.logic = createLogic({
     },
     process({ getState, action }, dispatch, done) {
         let payload = action.payload;
-        payload = (() => {
-            const state = getState().edits;
-            const is = typeInTypes(action.type);
+        const state = getState().edits;
+        const is = typeInTypes(action.type);
 
+        if (is(main.typesBy.type.SET_SOURCE)) {
+            setRendering({ state, payload }, dispatch);
+        }
+        payload = (() => {
             switch (true) {
-            case is(main.typesBy.type.SET_SOURCE):
-                setRendering({ state, payload }, dispatch);
-                // eslint-disable-next-line
             case is(main.typesBy.post.HARD):
                 return historian.insert(state, payload);
             case is(main.typesBy.post.TEMP):
@@ -139,7 +139,6 @@ main.logic = createLogic({
                 return state;
             }
         })();
-
         dispatch({ type: FULL_OVERWRITE, payload });
         done();
     }

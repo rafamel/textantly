@@ -87,7 +87,9 @@ function typesActions({ pre, types, post }) {
     return ans;
 }
 
-const typeInTypes = (type) => (types) => values(types).includes(type);
+const typeInTypes = (type) => (types) => {
+    return values(types).includes(type);
+};
 
 export {
     typesActions as default,

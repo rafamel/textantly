@@ -25,8 +25,8 @@ function getDimensions({ width, height }, degrees = 0) {
     } else {
         const [heightA, widthA] = trig(angle, width);
         const [widthB, heightB] = trig(angle, height);
-        ans.width = widthA + widthB;
-        ans.height = heightA + heightB;
+        ans.width = Math.ceil(widthA + widthB);
+        ans.height = Math.ceil(heightA + heightB);
     }
     return ans;
 }

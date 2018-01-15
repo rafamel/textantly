@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Slider from 'components/Elements/Fields/Slider';
+import isEqual from 'lodash.isequal';
 
 class ResizeSliders extends React.Component {
     static propTypes = {
@@ -19,6 +20,9 @@ class ResizeSliders extends React.Component {
         //     resize: e.target.value
         // });
     };
+    shouldComponentUpdate(nextProps) {
+        return !isEqual(this.props, nextProps);
+    }
     render() {
         const { value, dimensions } = this.props;
         return (

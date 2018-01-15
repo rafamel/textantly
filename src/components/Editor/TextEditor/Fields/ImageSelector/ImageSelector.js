@@ -7,6 +7,7 @@ import FolderOpen from 'material-ui-icons/FolderOpen';
 import Public from 'material-ui-icons/Public';
 import UrlDialog from './UrlDialog';
 import FreeLabel from 'components/Elements/Fields/FreeLabel';
+import isEqual from 'lodash.isequal';
 
 const styles = (theme) => ({
     root: {
@@ -128,10 +129,14 @@ class ImageSelector extends React.Component {
     componentWillMount() {
         this.unlockSyncTab();
     }
+    shouldComponentUpdate(_, nextState) {
+        return !isEqual(this.state, nextState);
+    }
     render() {
         const { classes, className, style } = this.props;
         let tabIndex = this.tabDict.toIndex[this.state.tab.current];
         if (tabIndex == null) tabIndex = false;
+
         return (
             <div
                 className={classnames(classes.root, className)}
@@ -157,11 +162,11 @@ class ImageSelector extends React.Component {
                 >
                     <Tab
                         icon={<FolderOpen />}
-                        className={classes.tab}
+                        classes={{ root: classes.tab }}
                     />
                     <Tab
                         icon={<Public />}
-                        className={classes.tab}
+                        classes={{ root: classes.tab }}
                     />
                 </Tabs>
             </div>

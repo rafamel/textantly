@@ -19,7 +19,7 @@ const styles = () => ({
 
 class ViewSwitcher extends React.Component {
     static propTypes = {
-        isRendering: PropTypes.bool,
+        broadFreeze: PropTypes.bool,
         children: PropTypes
             .arrayOf(PropTypes.element)
             .isRequired,
@@ -84,25 +84,27 @@ class ViewSwitcher extends React.Component {
         this.updateCurrent();
     }
     render() {
-        const { classes, children, isRendering } = this.props;
+        const { classes, children, broadFreeze } = this.props;
         const { current, previous } = this.state;
 
         const activeChildren = children.map((child, i) => {
             const isActive = current === i || previous === i;
-            const isFrozen = previous === i || isRendering;
+            const isFrozen = previous === i || broadFreeze;
             const setRef = (ref) => {
                 if (current === i) this.currentNode = ref;
             };
             return (!isActive)
                 ? null
                 : (
-                    <React.Fragment key={`view-${i}`}>
+                    <div
+                        key={`view-${i}`}
+                        ref={setRef}
+                        className={classes.inner}
+                    >
                         <Broadcast channel="freeze" value={isFrozen}>
-                            <div ref={setRef} className={classes.inner}>
-                                { (isActive) ? child : null }
-                            </div>
+                            { (isActive) ? child : null }
                         </Broadcast>
-                    </React.Fragment>
+                    </div>
                 );
         });
         const flexDirection = (previous == null || current >= previous)

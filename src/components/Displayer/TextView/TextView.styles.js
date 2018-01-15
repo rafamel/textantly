@@ -15,7 +15,6 @@ export default {
             : 'rgba(255,255,255,0.3)'
     },
     outer: {
-        overflow: 'hidden',
         position: 'absolute',
         display: 'flex',
         flexDirection: 'column',
@@ -29,12 +28,16 @@ export default {
         margin: '-0.125em 0 0',
         padding: 0,
         lineHeight: 0.9,
+        userSelect: 'none',
         color: ({ colorScheme }) => (colorScheme === 'dark')
             ? '#f2f2f2'
             : '#150f05',
         fontFamily: ({ fontFamily }) => fontFamily,
         fontWeight: ({ fontWeight }) => fontWeight,
-        textAlign: ({ alignment }) => alignment
+        textAlign: ({ alignment }) => alignment,
+        '&::selection': {
+            background: 'transparent'
+        }
     },
     overlayPosition: ({ overlayWidth, overlayHeight, overlayPosition }) => {
         const opposites = {

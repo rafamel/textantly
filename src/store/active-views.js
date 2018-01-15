@@ -3,7 +3,7 @@ import { typesActions } from './utils';
 
 const { types: t, actions } = typesActions({
     pre: 'ACTIVE_VIEWS',
-    types: ['CHANGE_MAIN', 'CHANGE_IMAGE']
+    types: ['CHANGE_MAIN', 'CHANGE_IMAGE', 'SET_DIMENSIONS']
 });
 
 const initialState = {
@@ -11,7 +11,8 @@ const initialState = {
     image: {
         main: null,
         crop: 'free'
-    }
+    },
+    dimensions: { width: 0, height: 0 }
 };
 
 const propTypes = {
@@ -19,6 +20,10 @@ const propTypes = {
     image: {
         main: PropTypes.string,
         crop: PropTypes.string.isRequired
+    },
+    dimensions: {
+        width: PropTypes.number.isRequired,
+        height: PropTypes.number.isRequired
     }
 };
 
@@ -40,6 +45,11 @@ function reducer(state = initialState, { type, payload }) {
                 ...state.image,
                 ...payload
             }
+        };
+    case t.SET_DIMENSIONS:
+        return {
+            ...state,
+            dimensions: payload
         };
     default:
         return state;

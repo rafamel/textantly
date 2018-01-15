@@ -41,7 +41,20 @@ function getDimensions(dimensions = {}, imageEdits) {
     return dimensionsEngine(dimensions, imageEdits);
 }
 
+function scale({ width, height, maxWidth, maxHeight }) {
+    const scaledWidth = Math.ceil(width * (maxHeight / height));
+    return (scaledWidth > maxWidth)
+        ? {
+            width: maxWidth,
+            height: Math.ceil(height * (maxWidth / width))
+        } : {
+            width: scaledWidth,
+            height: maxHeight
+        };
+}
+
 export default {
     draw,
-    getDimensions
+    getDimensions,
+    scale
 };

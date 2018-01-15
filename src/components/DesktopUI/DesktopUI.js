@@ -21,6 +21,7 @@ const styles = {
         overflow: 'hidden'
     },
     container: {
+        maxWidth: `calc(100% - ${drawerWidth}px)`,
         flexGrow: 1,
         display: 'flex',
         flexDirection: 'column'
@@ -48,12 +49,6 @@ class Container extends React.Component {
     static propTypes = {
         // JSS
         classes: PropTypes.object.isRequired
-    };
-    state = {
-        mobileOpen: false
-    };
-    handleDrawerToggle = () => {
-        this.setState({ mobileOpen: !this.state.mobileOpen });
     };
     render() {
         const { classes } = this.props;

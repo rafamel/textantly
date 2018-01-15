@@ -5,6 +5,7 @@ import BottomNavigation, { BottomNavigationAction } from 'material-ui/BottomNavi
 import Icon from 'material-ui/Icon';
 import CropSquare from 'material-ui-icons/CropSquare';
 import CropFree from 'material-ui-icons/CropFree';
+import isEqual from 'lodash.isequal';
 
 const styles = {
     root: {
@@ -28,6 +29,9 @@ class CropSelector extends React.Component {
     handleChange = (event, value) => {
         this.props.changeImageViews({ crop: value });
     };
+    shouldComponentUpdate(nextProps) {
+        return !isEqual(this.props, nextProps);
+    }
     render() {
         const { classes, cropView } = this.props;
 

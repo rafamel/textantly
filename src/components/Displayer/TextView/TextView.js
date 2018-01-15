@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { jss } from 'react-jss';
+import { withState, compose } from 'store/utils';
 import withBroadcast from 'utils/withBroadcast';
 import classnames from 'classnames';
 import ResizeObserver from 'resize-observer-polyfill';
@@ -10,28 +11,33 @@ import fontResize from './font-resize';
 import styles from './TextView.styles';
 
 const broadcaster = withBroadcast('freeze');
+const { connector, propTypes: storeTypes } = withState(
+    (state) => ({
+        textEdits: state.edits.text,
+        isTempEdit: Boolean(state.edits._history.temp)
+    })
+);
 
 class TextView extends React.Component {
     static propTypes = {
-        freeze: PropTypes.bool,
-        textEdits: PropTypes.object.isRequired
+        ...storeTypes,
+        freeze: PropTypes.bool
     };
     state = {
+        textString: '',
         fontSize: 100
     };
     // Nodes
     nodes = {};
-    setNode = (name) => (ref) => { this.nodes[name] = ref; };
-    // JSS
     styleSheet = jss.createStyleSheet(styles, { link: true });
     classes = this.styleSheet.classes;
-    stylesUpdate = (updateObj = this.props.textEdits) => {
-        this.styleSheet.update(updateObj).attach();
-    };
-    // Font Reize
     observer = {
         active: false,
         obj: new ResizeObserver(() => { this.fontResize(); })
+    };
+    setNode = (name) => (ref) => { this.nodes[name] = ref; };
+    stylesUpdate = (updateObj = this.props.textEdits) => {
+        this.styleSheet.update(updateObj).attach();
     };
     setObserver = ({ unobserve } = {}) => {
         if (unobserve) {
@@ -47,11 +53,13 @@ class TextView extends React.Component {
         }
     };
     fontResize = () => {
+        if (this.props.freeze || this.props.isTempEdit) return;
         fontResize.call(this);
     };
     // Lifecycle
     componentWillReceiveProps(nextProps) {
-        if (!nextProps.freeze) this.stylesUpdate(nextProps.textEdits);
+        if (nextProps.freeze || nextProps.isTempEdit) return;
+        this.stylesUpdate(nextProps.textEdits);
     }
     componentDidUpdate() {
         this.fontResize();
@@ -79,7 +87,7 @@ class TextView extends React.Component {
         const overlayStyle = (position === 'top' || position === 'bottom')
             ? { height: `${textEdits.overlayHeight}%` }
             : { width: `${textEdits.overlayWidth}%` };
-        // overlayStyle.opacity = (this.props.isRendering) ? 0 : 1;
+        const textOpacity = (this.props.isTempEdit) ? 0 : 1;
         return (
             <div className={classes.root}>
                 <div
@@ -100,7 +108,10 @@ class TextView extends React.Component {
                         >
                             <p
                                 className={classes.text}
-                                style={{ fontSize: this.state.fontSize }}
+                                style={{
+                                    fontSize: this.state.fontSize,
+                                    opacity: textOpacity
+                                }}
                             >
                                 {textString}
                             </p>
@@ -112,5 +123,7 @@ class TextView extends React.Component {
         );
     }
 };
-
-export default broadcaster(TextView);
+export default compose(
+    broadcaster,
+    connector
+)(TextView);

@@ -10,9 +10,8 @@ const styles = {
     root: {
         textAlign: 'center',
         '& canvas': {
-            display: 'none',
             maxWidth: '100%',
-            maxHeight: '100%',
+            display: 'none',
             margin: '0 auto',
             '&:last-child': {
                 display: 'block'
@@ -22,11 +21,11 @@ const styles = {
 };
 
 const broadcaster = withBroadcast('freeze');
-
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         source: state.edits.source,
-        imageEdits: state.edits.image
+        imageEdits: state.edits.image,
+        dimensions: state._activeViews.dimensions
     }), (actions) => ({
         setRendering: actions._loading.setRendering,
         setSourceHard: actions.edits.setSourceHard,
@@ -41,17 +40,40 @@ class ImageRender extends React.Component {
         exclude: PropTypes.string,
         freeze: PropTypes.bool,
         getDimensions: PropTypes.func,
+        available: PropTypes.object,
         // JSS
         classes: PropTypes.object.isRequired
     };
-    src = {
-        current: null,
-        loading: null
-    };
     rootNode = null;
+    src = { current: null, loading: null };
     drawn = {
+        canvas: null,
         image: null,
         for: null
+    };
+    updateAvailable = (props = this.props) => {
+        const canvas = this.drawn.canvas;
+        if (!canvas) return;
+
+        let available;
+        if (props.available) available = props.available;
+        else if (props.dimensions) available = props.dimensions;
+        if (!available) return;
+
+        let { width, height } = engine.scale({
+            width: canvas.width,
+            height: canvas.height,
+            maxWidth: available.width,
+            maxHeight: available.height
+        });
+
+        if (width < canvas.width) {
+            canvas.style.maxHeight = `${height}px`;
+            canvas.style.width = `${width}px`;
+        } else if (canvas.style.width) {
+            canvas.style.maxHeight = null;
+            canvas.style.width = null;
+        }
     };
     drawCanvas = ({ image, force, props }) => {
         if (!props) props = this.props;
@@ -73,17 +95,19 @@ class ImageRender extends React.Component {
             && this.drawn.for
             && isEqual(imageEdits, this.drawn.for)
         ) {
-            return;
+            return this.updateAvailable(props);
         }
 
         const canvas = engine.draw(image, { imageEdits });
-        rootNode.prepend(canvas);
-        if (rootNode.children[1]) rootNode.children[1].remove();
-        props.setRendering(false);
         if (props.getDimensions) {
             props.getDimensions({ width: canvas.width, height: canvas.height });
         }
+        this.drawn.canvas = canvas;
         this.drawn.for = imageEdits;
+        this.updateAvailable(props);
+        rootNode.prepend(canvas);
+        if (rootNode.children[1]) rootNode.children[1].remove();
+        props.setRendering(false);
     };
     loadImage = (source) => {
         const loadFailed = () => {

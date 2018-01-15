@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import Input, { InputLabel } from 'material-ui/Input';
 import { FormControl } from 'material-ui/Form';
 import Select from 'material-ui/Select';
+import isEqual from 'lodash.isequal';
 
 class Selector extends React.Component {
     static propTypes = {
-        id: PropTypes.string,
         name: PropTypes.string,
         label: PropTypes.string,
         value: PropTypes.string.isRequired,
@@ -14,14 +14,15 @@ class Selector extends React.Component {
         className: PropTypes.string,
         onChange: PropTypes.func
     };
+    shouldComponentUpdate(nextProps) {
+        return !isEqual(this.props, nextProps);
+    }
     render() {
-        const label = (!this.props.label)
-            ? null
-            : (
-                <InputLabel htmlFor={this.props.id}>
-                    {this.props.label}
-                </InputLabel>
-            );
+        const label = (!this.props.label) ? null : (
+            <InputLabel>
+                {this.props.label}
+            </InputLabel>
+        );
         return (
             <FormControl
                 className={this.props.className}
@@ -32,7 +33,6 @@ class Selector extends React.Component {
                 <Select
                     native
                     name={this.props.name}
-                    id={this.props.id}
                     value={this.props.value}
                     onChange={this.props.onChange}
                     input={<Input />}

@@ -25,11 +25,13 @@ function getType(obj, firstKey) {
 }
 
 function propTyper(obj) {
-    return Object.keys(obj)
-        .reduce((acc, key) => {
-            acc[key] = getType(obj[key], key);
-            return acc;
-        }, {});
+    return (process.env.NODE_ENV === 'production')
+        ? {}
+        : Object.keys(obj)
+            .reduce((acc, key) => {
+                acc[key] = getType(obj[key], key);
+                return acc;
+            }, {});
 }
 
 export {

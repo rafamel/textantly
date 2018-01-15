@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Selector from 'components/Elements/Fields/Selector';
+import isEqual from 'lodash.isequal';
 
 const weightsDict = {
     100: 'Thin',
@@ -16,7 +17,6 @@ const weightsDict = {
 
 class WeightSelector extends React.Component {
     static propTypes = {
-        id: PropTypes.string,
         name: PropTypes.string,
         label: PropTypes.string,
         value: PropTypes.oneOfType([
@@ -27,12 +27,19 @@ class WeightSelector extends React.Component {
         className: PropTypes.string,
         onChange: PropTypes.func
     };
-    state = {
+    weights = {
         lastIntentionalWeight: this.props.value,
         isIntentional: true
     };
+    handleChange = (e) => {
+        this.props.onChange(e);
+        this.weights = {
+            lastIntentionalWeight: e.target.value,
+            isIntentional: true
+        };
+    };
     componentWillReceiveProps(nextProps) {
-        const { lastIntentionalWeight, isIntentional } = this.state;
+        const { lastIntentionalWeight, isIntentional } = this.weights;
         const { fontFamilyWeights, onChange, name } = nextProps;
         const weightInWeights = fontFamilyWeights
             .map(String)
@@ -49,21 +56,17 @@ class WeightSelector extends React.Component {
                             ? [weight, distance]
                             : acc;
                     }, [-1, -1]);
-                this.setState({ isIntentional: false });
+                this.weights.isIntentional = false;
                 onChange({ target: { name, value: String(closestWeight[0]) } });
             }
         } else if (weightInWeights) {
-            this.setState({ isIntentional: true });
+            this.weights.isIntentional = true;
             onChange({ target: { name, value: lastIntentionalWeight } });
         }
     }
-    handleChange = (e) => {
-        this.props.onChange(e);
-        this.setState({
-            lastIntentionalWeight: e.target.value,
-            isIntentional: true
-        });
-    };
+    shouldComponentUpdate(nextProps) {
+        return !isEqual(this.props, nextProps);
+    }
     render() {
         return (
             <Selector

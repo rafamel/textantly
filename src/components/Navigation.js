@@ -52,6 +52,7 @@ class Navigation extends React.Component {
             root: classes.tab,
             labelContainer: classes.label
         };
+
         return (
             <Tabs
                 classes={{ root: className }}

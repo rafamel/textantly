@@ -4,8 +4,8 @@ import blueGrey from 'material-ui/colors/blueGrey';
 
 export default createMuiTheme({
     palette: {
-        primary: teal,
-        secondary: blueGrey
+        primary: { main: teal[500] },
+        secondary: { main: blueGrey[500] }
     },
     typography: {
         fontFamily: '"Roboto","Helvetica Neue",-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif',

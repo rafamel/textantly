@@ -1,19 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
 import { withStyles } from 'material-ui/styles';
+import { withState, compose } from 'store/utils';
 import withBroadcast from 'utils/withBroadcast';
-import ResizeObserver from 'resize-observer-polyfill';
 import ImageRender from '../ImageRender';
 import rotateEngine from 'engine/rotate';
+import engine from 'engine';
 
 const styles = {
-    root: {
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center'
-    },
     outer: {
         position: 'relative',
         maxWidth: '100%',
@@ -31,78 +25,58 @@ const styles = {
 };
 
 const broadcaster = withBroadcast('freeze');
+const { connector, propTypes: storeTypes } = withState(
+    (state) => ({
+        rotate: state.edits.image.rotate,
+        available: state._activeViews.dimensions
+    })
+);
 
 class RotateView extends React.Component {
     static propTypes = {
+        ...storeTypes,
         freeze: PropTypes.bool,
-        rotate: PropTypes.number,
         // JSS
         classes: PropTypes.object.isRequired
     };
     state = {
         outer: { height: 0, width: 0 },
-        inner: { height: 0, width: 0 }
+        inner: {}
     };
-    dimensions = {
-        available: { width: 0, height: 0 },
-        image: { width: 0, height: 0 }
-    };
-    observer = new ResizeObserver((entries) => {
-        const { width, height } = entries[0].contentRect;
-        this.setAvailable({ width, height });
-    });
-    setAvailable = ({ width, height }) => {
+    imageDimensions = { width: 0, height: 0 };
+    setImageDimensions = ({ width, height }) => {
         if (
-            width !== this.dimensions.available.width
-            || height !== this.dimensions.available.height
+            width !== this.imageDimensions.width
+            || height !== this.imageDimensions.height
         ) {
-            // Ignore height
-            this.dimensions.available = { width, height: null };
-            this.setComputed();
-        }
-    };
-    setImage = ({ width, height }) => {
-        if (
-            width !== this.dimensions.image.width
-            || height !== this.dimensions.image.height
-        ) {
-            this.dimensions.image = { width, height };
+            this.imageDimensions = { width, height };
             this.setComputed();
         }
     };
     setComputed = (degrees = this.props.rotate) => {
-        const { image, available } = this.dimensions;
-        const rotated = rotateEngine.getDimensions(
-            { width: image.width, height: image.height }, degrees
-        );
-
-        if (available.width === 0 || available.height === 0) {
-            return this.setState({
-                outer: { height: 0, width: 0 },
-                inner: { height: 0, width: 0 }
-            });
+        const image = this.imageDimensions;
+        const available = this.props.available;
+        if (!available.height || !available.width
+            || !image.height || !image.width) {
+            return this.setState({ outer: { width: 0, height: 0 } });
         }
 
-        const heightDiff = (rotated.height - (available.height || rotated.height));
-        const widthDiff = (rotated.width - (available.width || rotated.width));
-        if (heightDiff <= 0 && widthDiff <= 0) {
-            return this.setState({
-                outer: { height: rotated.height, width: rotated.width },
-                inner: { height: image.height, width: image.width, maxWidth: 'none' }
+        const rotated = rotateEngine.getDimensions(image, degrees);
+        const outer = (rotated.width <= available.width
+            && rotated.height <= available.height)
+            ? { width: rotated.width, height: rotated.height }
+            : engine.scale({
+                ...rotated,
+                maxHeight: available.height,
+                maxWidth: available.width
             });
-        }
-
-        const outer = (heightDiff > widthDiff)
-            ? {
-                height: available.height,
-                width: (rotated.width * available.height) / rotated.height
-            } : {
-                height: (rotated.height * available.width) / rotated.width,
-                width: available.width
-            };
         const inner = {
-            height: (outer.height * image.height) / rotated.height,
-            width: (outer.width * image.width) / rotated.width
+            height: Math.round(
+                (outer.height * image.height) / rotated.height
+            ),
+            width: Math.round(
+                (outer.width * image.width) / rotated.width
+            )
         };
         return this.setState({ outer, inner });
     };
@@ -110,14 +84,7 @@ class RotateView extends React.Component {
         this.setComputed(nextProps.rotate);
     }
     componentDidMount() {
-        this.observer.observe(this.node);
-        this.setAvailable({
-            width: this.node.clientWidth,
-            height: this.node.clientHeight
-        });
-    }
-    componentWillUnmount() {
-        this.observer.unobserve(this.node);
+        this.setComputed();
     }
     shouldComponentUpdate(nextProps) {
         return !nextProps.freeze;
@@ -127,25 +94,22 @@ class RotateView extends React.Component {
         return (
             <div
                 ref={(ref) => { this.node = ref; }}
-                className={classes.root}
+                className={classes.outer}
+                style={this.state.outer}
             >
                 <div
-                    className={classes.outer}
-                    style={this.state.outer}
+                    className={classes.inner}
+                    style={{
+                        ...this.state.inner,
+                        transform: (rotate)
+                            ? `rotate(${rotate}deg)` : 'none'
+                    }}
                 >
-                    <div
-                        className={classes.inner}
-                        style={{
-                            ...this.state.inner,
-                            transform: (rotate)
-                                ? `rotate(${rotate}deg)` : 'none'
-                        }}
-                    >
-                        <ImageRender
-                            exclude='rotate'
-                            getDimensions={this.setImage}
-                        />
-                    </div>
+                    <ImageRender
+                        available={this.state.inner}
+                        exclude='rotate'
+                        getDimensions={this.setImageDimensions}
+                    />
                 </div>
             </div>
         );
@@ -154,5 +118,6 @@ class RotateView extends React.Component {
 
 export default compose(
     broadcaster,
+    connector,
     withStyles(styles)
 )(RotateView);

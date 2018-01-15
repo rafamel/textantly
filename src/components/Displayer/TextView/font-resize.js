@@ -5,8 +5,8 @@ function getDimensions() {
     if (!nodes.parent || !nodes.child) return;
     const dimensions = {
         parent: {
-            width: nodes.parent.clientWidth + 1,
-            height: nodes.parent.clientHeight + 1
+            width: nodes.parent.clientWidth + 2,
+            height: nodes.parent.clientHeight + 2
         },
         child: {
             width: nodes.child.clientWidth,
