@@ -7,7 +7,6 @@ import ResizeObserver from 'resize-observer-polyfill';
 import ViewSwitcher from './ViewSwitcher';
 import ImageRender from './ImageRender';
 import TextView from './TextView/TextView';
-import RotateView from './ImageViews/RotateView';
 
 const styles = {
     root: {
@@ -60,8 +59,6 @@ class Displayer extends React.Component {
             }
             // Image Views
             switch (imageView.main) {
-            case 'rotate':
-                return 'rotate-view';
             default:
                 return 'image-render-view';
             }
@@ -77,7 +74,6 @@ class Displayer extends React.Component {
                         active={activeView()}
                     >
                         <TextView key="text-view" />
-                        <RotateView key="rotate-view" />
                         <ImageRender key="image-render-view" />
                     </ViewSwitcher>
                 </div>
