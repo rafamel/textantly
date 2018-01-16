@@ -11,7 +11,8 @@ const styles = {
         flexGrow: 1,
         maxWidth: 'none',
         minWidth: 90,
-        height: 64
+        height: 64,
+        width: '50%'
     },
     label: {
         paddingTop: 4,

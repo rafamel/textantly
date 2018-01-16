@@ -57,6 +57,7 @@ class ImageEditor extends React.Component {
     handleChange = (e, index) => {
         const view = this.tabDict.toString[index];
         if (view === 'flip') return this.doFlip();
+
         this.props.changeImageViews({ main: view });
     };
     componentWillReceiveProps(nextProps) {

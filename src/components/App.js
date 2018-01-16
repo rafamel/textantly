@@ -4,11 +4,9 @@ import { Provider } from 'react-redux';
 import store from 'store/_store';
 import { withState, compose } from 'store/utils';
 import Reboot from 'material-ui/Reboot';
-import Header from './Header';
 import LoadingBar from './LoadingBar';
 import SnackBar from './SnackBar';
 import DesktopUI from './DesktopUI/DesktopUI';
-import { classes as appClasses } from 'styles';
 import theme from '../theme';
 
 const { connector, propTypes: storeTypes } = withState(
@@ -48,13 +46,7 @@ class App extends React.Component {
                     width: '100%'
                 }}>
                     <DesktopUI />
-                    {/* <div className={appClasses.container}>
-                        <Header />
-                        <Navigation />
-                        <Editor />
-
-                        <SnackBar />
-                    </div> */}
+                    <SnackBar />
                 </div>
             </div>
         );

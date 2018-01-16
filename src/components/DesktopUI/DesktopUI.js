@@ -2,16 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Drawer from 'material-ui/Drawer';
-import AppBar from 'material-ui/AppBar';
-import Toolbar from 'material-ui/Toolbar';
-import Typography from 'material-ui/Typography';
-
 import Editor from '../Editor/Editor';
 import Navigation from '../Navigation';
 import Displayer from '../Displayer/Displayer';
 import HistoryButtons from './HistoryButtons';
+import AppBar from 'material-ui/AppBar';
+import TopBar from '../TopBar';
 
 const drawerWidth = 350;
+const appBarHeight = 64;
 const styles = {
     frame: {
         width: '100%',
@@ -36,6 +35,10 @@ const styles = {
         width: drawerWidth
     },
     drawer: {
+        height: `calc(100% - ${appBarHeight}px)`
+    },
+    drawerPaper: {
+        height: '100%',
         width: 350,
         position: 'static',
         borderRight: '1px solid rgba(136, 136, 136, 0.16)'
@@ -52,7 +55,6 @@ class Container extends React.Component {
     };
     render() {
         const { classes } = this.props;
-
         return (
             <div className={classes.frame}>
                 <div>
@@ -60,21 +62,18 @@ class Container extends React.Component {
                         <Navigation className={classes.navigation} />
                     </AppBar>
                     <Drawer
-                        classes={{ paper: classes.drawer }}
+                        classes={{
+                            docked: classes.drawer,
+                            paper: classes.drawerPaper
+                        }}
                         type="permanent"
                         open
                     >
-                        <Editor />
+                        <Editor/>
                     </Drawer>
                 </div>
                 <div className={classes.container}>
-                    <AppBar classes={{ root: classes.appBar }}>
-                        <Toolbar>
-                            <Typography type="title" color="inherit" noWrap>
-                                Textantly
-                            </Typography>
-                        </Toolbar>
-                    </AppBar>
+                    <TopBar />
                     <Displayer className={classes.displayer} />
                     <HistoryButtons />
                 </div>

@@ -1,40 +1,42 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import FolderOpen from 'material-ui-icons/FolderOpen';
 import Public from 'material-ui-icons/Public';
 import UrlDialog from './UrlDialog';
-import FreeLabel from 'components/Elements/Fields/FreeLabel';
-import isEqual from 'lodash.isequal';
 
 const styles = (theme) => ({
     root: {
         width: '100%'
     },
     tab: {
-        maxWidth: 'none',
-        height: 46
+        maxWidth: 'none'
     },
     hide: {
         display: 'none'
     }
 });
 
+const { connector, propTypes: storeTypes } = withState(
+    (state) => ({
+        sourceFrom: state.edits.source.from
+    }), (actions) => ({
+        setSourceTemp: actions.edits.setSourceTemp,
+        setLoading: actions._loading.setLoading,
+        setRendering: actions._loading.setRendering,
+        addAlert: actions.alerts.add
+    })
+);
+
 class ImageSelector extends React.Component {
     static propTypes = {
+        ...storeTypes,
         // Style
         className: PropTypes.string,
         style: PropTypes.object,
-        // State & Actions
-        sourceFrom: PropTypes
-            .oneOfType([PropTypes.string, PropTypes.bool])
-            .isRequired,
-        setLoading: PropTypes.func.isRequired,
-        setRendering: PropTypes.func.isRequired,
-        setSourceTemp: PropTypes.func.isRequired,
-        addAlert: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };
@@ -100,7 +102,10 @@ class ImageSelector extends React.Component {
 
             const { name, type } = file;
             if (!type.match(/^image\//)) {
-                this.props.addAlert(`File ${name} is not an image`);
+                const displayName = (name.length <= 30)
+                    ? name
+                    : name.slice(0, 30) + '...';
+                this.props.addAlert(`File ${displayName} is not an image`);
                 return;
             }
 
@@ -129,9 +134,6 @@ class ImageSelector extends React.Component {
     componentWillMount() {
         this.unlockSyncTab();
     }
-    shouldComponentUpdate(_, nextState) {
-        return !isEqual(this.state, nextState);
-    }
     render() {
         const { classes, className, style } = this.props;
         let tabIndex = this.tabDict.toIndex[this.state.tab.current];
@@ -140,32 +142,27 @@ class ImageSelector extends React.Component {
         return (
             <div
                 className={classnames(classes.root, className)}
-                style={{
-                    marginBottom: 4,
-                    ...style
-                }}
+                style={style}
             >
                 <UrlDialog
                     _isOpen={this.state._urlDialogIsOpen}
                     callback={this.readUrl}
                 />
-                <FreeLabel
-                    label="Select image"
-                    style={{ marginBottom: -2 }}
-                />
                 <Tabs
                     value={tabIndex}
                     onChange={this.handleTabChange}
                     fullWidth
-                    indicatorColor="primary"
+                    indicatorColor="none"
                     textColor="primary"
                 >
                     <Tab
                         icon={<FolderOpen />}
+                        label="File"
                         classes={{ root: classes.tab }}
                     />
                     <Tab
                         icon={<Public />}
+                        label="URL"
                         classes={{ root: classes.tab }}
                     />
                 </Tabs>
@@ -174,4 +171,7 @@ class ImageSelector extends React.Component {
     }
 }
 
-export default withStyles(styles)(ImageSelector);
+export default compose(
+    withStyles(styles),
+    connector
+)(ImageSelector);

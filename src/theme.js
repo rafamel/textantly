@@ -10,10 +10,17 @@ export default createMuiTheme({
     typography: {
         fontFamily: '"Roboto","Helvetica Neue",-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif',
         fontSize: 14,
-        h1: {
-            fontSize: '3.75rem',
+        title: {
+            fontSize: 20,
             fontWeight: 300,
-            lineHeight: 1.1
+            lineHeight: 1.1,
+            margin: 'auto 0'
+        },
+        subheading: {
+            fontSize: 14,
+            fontWeight: 300,
+            lineHeight: 1.1,
+            margin: '3px 0 1px'
         }
     }
 });

@@ -7,9 +7,12 @@ import Historian, {
 } from './historian';
 import config from 'config';
 import loading from './loading';
+import activeViews from './active-views';
+import isEqual from 'lodash.isequal';
 
 const initialState = {
     _history: historianDefaults,
+    _forView: null,
     source: {
         ...config.defaults.src,
         from: false,
@@ -78,7 +81,8 @@ function reducer(state = initialState, { type, payload }) {
 }
 
 function setRendering({ state, payload }, dispatch) {
-    if (state.source.src !== payload.source.src) {
+    if (state.source.src !== payload.source.src
+    || !isEqual(state.image, payload.image)) {
         dispatch(loading.actions.setRendering(true));
     }
 }
@@ -170,8 +174,14 @@ history.logic = createLogic({
         next({ type: action.type, payload });
     },
     process({ getState, action }, dispatch, done) {
-        const state = getState().edits;
+        const mState = getState();
+        const state = mState.edits;
         const payload = action.payload;
+
+        if (mState._activeViews.main !== 'text'
+            && !isEqual(state.text, payload.text)) {
+            dispatch(activeViews.actions.changeMain('text'));
+        }
 
         setRendering({ state, payload }, dispatch);
         dispatch({ type: FULL_OVERWRITE, payload });

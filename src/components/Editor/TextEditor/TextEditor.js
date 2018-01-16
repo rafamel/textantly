@@ -7,14 +7,13 @@ import fontData from 'services/font-data';
 import Selector from 'components/Elements/Fields/Selector';
 import TextInput from 'components/Elements/Fields/TextInput';
 import WeightSelector from './Fields/WeightSelector';
-import ImageSelector from './Fields/ImageSelector/ImageSelector';
 import OverlayLengthSlider from './Fields/OverlayLengthSlider';
 
 const fontFamilies = Object.keys(fontData);
 
 const styles = (theme) => ({
     root: {
-        padding: '0 20px'
+        padding: '10px 20px'
     },
     textField: {
         boxSizing: 'border-box',
@@ -24,16 +23,11 @@ const styles = (theme) => ({
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        text: state.edits.text,
-        sourceFrom: state.edits.source.from
+        text: state.edits.text
     }), (actions) => ({
         setTextHard: actions.edits.setTextHard,
         setTextTemp: actions.edits.setTextTemp,
-        setSourceTemp: actions.edits.setSourceTemp,
-        tempForget: actions.edits.tempForget,
-        setLoading: actions._loading.setLoading,
-        setRendering: actions._loading.setRendering,
-        addAlert: actions.alerts.add
+        tempForget: actions.edits.tempForget
     })
 );
 
@@ -65,14 +59,6 @@ class TextEditor extends React.Component {
                 autoComplete="off"
                 onSubmit={this.onSubmit}
             >
-                <ImageSelector
-                    setSourceTemp={this.props.setSourceTemp}
-                    sourceFrom={this.props.sourceFrom}
-                    setLoading={this.props.setLoading}
-                    setRendering={this.props.setRendering}
-                    addAlert={this.props.addAlert}
-                    className={classes.textField}
-                />
                 <TextInput
                     name="textString"
                     label="Text"

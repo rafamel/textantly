@@ -29,6 +29,8 @@ const propTypes = {
 
 function reducer(state = initialState, { type, payload }) {
     switch (type) {
+    case t.RESET:
+        return initialState;
     case t.CHANGE_MAIN:
         return {
             ...state,
