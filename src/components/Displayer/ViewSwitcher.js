@@ -19,7 +19,6 @@ const styles = () => ({
 
 class ViewSwitcher extends React.Component {
     static propTypes = {
-        broadFreeze: PropTypes.bool,
         children: PropTypes
             .arrayOf(PropTypes.element)
             .isRequired,
@@ -85,12 +84,12 @@ class ViewSwitcher extends React.Component {
         this.updateCurrent();
     }
     render() {
-        const { classes, children, broadFreeze } = this.props;
+        const { classes, children } = this.props;
         const { current, previous } = this.state;
 
-        const activeChildren = children.map((child, i) => {
+        const activeChildren = React.Children.map(children, (child, i) => {
             const isActive = current === i || previous === i;
-            const isFrozen = previous === i || broadFreeze;
+            const isFrozen = previous === i;
             const setRef = (ref) => {
                 if (current === i) this.currentNode = ref;
             };

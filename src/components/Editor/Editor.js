@@ -8,7 +8,8 @@ import ImageEditor from './ImageEditor/ImageEditor';
 
 const styles = {
     root: {
-        marginBottom: 48
+        margin: 0,
+        height: '100%'
     }
 };
 
@@ -40,11 +41,10 @@ class Editor extends React.Component {
         const viewIndex = this.tabDict.toIndex[mainView] || 0;
         return (
             <div className={classes.root}>
-
                 <SwipeableViews
                     axis={(theme.direction === 'rtl') ? 'x-reverse' : 'x'}
                     index={viewIndex}
-                    animateHeight={true}
+                    animateHeight={false}
                     onChangeIndex={this.handleChange}
                 >
                     <TextEditor />

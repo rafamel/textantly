@@ -66,7 +66,7 @@ const propTypes = {
 
 const typesPre = 'EDITS';
 const FULL_OVERWRITE = `${typesPre}_FULL_OVERWRITE`;
-const historian = Historian('_history');
+const historian = Historian({ key: '_history' });
 
 function reducer(state = initialState, { type, payload }) {
     switch (type) {

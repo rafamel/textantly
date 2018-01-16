@@ -26,8 +26,7 @@ const styles = {
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         mainView: state._activeViews.main,
-        imageView: state._activeViews.image,
-        isRendering: state._loading.rendering
+        imageView: state._activeViews.image
     }), (actions) => ({
         setDimensions: actions._activeViews.setDimensions
     })
@@ -52,7 +51,7 @@ class Displayer extends React.Component {
         this.observer.unobserve(this.rootNode);
     }
     render() {
-        const { classes, className, isRendering } = this.props;
+        const { classes, className } = this.props;
 
         const activeView = () => {
             const { mainView, imageView } = this.props;
@@ -75,7 +74,6 @@ class Displayer extends React.Component {
             >
                 <div className={classes.view}>
                     <ViewSwitcher
-                        broadFreeze={isRendering}
                         active={activeView()}
                     >
                         <TextView key="text-view" />

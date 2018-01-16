@@ -44,13 +44,15 @@ const propTypes = {
 
 export { defaultValues, propTypes };
 
-export default function history(key) {
+export default function history({ key, exclude }) {
+    if (!exclude) exclude = [];
+
     function insert(previous, updated) {
         if (previous[key].temp) {
             return insert(previous[key].temp, updated);
         }
 
-        const diffObj = diff(previous, updated, key);
+        const diffObj = diff(previous, updated, exclude.concat(key));
         if (!diffObj) return previous;
 
         const currentHistory = previous[key];

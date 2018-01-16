@@ -1,22 +1,20 @@
 import PropTypes from 'prop-types';
 
 function getType(obj, firstKey, actions) {
-    // eslint-disable-next-line
-    const errorMsg = () => console.error(
-        `Some type could not be retrieved on key "${firstKey}" for withState()`
-    );
-    if (!obj) return errorMsg();
+    if (!obj) return;
+
     if (typeof obj === 'function') {
         if (actions) return PropTypes.func.isRequired;
         else return obj();
     }
 
     const keys = Object.keys(obj);
-    if (!keys.length)  return errorMsg();
+    if (!keys.length) return;
 
     const ans = {};
     keys.forEach(key => {
-        ans[key] = getType(obj[key], firstKey);
+        const type = getType(obj[key], firstKey);
+        if (type) ans[key] = type;
     });
     return PropTypes.shape(ans).isRequired;
 }
@@ -24,7 +22,8 @@ function getType(obj, firstKey, actions) {
 function propTyper(obj, actions = false) {
     return Object.keys(obj)
         .reduce((acc, key) => {
-            acc[key] = getType(obj[key], key, actions);
+            const type = getType(obj[key], key, actions);
+            if (type) acc[key] = type;
             return acc;
         }, {});
 }

@@ -1,126 +1,105 @@
-import isEqual from 'lodash.isequal';
+function setSize(size) {
+    this.nodes.text.style.fontSize = `${size}px`;
+    this.current.fontSize = size;
+}
+
+function setPhase(phase) {
+    this.current.phase = phase;
+    this.current.up = null;
+}
 
 function getDimensions() {
     const nodes = this.nodes;
-    if (!nodes.parent || !nodes.child) return;
+    if (!nodes.outer || !nodes.inner) return;
     const dimensions = {
-        parent: {
-            width: nodes.parent.clientWidth + 2,
-            height: nodes.parent.clientHeight + 2
+        outer: {
+            width: nodes.outer.clientWidth + 1,
+            height: nodes.outer.clientHeight + 1
         },
-        child: {
-            width: nodes.child.clientWidth,
-            height: nodes.child.clientHeight
+        inner: {
+            width: nodes.inner.clientWidth,
+            height: nodes.inner.clientHeight
         }
     };
-    const anyEmpty = (!dimensions.child.width && !dimensions.child.height)
-        || dimensions.parent.width <= 1 || dimensions.parent.height <= 1;
+    const anyEmpty = (!dimensions.inner.width && !dimensions.inner.height)
+        || dimensions.outer.width <= 1 || dimensions.outer.height <= 1;
     if (anyEmpty) return;
 
     return dimensions;
 }
 
-function setInitState(phase = 1) {
-    state = {
-        lock: true,
-        phase: phase,
-        up: null,
-        ranFor: false,
-        queued: false,
-        endOnNext: false
-    };
-}
+function resize(dimensions, goingUp) {
+    const { phase, fontSize: currentSize } = this.current;
 
-function setEndState(dimensions) {
-    state = {
-        lock: false,
-        phase: 1,
-        up: null,
-        ranFor: dimensions,
-        queued: state.queued,
-        endOnNext: false
-    };
-}
-
-function newFontSize(dimensions) {
-    const minSize = 1;
-    const currentSize = this.state.fontSize;
-    const sizePhase2 = () => Math.max(
-        minSize, currentSize + ((state.up) ? 1 : -1)
-    );
-    if (state.phase === 2) return sizePhase2();
-    else {
-        const alpha = 0.1;
-        const diff = alpha * Math.min(
-            Math.abs(dimensions.parent.width - dimensions.child.width),
-            Math.abs(dimensions.parent.height - dimensions.child.height)
+    const phase1 = () => {
+        const alpha = 0.2;
+        const diff = alpha * 0.5 * (
+            Math.abs(dimensions.outer.width - dimensions.inner.width)
+            + Math.abs(dimensions.outer.height - dimensions.inner.height)
         );
+
         if (diff < 1) {
-            setInitState(2);
-            state.lock = false;
-            return sizePhase2();
+            setPhase.call(this, 2);
+            return phase2();
         }
-        return Math.max(minSize, currentSize + ((state.up) ? diff : -diff));
-    }
-}
-
-function runResize(dimensions) {
-    const initPhase2 = () => {
-        setInitState(2);
-        return runResize.call(this, dimensions);
+        return Math.max(minSize, currentSize + ((goingUp) ? diff : -diff));
     };
-    const { parent, child } = dimensions;
-    if (child.width > parent.width || child.height > parent.height) {
-        if (state.up) {
-            if (state.phase === 2) state.endOnNext = true;
-            else return initPhase2();
-        } else if (child.height <= 2 || child.width <= 2) {
-            return setEndState(dimensions);
-        }
+    const phase2 = () => Math.max(
+        minSize, currentSize + ((goingUp) ? 1 : -1)
+    );
 
-        state.up = false;
-        state.lock = false;
-        this.setState({ fontSize: newFontSize.call(this, dimensions) });
-    } else {
-        if (state.up === false) {
-            if (state.phase === 2) setEndState(dimensions);
-            else initPhase2();
-        } else {
-            state.up = true;
-            state.lock = false;
-            this.setState({ fontSize: newFontSize.call(this, dimensions) });
-        }
-    }
+    const size = (phase === 1) ? phase1() : phase2();
+    setSize.call(this, Math.round(size));
+    return size;
 }
 
-let state;
-export default function fontResize() {
-    if (!Object.keys(this.nodes).length) return;
-    if (!state) setInitState();
-    else if (state.lock) {
-        state.queued = true;
+function fontResize(ongoing) {
+    const next = () => {
+        if (this.current.phase === 2) {
+            setPhase.call(this, 0);
+            if (this.current.stack) {
+                this.current.stack = false;
+                fontResize.call(this);
+            }
+        } else {
+            setPhase.call(this, 2);
+            fontResize.call(this, true);
+        }
+    };
+
+    if (this.current.phase && !ongoing) {
+        this.current.stack = true;
         return;
-    }
+    };
 
     const dimensions = getDimensions.call(this);
-    if (!dimensions) {
-        state.lock = false;
-        setTimeout(() => { fontResize.call(this); }, 250);
-        return;
-    }
+    if (!dimensions) return setPhase.call(this, 0);
 
-    if (state.ranFor && isEqual(state.ranFor, dimensions)) {
-        if (!state.queued) {
-            state.lock = false;
-            return;
+    if (!this.current.phase) setPhase.call(this, 1);
+    const goingUp = this.current.up;
+    const { outer, inner } = dimensions;
+    if (inner.height > outer.height || inner.width > outer.width) {
+        const size = resize.call(this, dimensions, false);
+        if (goingUp === null || goingUp === false) {
+            this.current.up = false;
+            if (size > minSize) fontResize.call(this, true);
+            else next();
+        } else {
+            next();
         }
-        setInitState();
+    } else {
+        if (goingUp === null || goingUp === true) {
+            this.current.up = true;
+            resize.call(this, dimensions, true);
+            fontResize.call(this, true);
+        } else {
+            next();
+        }
     }
-    if (state.endOnNext) {
-        setEndState(dimensions);
-        if (!state.queued) return;
-        else state.lock = true;
-    }
-
-    return runResize.call(this, dimensions);
 }
+
+const minSize = 1;
+export {
+    fontResize as default,
+    setPhase
+};

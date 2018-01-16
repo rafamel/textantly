@@ -1,10 +1,10 @@
 import deepDiff from 'deep-diff';
 import deep from 'lodash.clonedeep';
 
-export function diff(previous, updated, key) {
+export function diff(previous, updated, ignore) {
     return deepDiff.diff(previous, updated, function (_, diffKey) {
-        // Filter history key
-        return diffKey === key;
+        // Filter keys
+        return ignore.includes(diffKey);
     });
 };
 
