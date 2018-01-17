@@ -133,6 +133,7 @@ main.logic = createLogic({
         if (is(main.typesBy.type.SET_SOURCE)) {
             setRendering({ state, payload }, dispatch);
         }
+
         payload = (() => {
             switch (true) {
             case is(main.typesBy.post.HARD):
@@ -174,11 +175,11 @@ history.logic = createLogic({
         next({ type: action.type, payload });
     },
     process({ getState, action }, dispatch, done) {
-        const mState = getState();
-        const state = mState.edits;
+        const globalState = getState();
+        const state = globalState.edits;
         const payload = action.payload;
 
-        if (mState._activeViews.main !== 'text'
+        if (globalState._activeViews.main !== 'text'
             && !isEqual(state.text, payload.text)) {
             dispatch(activeViews.actions.changeMain('text'));
         }

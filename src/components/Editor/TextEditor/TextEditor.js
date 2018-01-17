@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
 import config from 'config';
-import fontData from 'services/font-data';
+import { data as fontData } from 'services/fonts';
 import Selector from 'components/Elements/Fields/Selector';
 import TextInput from 'components/Elements/Fields/TextInput';
 import WeightSelector from './Fields/WeightSelector';

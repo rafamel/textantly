@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
+import Button from 'material-ui/Button';
+import SaveIcon from 'material-ui-icons/Save';
 import ResizeObserver from 'resize-observer-polyfill';
 import ViewSwitcher from './ViewSwitcher';
 import ImageRender from './ImageRender';
@@ -12,6 +14,7 @@ const styles = {
     root: {
         fontSize: 0,
         display: 'flex',
+        position: 'relative',
         flexDirection: 'column',
         justifyContent: 'center',
         textAlign: 'center'
@@ -19,6 +22,12 @@ const styles = {
     view: {
         width: '100%',
         margin: 'auto'
+    },
+    saveButton: {
+        position: 'absolute',
+        bottom: 22,
+        right: 22,
+        boxShadow: 'none'
     }
 };
 
@@ -77,6 +86,14 @@ class Displayer extends React.Component {
                         <ImageRender key="image-render-view" />
                     </ViewSwitcher>
                 </div>
+                <Button
+                    raised
+                    className={classes.saveButton}
+                    aria-label="save"
+                    fab
+                >
+                    <SaveIcon />
+                </Button>
             </main>
         );
     }

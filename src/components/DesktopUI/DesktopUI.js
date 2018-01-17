@@ -48,38 +48,33 @@ const styles = {
     }
 };
 
-class Container extends React.Component {
-    static propTypes = {
-        // JSS
-        classes: PropTypes.object.isRequired
-    };
-    render() {
-        const { classes } = this.props;
-        return (
-            <div className={classes.frame}>
-                <div>
-                    <AppBar classes={{ root: classes.appBar }}>
-                        <Navigation className={classes.navigation} />
-                    </AppBar>
-                    <Drawer
-                        classes={{
-                            docked: classes.drawer,
-                            paper: classes.drawerPaper
-                        }}
-                        type="permanent"
-                        open
-                    >
-                        <Editor/>
-                    </Drawer>
-                </div>
-                <div className={classes.container}>
-                    <TopBar />
-                    <Displayer className={classes.displayer} />
-                    <HistoryButtons />
-                </div>
-            </div>
-        );
-    }
-}
+const DesktopUI = ({ classes }) => (
+    <div className={classes.frame}>
+        <div>
+            <AppBar classes={{ root: classes.appBar }}>
+                <Navigation className={classes.navigation} />
+            </AppBar>
+            <Drawer
+                classes={{
+                    docked: classes.drawer,
+                    paper: classes.drawerPaper
+                }}
+                type="permanent"
+                open
+            >
+                <Editor/>
+            </Drawer>
+        </div>
+        <div className={classes.container}>
+            <TopBar />
+            <Displayer className={classes.displayer} />
+            <HistoryButtons />
+        </div>
+    </div>
+);
 
-export default withStyles(styles)(Container);
+DesktopUI.propTypes = {
+    classes: PropTypes.object.isRequired
+};
+
+export default withStyles(styles)(DesktopUI);

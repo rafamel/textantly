@@ -23,7 +23,6 @@ export default {
         color: ({ colorScheme }) => (colorScheme === 'dark')
             ? '#f2f2f2'
             : '#150f05',
-        fontFamily: ({ fontFamily }) => fontFamily,
         fontWeight: ({ fontWeight }) => fontWeight,
         textAlign: ({ alignment }) => alignment,
         '&::selection': {
