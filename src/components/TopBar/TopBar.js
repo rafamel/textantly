@@ -23,7 +23,29 @@ const styles = (theme) => ({
     toolbar: {
         width: '100%',
         userSelect: 'none',
-        padding: '0 10px'
+        padding: '0 16px 0 10px',
+        minHeight: barHeight.desktop,
+        height: barHeight.desktop,
+        [theme.breakpoints._q.mobile]: {
+            padding: '0 13px',
+            minHeight: barHeight.mobile,
+            height: barHeight.mobile
+        }
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 300,
+        lineHeight: 1.1,
+        margin: 'auto 0'
+    },
+    subheading: {
+        fontSize: 14,
+        fontWeight: 300,
+        lineHeight: 1.1,
+        margin: '3px 0 1px',
+        [theme.breakpoints._q.mobile]: {
+            display: 'none'
+        }
     },
     button: {
         width: 40,
@@ -34,6 +56,11 @@ const styles = (theme) => ({
         cursor: 'auto',
         '&:hover': {
             backgroundColor: 'rgba(255,255,255,.95)'
+        },
+        [theme.breakpoints._q.mobile]: {
+            height: 36,
+            width: 36,
+            marginRight: 10
         }
     },
     buttonLabel: { color: theme.palette.primary.main },
@@ -68,12 +95,18 @@ const TopBar = ({ classes, isMobile }) => (
             </Button>
             <div>
                 <Typography
-                    type="title" color="inherit" noWrap
+                    classes={{ root: classes.title }}
+                    type="title"
+                    color="inherit"
+                    noWrap
                 >
                     Textantly
                 </Typography>
                 <Typography
-                    type="subheading" color="inherit" noWrap
+                    classes={{ root: classes.subheading }}
+                    type="subheading"
+                    color="inherit"
+                    noWrap
                 >
                     Delicious morning coffee, a keystoke away
                 </Typography>
