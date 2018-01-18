@@ -99,7 +99,7 @@ class ImageEditor extends React.Component {
             />),
             resize: (<ResizeSliders
                 key="resize"
-                value={imageEdits.resize}
+                resize={imageEdits.resize}
                 dimensions={engine.getDimensions(
                     sourceDimensions,
                     { ...imageEdits, resize: undefined }

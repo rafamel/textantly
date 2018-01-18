@@ -1,13 +1,16 @@
+import resize from './resize';
 import rotate from './rotate';
 import flip from './flip';
 
 function drawEngine(canvas, imageEdits) {
+    canvas = resize.draw(canvas, imageEdits.resize);
     canvas = flip.draw(canvas, imageEdits.flip);
     canvas = rotate.draw(canvas, imageEdits.rotate);
     return canvas;
 }
 
 function dimensionsEngine(dimensions, imageEdits) {
+    dimensions = resize.getDimensions(dimensions, imageEdits.resize);
     dimensions = rotate.getDimensions(dimensions, imageEdits.rotate);
     return dimensions;
 }
