@@ -1,6 +1,6 @@
 export default {
-    name: 'Textantly',
     snackbarDuration: 3500,
+    mobileBreakpoint: 'md',
     defaults: {
         src: {
             name: '',

@@ -11,7 +11,7 @@ const data = Object.keys(fonts).reduce((acc, key) => {
     return acc;
 }, {});
 
-function load(fontName, timeout = 1500) {
+function load(fontName, timeout = 3000) {
     googleFonts.add({ [fontName]: true });
     return (new FontFaceObserver(fontName)).load(null, timeout);
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Slider from 'components/Elements/Fields/Slider';
+import Slider from '../../Fields/Slider';
 import isEqual from 'lodash.isequal';
 
 class OverlayLengthSlider extends React.Component {
@@ -10,7 +10,8 @@ class OverlayLengthSlider extends React.Component {
         overlayHeight: PropTypes.number.isRequired,
         className: PropTypes.string,
         onChange: PropTypes.func,
-        onAfterChange: PropTypes.func
+        onAfterChange: PropTypes.func,
+        addLabel: PropTypes.bool
     };
     shouldComponentUpdate(nextProps) {
         return !isEqual(this.props, nextProps);
@@ -23,22 +24,24 @@ class OverlayLengthSlider extends React.Component {
             className: this.props.className,
             onChange: this.props.onChange,
             onAfterChange: this.props.onAfterChange,
-            style: { marginBottom: 4 }
+            style: (this.props.addLabel)
+                ? { marginBottom: 4, padding: 0 }
+                : null
         };
         const overlayPosition = this.props.overlayPosition;
         return (overlayPosition === 'top' || overlayPosition === 'bottom')
             ? (
                 <Slider
                     name="overlayHeight"
-                    label="Overlay Height"
+                    label={(this.props.addLabel) ? 'Overlay Height' : null}
                     value={this.props.overlayHeight}
                     {...commonProps}
                 />
             ) : (
                 <Slider
                     name="overlayWidth"
-                    label="Overlay Width"
                     value={this.props.overlayWidth}
+                    label={(this.props.addLabel) ? 'Overlay Width' : null}
                     {...commonProps}
                 />
             );

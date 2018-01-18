@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Selector from 'components/Elements/Fields/Selector';
+import Selector from '../../Fields/Selector';
 import isEqual from 'lodash.isequal';
 
 const weightsDict = {

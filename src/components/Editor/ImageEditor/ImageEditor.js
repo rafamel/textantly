@@ -1,6 +1,10 @@
 import React from 'react';
-import { withState } from 'store/utils';
-import VerticalTabs, { VerticalTab } from 'components/Elements/VerticalTabs';
+import PropTypes from 'prop-types';
+import { withState, compose } from 'store/utils';
+import { withTheme } from 'material-ui/styles';
+import SwipeableViews from 'react-swipeable-views';
+import TopTabs from '../../MobileUI/TopTabs';
+import VerticalTabs, { VerticalTab } from './VerticalTabs';
 import { Collapse } from 'react-collapse';
 import Crop from 'material-ui-icons/Crop';
 import Flip from 'material-ui-icons/Flip';
@@ -15,7 +19,8 @@ const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         imageEdits: state.edits.image,
         imageViews: state._activeViews.image,
-        sourceDimensions: state.edits.source.dimensions
+        sourceDimensions: state.edits.source.dimensions,
+        isMobile: state._activeViews.isMobile
     }), (actions) => ({
         changeImageViews: actions._activeViews.changeImage,
         setImageHard: actions.edits.setImageHard,
@@ -25,7 +30,9 @@ const { connector, propTypes: storeTypes } = withState(
 
 class ImageEditor extends React.Component {
     static propTypes = {
-        ...storeTypes
+        ...storeTypes,
+        // JSS
+        theme: PropTypes.object.isRequired
     };
     state = {
         activeIndex: 0
@@ -68,62 +75,99 @@ class ImageEditor extends React.Component {
     }
     render() {
         const {
+            theme,
             imageViews,
             changeImageViews,
             imageEdits,
             setImageHard,
             setImageTemp,
-            sourceDimensions
+            sourceDimensions,
+            isMobile
         } = this.props;
+
+        const fields = {
+            crop: (<CropSelector
+                key="crop"
+                cropView={imageViews.crop}
+                changeImageViews={changeImageViews}
+            />),
+            rotate: (<RotateSlider
+                key="rotate"
+                value={imageEdits.rotate}
+                setImageHard={setImageHard}
+                setImageTemp={setImageTemp}
+            />),
+            resize: (<ResizeSliders
+                key="resize"
+                value={imageEdits.resize}
+                dimensions={engine.getDimensions(
+                    sourceDimensions,
+                    { ...imageEdits, resize: undefined }
+                )}
+                setImageHard={setImageHard}
+                setImageTemp={setImageTemp}
+            />)
+        };
+
         const isOpen = (name) => imageViews.main === name;
-        return (
-            <VerticalTabs
-                value={this.state.activeIndex}
-                onChange={this.handleChange}
-            >
-                <VerticalTab
-                    label="Crop"
-                    icon={<Crop />}
-                />
-                <Collapse isOpened={isOpen('crop')}>
-                    <CropSelector
-                        cropView={imageViews.crop}
-                        changeImageViews={changeImageViews}
+        return (isMobile)
+            ? (
+                <React.Fragment>
+                    <TopTabs
+                        value={this.state.activeIndex}
+                        onChange={this.handleChange}
+                        labels={['Crop', 'Rotate', 'Resize', 'Flip']}
                     />
-                </Collapse>
-                <VerticalTab
-                    label="Rotate"
-                    icon={<Rotate90DegreesCcw />}
-                />
-                <Collapse isOpened={isOpen('rotate')}>
-                    <RotateSlider
-                        value={imageEdits.rotate}
-                        setImageHard={setImageHard}
-                        setImageTemp={setImageTemp}
+                    <SwipeableViews
+                        axis={(theme.direction === 'rtl') ? 'x-reverse' : 'x'}
+                        index={this.tabDict.toIndex[imageViews.main]}
+                        animateHeight={true}
+                        disabled
+                    >
+                        {
+                            Object.keys(fields).reduce((acc, key) => {
+                                acc[this.tabDict.toIndex[key]] = fields[key];
+                                return acc;
+                            }, [])
+                        }
+                    </SwipeableViews>
+                </React.Fragment>
+            ) : (
+                <VerticalTabs
+                    value={this.state.activeIndex}
+                    onChange={this.handleChange}
+                >
+                    <VerticalTab
+                        label="Crop"
+                        icon={<Crop />}
                     />
-                </Collapse>
-                <VerticalTab
-                    label="Resize"
-                    icon={<PhotoSizeSelectLarge />}
-                />
-                <Collapse isOpened={isOpen('resize')}>
-                    <ResizeSliders
-                        value={imageEdits.resize}
-                        dimensions={engine.getDimensions(
-                            sourceDimensions,
-                            { ...imageEdits, resize: undefined }
-                        )}
-                        setImageHard={setImageHard}
-                        setImageTemp={setImageTemp}
+                    <Collapse isOpened={isOpen('crop')}>
+                        {fields.crop}
+                    </Collapse>
+                    <VerticalTab
+                        label="Rotate"
+                        icon={<Rotate90DegreesCcw />}
                     />
-                </Collapse>
-                <VerticalTab
-                    label="Flip"
-                    icon={<Flip />}
-                />
-            </VerticalTabs>
-        );
+                    <Collapse isOpened={isOpen('rotate')}>
+                        {fields.rotate}
+                    </Collapse>
+                    <VerticalTab
+                        label="Resize"
+                        icon={<PhotoSizeSelectLarge />}
+                    />
+                    <Collapse isOpened={isOpen('resize')}>
+                        {fields.resize}
+                    </Collapse>
+                    <VerticalTab
+                        label="Flip"
+                        icon={<Flip />}
+                    />
+                </VerticalTabs>
+            );
     }
 }
 
-export default connector(ImageEditor);
+export default compose(
+    withTheme(),
+    connector
+)(ImageEditor);

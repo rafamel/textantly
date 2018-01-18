@@ -6,7 +6,7 @@ import { withStyles } from 'material-ui/styles';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import FolderOpen from 'material-ui-icons/FolderOpen';
 import Public from 'material-ui-icons/Public';
-import UrlDialog from './UrlDialog';
+import ImageOpener from './ImageOpener';
 
 const styles = (theme) => ({
     root: {
@@ -23,11 +23,6 @@ const styles = (theme) => ({
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         sourceFrom: state.edits.source.from
-    }), (actions) => ({
-        setSourceTemp: actions.edits.setSourceTemp,
-        setLoading: actions._loading.setLoading,
-        setRendering: actions._loading.setRendering,
-        addAlert: actions.alerts.add
     })
 );
 
@@ -41,102 +36,53 @@ class ImageSelector extends React.Component {
         classes: PropTypes.object.isRequired
     };
     state = {
-        tab: { current: false, lock: false },
-        _urlDialogIsOpen: false
+        value: false
     };
+    lock = false;
     openTimeout = null;
     tabDict = {
         toIndex: { file: 0, url: 1 },
         toString: { 0: 'file', 1: 'url' }
     };
     unlockSyncTab = (props = this.props) => {
-        this.setState({
-            tab: { current: props.sourceFrom, lock: false }
-        });
+        this.lock = false;
+        this.setState({ value: props.sourceFrom });
     };
-    setImage = (obj) => {
-        // this.props.setRendering(true);
-        this.props.setSourceTemp(obj);
-    };
-    handleTabChange = (event, value) => {
-        const tab = this.tabDict.toString[value];
-        this.setState({ tab: { current: tab, lock: true } });
+    handleTabChange = (event, index) => {
+        const value = this.tabDict.toString[index];
+        this.lock = true;
+        this.setState({ value });
 
-        if (this.openTimeout) {
-            clearTimeout(this.openTimeout);
-        }
-
+        if (this.openTimeout) clearTimeout(this.openTimeout);
         const openTimeout = setTimeout(() => {
-            if (tab === 'file') {
-                this.setState({ _urlDialogIsOpen: false });
-                this.readFile();
-            } else if (tab === 'url') {
-                this.setState({ _urlDialogIsOpen: true });
-            }
-            this.openTimeout = null;
+            if (!this._isMounted) return;
+
+            this.unlockSyncTab();
+            if (value === 'file') this.openFile();
+            else if (value === 'url') this.openUrl();
         }, 350);
 
         this.openTimeout = openTimeout;
     };
-    readUrl = (url) => {
-        this.setState({ _urlDialogIsOpen: false });
-        if (!url) {
-            this.unlockSyncTab();
-            return;
-        }
-
-        const imageName = (str) => str.split('/').slice(-1)[0];
-        this.setState({ tab: { current: 'url', lock: false } });
-        this.setImage({
-            name: imageName(url),
-            src: url,
-            from: 'url'
-        });
-    };
-    readFile = () => {
-        const input = document.createElement('input');
-        input.setAttribute('type', 'file');
-        input.onchange = () => {
-            const file = input.files[0];
-            if (!file) return;
-
-            const { name, type } = file;
-            if (!type.match(/^image\//)) {
-                const displayName = (name.length <= 30)
-                    ? name
-                    : name.slice(0, 30) + '...';
-                this.props.addAlert(`File ${displayName} is not an image`);
-                return;
-            }
-
-            const fileReader = new FileReader();
-            this.props.setLoading(true);
-            fileReader.addEventListener('load', () => {
-                this.props.setLoading(false);
-                this.setState({ tab: { current: 'file', lock: false } });
-                this.setImage({
-                    name,
-                    src: fileReader.result,
-                    from: 'file'
-                });
-            });
-            fileReader.readAsDataURL(file);
-        };
-        input.click();
-        this.unlockSyncTab();
+    hookOpener = ({ openFile, openUrl }) => {
+        this.openFile = openFile;
+        this.openUrl = openUrl;
     };
     componentWillReceiveProps(nextProps) {
-        const tab = this.state.tab;
-        if (!tab.lock && tab.current !== nextProps.sourceFrom) {
+        if (!this.lock && this.state.value !== nextProps.sourceFrom) {
             this.unlockSyncTab(nextProps);
         }
     }
     componentWillMount() {
+        this._isMounted = true;
         this.unlockSyncTab();
+    }
+    componentWillUnmount() {
+        this._isMounted = false;
     }
     render() {
         const { classes, className, style } = this.props;
-        let tabIndex = this.tabDict.toIndex[this.state.tab.current];
+        let tabIndex = this.tabDict.toIndex[this.state.value];
         if (tabIndex == null) tabIndex = false;
 
         return (
@@ -144,10 +90,7 @@ class ImageSelector extends React.Component {
                 className={classnames(classes.root, className)}
                 style={style}
             >
-                <UrlDialog
-                    _isOpen={this.state._urlDialogIsOpen}
-                    callback={this.readUrl}
-                />
+                <ImageOpener actions={this.hookOpener} />
                 <Tabs
                     value={tabIndex}
                     onChange={this.handleTabChange}

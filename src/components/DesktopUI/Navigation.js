@@ -2,16 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
+import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import TextFormat from 'material-ui-icons/TextFormat';
 import Image from 'material-ui-icons/Image';
 
 const styles = {
+    appBar: {
+        position: 'static',
+        boxShadow: 'none'
+    },
     tab: {
         flexGrow: 1,
         maxWidth: 'none',
         minWidth: 90,
-        height: 64,
         width: '50%'
     },
     label: {
@@ -34,7 +38,7 @@ const { connector, propTypes: storeTypes } = withState(
 class Navigation extends React.Component {
     static propTypes = {
         ...storeTypes,
-        classname: PropTypes.string,
+        height: PropTypes.number.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };
@@ -47,31 +51,38 @@ class Navigation extends React.Component {
         this.props.changeMainView(view);
     };
     render() {
-        const { classes, mainView, className } = this.props;
+        const { classes, mainView, height } = this.props;
         const viewIndex = this.tabDict.toIndex[mainView] || 0;
-        const tabClasses = {
-            root: classes.tab,
-            labelContainer: classes.label
+        const tabProps = {
+            classes: {
+                root: classes.tab,
+                labelContainer: classes.label
+            },
+            style: { height }
         };
 
         return (
-            <Tabs
-                classes={{ root: className }}
-                value={viewIndex}
-                indicatorColor="rgba(255, 255, 255, 0.6)"
-                onChange={this.handleChange}
+            <AppBar
+                classes={{ root: classes.appBar }}
+                style={{ height }}
             >
-                <Tab
-                    classes={tabClasses}
-                    label="Text"
-                    icon={<TextFormat />}
-                />
-                <Tab
-                    classes={tabClasses}
-                    label="Edit Image"
-                    icon={<Image />}
-                />
-            </Tabs>
+                <Tabs
+                    value={viewIndex}
+                    indicatorColor="rgba(255, 255, 255, 0.6)"
+                    onChange={this.handleChange}
+                >
+                    <Tab
+                        {...tabProps}
+                        label="Text"
+                        icon={<TextFormat />}
+                    />
+                    <Tab
+                        {...tabProps}
+                        label="Edit Image"
+                        icon={<Image />}
+                    />
+                </Tabs>
+            </AppBar>
         );
     }
 }

@@ -2,29 +2,33 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
-import classnames from 'classnames';
 import SwipeableViews from 'react-swipeable-views';
 import TextEditor from './TextEditor/TextEditor';
 import ImageEditor from './ImageEditor/ImageEditor';
 import ImageSelector from './ImageSelector/ImageSelector';
 
 const imageSelectorHeight = 72;
-const styles = {
+const styles = (theme) => ({
     root: {
         margin: 0,
-        height: `calc(100% - ${imageSelectorHeight}px)`
+        [theme.breakpoints._q.desktop]: {
+            height: `calc(100% - ${imageSelectorHeight}px)`
+        }
     },
     swipeable: {
-        height: '100%',
-        '& > div': {
-            height: '100%'
+        [theme.breakpoints._q.desktop]: {
+            height: '100%',
+            '& > div': {
+                height: '100%'
+            }
         }
     }
-};
+});
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        mainView: state._activeViews.main
+        mainView: state._activeViews.main,
+        isMobile: state._activeViews.isMobile
     }), (actions) => ({
         changeMainView: actions._activeViews.changeMain
     })
@@ -33,7 +37,6 @@ const { connector, propTypes: storeTypes } = withState(
 class Editor extends React.Component {
     static propTypes = {
         ...storeTypes,
-        className: PropTypes.string,
         // JSS
         theme: PropTypes.object.isRequired,
         classes: PropTypes.object.isRequired
@@ -47,23 +50,26 @@ class Editor extends React.Component {
         this.props.changeMainView(view);
     };
     render() {
-        const { theme, classes, className, mainView } = this.props;
+        const { theme, classes, mainView, isMobile } = this.props;
         const viewIndex = this.tabDict.toIndex[mainView] || 0;
-        return (
-            <div className={classnames(classes.root, className)}>
-                <SwipeableViews
-                    className={classes.swipeable}
-                    axis={(theme.direction === 'rtl') ? 'x-reverse' : 'x'}
-                    index={viewIndex}
-                    onChangeIndex={this.handleChange}
-                    disabled
-                >
-                    <TextEditor />
-                    <ImageEditor />
-                </SwipeableViews>
-                <ImageSelector />
-            </div>
-        );
+
+        return (isMobile)
+            ? (mainView === 'text') ? (<TextEditor />) : (<ImageEditor />)
+            : (
+                <div className={classes.root}>
+                    <SwipeableViews
+                        className={classes.swipeable}
+                        axis={(theme.direction === 'rtl') ? 'x-reverse' : 'x'}
+                        index={viewIndex}
+                        onChangeIndex={this.handleChange}
+                        disabled
+                    >
+                        <TextEditor />
+                        <ImageEditor />
+                    </SwipeableViews>
+                    <ImageSelector />
+                </div>
+            );
     }
 }
 

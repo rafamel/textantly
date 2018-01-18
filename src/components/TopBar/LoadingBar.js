@@ -8,7 +8,6 @@ const styles = {
     root: {
         position: 'fixed',
         display: 'block',
-        top: 0,
         left: 0,
         right: 0,
         transition: 'opacity linear .75s',
@@ -21,6 +20,7 @@ const styles = {
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
+        isMobile: state._activeViews.isMobile,
         loading: state._loading.loading,
         rendering: state._loading.rendering
     })
@@ -29,16 +29,20 @@ const { connector, propTypes: storeTypes } = withState(
 class LoadingBar extends React.Component {
     static propTypes = {
         ...storeTypes,
+        top: PropTypes.number,
         // JSS
         classes: PropTypes.object.isRequired
+    };
+    static defaultProps = {
+        top: 0
     };
     state = {
         _opacity: 1,
         _hidden: false,
         timeout: null
     };
-    componentWillReceiveProps(nextProps) {
-        const _opacity = Number(nextProps.loading || nextProps.rendering);
+    updateOpacity(props = this.props) {
+        const _opacity = Number(props.loading || props.rendering);
         if (_opacity === this.state._opacity) return;
 
         if (this.state.timeout) clearTimeout(this.state.timeout);
@@ -58,9 +62,19 @@ class LoadingBar extends React.Component {
             timeout
         });
     }
+    componentWillReceiveProps(nextProps) {
+        this.updateOpacity(nextProps);
+    }
+    componentWillMount() {
+        this.updateOpacity();
+    }
+    componentWillUnmount() {
+        if (this.state.timeout) clearTimeout(this.state.timeout);
+    }
     render() {
-        const { classes } = this.props;
+        const { classes, top } = this.props;
         const style = {
+            top,
             opacity: this.state._opacity,
             display: (this.state._hidden) ? 'none' : 'block'
         };

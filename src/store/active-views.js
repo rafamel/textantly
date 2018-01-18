@@ -3,13 +3,14 @@ import { typesActions } from './utils';
 
 const { types: t, actions } = typesActions({
     pre: 'ACTIVE_VIEWS',
-    types: ['CHANGE_MAIN', 'CHANGE_IMAGE', 'SET_DIMENSIONS']
+    types: ['SET_MOBILE', 'CHANGE_MAIN', 'CHANGE_IMAGE', 'SET_DIMENSIONS']
 });
 
 const initialState = {
+    isMobile: false,
     main: 'text',
     image: {
-        main: null,
+        main: 'crop',
         crop: 'free'
     },
     dimensions: { width: 0, height: 0 }
@@ -29,15 +30,14 @@ const propTypes = {
 
 function reducer(state = initialState, { type, payload }) {
     switch (type) {
-    case t.RESET:
-        return initialState;
+    case t.SET_MOBILE:
+        return {
+            ...state,
+            isMobile: payload
+        };
     case t.CHANGE_MAIN:
         return {
             ...state,
-            image: {
-                ...state.image,
-                main: null
-            },
             main: payload
         };
     case t.CHANGE_IMAGE:

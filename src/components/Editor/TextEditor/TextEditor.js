@@ -2,28 +2,45 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
-import config from 'config';
-import { data as fontData } from 'services/fonts';
-import Selector from 'components/Elements/Fields/Selector';
-import TextInput from 'components/Elements/Fields/TextInput';
+import SwipeableViews from 'react-swipeable-views';
+import TopTabs from '../../MobileUI/TopTabs';
+import Selector from '../Fields/Selector';
+import TextInput from '../Fields/TextInput';
 import WeightSelector from './Fields/WeightSelector';
 import OverlayLengthSlider from './Fields/OverlayLengthSlider';
+import config from 'config';
+import { data as fontData } from 'services/fonts';
 
 const fontFamilies = Object.keys(fontData);
 
 const styles = (theme) => ({
-    root: {
-        padding: '10px 20px'
-    },
     textField: {
         boxSizing: 'border-box',
-        margin: `${theme.spacing.unit}px 0`
+        margin: `${theme.spacing.unit}px 0`,
+        [theme.breakpoints._q.mobile]: {
+            margin: 0,
+            '& select, & input': {
+                height: '1.8em',
+                paddingLeft: theme.spacing.unit * 1.5,
+                paddingRight: theme.spacing.unit * 1.5
+            }
+        }
+    },
+    // Desktop
+    form: {
+        padding: '10px 20px'
+    },
+    // Mobile
+    tabs: {
+        marginLeft: -56,
+        width: 'calc(100% + 56px)'
     }
 });
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        text: state.edits.text
+        text: state.edits.text,
+        isMobile: state._activeViews.isMobile
     }), (actions) => ({
         setTextHard: actions.edits.setTextHard,
         setTextTemp: actions.edits.setTextTemp,
@@ -36,6 +53,12 @@ class TextEditor extends React.Component {
         ...storeTypes,
         // JSS
         classes: PropTypes.object.isRequired
+    };
+    state = {
+        value: 0
+    };
+    changeView = (event, value) => {
+        this.setState({ value });
     };
     handleChange = (e) => {
         this.props.setTextHard({
@@ -51,94 +74,132 @@ class TextEditor extends React.Component {
         e.preventDefault();
     };
     render() {
-        const { classes, text } = this.props;
-        return (
-            <form
-                className={classes.root}
-                noValidate
-                autoComplete="off"
-                onSubmit={this.onSubmit}
-            >
-                <TextInput
-                    name="textString"
-                    label="Text"
-                    placeholder={config.defaults.text.textString}
-                    value={text.textString}
-                    className={classes.textField}
-                    onChange={this.handleChangeTemp}
-                    onAfterChange={this.handleChange}
-                />
-                <Selector
-                    name="fontFamily"
-                    label="Font Family"
-                    value={text.fontFamily}
-                    options={
-                        fontFamilies.map(font => ({
-                            display: font,
-                            value: font
-                        }))
-                    }
-                    className={classes.textField}
-                    onChange={this.handleChange}
-                />
-                <WeightSelector
-                    name="fontWeight"
-                    label="Font Weight"
-                    value={text.fontWeight}
-                    className={classes.textField}
-                    onChange={this.handleChange}
-                    fontFamilyWeights={fontData[text.fontFamily]}
-                />
-                <Selector
-                    name="alignment"
-                    label="Text Alignment"
-                    className={classes.textField}
-                    onChange={this.handleChange}
-                    value={text.alignment}
-                    options={[
-                        { display: 'Center', value: 'center' },
-                        { display: 'Left', value: 'left' },
-                        { display: 'Right', value: 'right' }
-                    ]}
-                />
-                <Selector
-                    name="overlayPosition"
-                    label="Overlay Position"
-                    className={classes.textField}
-                    onChange={this.handleChange}
-                    value={text.overlayPosition}
-                    options={[
-                        { display: 'Left', value: 'left' },
-                        { display: 'Right', value: 'right' },
-                        { display: 'Top', value: 'top' },
-                        { display: 'Bottom', value: 'bottom' }
-                    ]}
-                />
-                <OverlayLengthSlider
-                    overlayPosition={text.overlayPosition}
-                    overlayWidth={text.overlayWidth}
-                    overlayHeight={text.overlayHeight}
-                    className={classes.textField}
-                    onChange={this.handleChangeTemp}
-                    onAfterChange={this.handleChange}
-                />
-                <Selector
-                    name="colorScheme"
-                    label="Color Scheme"
-                    className={classes.textField}
-                    onChange={this.handleChange}
-                    value={text.colorScheme}
-                    options={[
-                        { display: 'Light', value: 'light' },
-                        { display: 'Dark', value: 'dark' }
-                    ]}
-                />
-            </form>
-        );
+        const { classes, text, theme, isMobile } = this.props;
+        const lb = (label) => (!isMobile) ? label : null;
+        const fields = [
+            <TextInput
+                key="textString"
+                name="textString"
+                label={lb('Text')}
+                placeholder={config.defaults.text.textString}
+                value={text.textString}
+                className={classes.textField}
+                onChange={this.handleChangeTemp}
+                onAfterChange={this.handleChange}
+            />,
+            <Selector
+                key="fontFamily"
+                name="fontFamily"
+                label={lb('Font Family')}
+                value={text.fontFamily}
+                options={
+                    fontFamilies.map(font => ({
+                        display: font,
+                        value: font
+                    }))
+                }
+                className={classes.textField}
+                onChange={this.handleChange}
+            />,
+            <WeightSelector
+                key="fontWeight"
+                name="fontWeight"
+                label={lb('Font Weight')}
+                value={text.fontWeight}
+                className={classes.textField}
+                onChange={this.handleChange}
+                fontFamilyWeights={fontData[text.fontFamily]}
+            />,
+            <Selector
+                key="alignment"
+                name="alignment"
+                label={lb('Text Alignment')}
+                className={classes.textField}
+                onChange={this.handleChange}
+                value={text.alignment}
+                options={[
+                    { display: 'Center', value: 'center' },
+                    { display: 'Left', value: 'left' },
+                    { display: 'Right', value: 'right' }
+                ]}
+            />,
+            <Selector
+                key="overlayPosition"
+                name="overlayPosition"
+                label={lb('Overlay Position')}
+                className={classes.textField}
+                onChange={this.handleChange}
+                value={text.overlayPosition}
+                options={[
+                    { display: 'Left', value: 'left' },
+                    { display: 'Right', value: 'right' },
+                    { display: 'Top', value: 'top' },
+                    { display: 'Bottom', value: 'bottom' }
+                ]}
+            />,
+            <OverlayLengthSlider
+                key="overlayLength"
+                addLabel={!isMobile}
+                overlayPosition={text.overlayPosition}
+                overlayWidth={text.overlayWidth}
+                overlayHeight={text.overlayHeight}
+                className={classes.textField}
+                onChange={this.handleChangeTemp}
+                onAfterChange={this.handleChange}
+            />,
+            <Selector
+                key="colorScheme"
+                name="colorScheme"
+                label={lb('Color Scheme')}
+                className={classes.textField}
+                onChange={this.handleChange}
+                value={text.colorScheme}
+                options={[
+                    { display: 'Light', value: 'light' },
+                    { display: 'Dark', value: 'dark' }
+                ]}
+            />
+        ];
+
+        return (isMobile)
+            ? (
+                <React.Fragment>
+                    <TopTabs
+                        value={this.state.value}
+                        onChange={this.changeView}
+                        labels={[
+                            'Text',
+                            'Font Family',
+                            'Font Weight',
+                            'Alignment',
+                            'Position',
+                            'Overlay Length',
+                            'Color'
+                        ]}
+                    />
+                    <SwipeableViews
+                        axis={(theme.direction === 'rtl') ? 'x-reverse' : 'x'}
+                        index={this.state.value}
+                        animateHeight={true}
+                        disabled
+                    >
+                        {fields}
+                    </SwipeableViews>
+                </React.Fragment>
+            ) : (
+                <form
+                    className={classes.form}
+                    noValidate
+                    autoComplete="off"
+                    onSubmit={this.onSubmit}
+                >
+                    {fields}
+                </form>
+            );
     }
 }
 
 export default compose(
-    withStyles(styles),
+    withStyles(styles, { withTheme: true }),
     connector
 )(TextEditor);

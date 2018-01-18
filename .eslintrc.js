@@ -35,8 +35,6 @@ module.exports = {
         'class-property/class-property-semicolon': 2,
         // Console.log
         'no-console': 1,
-        // Switch
-        'default-case': 0,
         // Indentation
         'indent': [ 2, 4 ],
         // Semicolons

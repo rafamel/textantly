@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Slider from 'components/Elements/Fields/Slider';
+import Slider from '../../Fields/Slider';
 import isEqual from 'lodash.isequal';
 
 class RotateSlider extends React.Component {
@@ -25,7 +25,6 @@ class RotateSlider extends React.Component {
     render() {
         return (
             <Slider
-                style={{ padding: '22px 24px' }}
                 name="rotate-slider"
                 value={this.props.value}
                 min={-180}

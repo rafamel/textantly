@@ -1,27 +1,61 @@
 import React from 'react';
-import { MuiThemeProvider } from 'material-ui/styles';
+import PropTypes from 'prop-types';
+import { MuiThemeProvider, withStyles } from 'material-ui/styles';
 import { Provider } from 'react-redux';
 import store from 'store/_store';
 import { withState, compose } from 'store/utils';
 import Reboot from 'material-ui/Reboot';
-import LoadingBar from './LoadingBar';
-import SnackBar from './SnackBar';
 import DesktopUI from './DesktopUI/DesktopUI';
+import MobileUI from './MobileUI/MobileUI';
+import LoadingBar from './TopBar/LoadingBar';
+import SnackBar from './SnackBar';
 import theme from '../theme';
+import config from 'config';
+
+const styles = {
+    ui: {
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        width: '100%',
+        '& > *': {
+            flexGrow: 1
+        }
+    }
+};
 
 const { connector, propTypes: storeTypes } = withState(
-    null,
+    (state) => ({
+        isMobile: state._activeViews.isMobile
+    }),
     (actions) => ({
-        setLoading: actions._loading.setLoading
+        setLoading: actions._loading.setLoading,
+        setMobile: actions._activeViews.setMobile
     })
 );
 
 class App extends React.Component {
     static propTypes = {
-        ...storeTypes
+        ...storeTypes,
+        // JSS
+        classes: PropTypes.object.isRequired
     };
     state = {
         hasLoaded: false
+    };
+    setUI = (width = window.innerWidth) => {
+        const breakpoint = theme.breakpoints.values[config.mobileBreakpoint];
+        const isMobile = width < breakpoint;
+
+        if (isMobile !== this.props.isMobile) {
+            this.setState({ hasLoaded: false });
+            this.props.setLoading(true);
+            this.props.setMobile(isMobile);
+            setTimeout(() => {
+                this.props.setLoading(false);
+                this.setState({ hasLoaded: true });
+            }, 500);
+        }
     };
     componentDidMount() {
         this.props.setLoading(true);
@@ -33,21 +67,25 @@ class App extends React.Component {
                 clearInterval(interval);
             }
         }, 50);
+
+        this.setUI();
+        window.addEventListener('resize', (e) => {
+            this.setUI(e.target.innerWidth);
+        });
     }
     render() {
-        const hideUntilLoaded = (!this.state.hasLoaded)
-            ? { opacity: 0 } : {};
+        const { isMobile, classes } = this.props;
+        const hasLoaded = this.state.hasLoaded;
         return (
             <div>
-                <LoadingBar />
-                <div style={{
-                    ...hideUntilLoaded,
-                    height: '100vh',
-                    width: '100%'
-                }}>
-                    <DesktopUI />
-                    <SnackBar />
+                {!hasLoaded && (<LoadingBar />)}
+                <div
+                    className={classes.ui}
+                    style={{ opacity: (hasLoaded) ? 1 : 0 }}
+                >
+                    {(isMobile) ? (<MobileUI />) : (<DesktopUI />)}
                 </div>
+                <SnackBar />
             </div>
         );
     };
@@ -64,4 +102,8 @@ const wrapApp = (App) => function AppWrapper() {
     );
 };
 
-export default compose(wrapApp, connector)(App);
+export default compose(
+    wrapApp,
+    withStyles(styles),
+    connector
+)(App);

@@ -15,6 +15,7 @@ const styles = (theme) => {
     return {
         root: {
             width: '100%',
+            padding: '22px 24px',
             // Slider
             '& .rc-slider': {
                 width: 'calc(100% - 16px)',

@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import Button from 'material-ui/Button';
 import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
-import ArrowBack from 'material-ui-icons/ArrowBack';
-import ArrowForward from 'material-ui-icons/ArrowForward';
+import Undo from 'material-ui-icons/Undo';
+import Redo from 'material-ui-icons/Redo';
 import Restore from 'material-ui-icons/SettingsBackupRestore';
 
 const styles = theme => ({
@@ -57,7 +57,7 @@ class HistoryButtons extends React.Component {
                     onClick={backwards}
                     disabled={!historyCan.backwards}
                 >
-                    <ArrowBack className={classes.leftIcon} />
+                    <Undo className={classes.leftIcon} />
                     Undo
                 </Button>
                 <Button
@@ -72,7 +72,7 @@ class HistoryButtons extends React.Component {
                     disabled={!historyCan.forwards}
                 >
                     Redo
-                    <ArrowForward className={classes.rightIcon} />
+                    <Redo className={classes.rightIcon} />
                 </Button>
             </div>
         );

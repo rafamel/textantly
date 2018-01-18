@@ -3,43 +3,37 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Drawer from 'material-ui/Drawer';
 import Editor from '../Editor/Editor';
-import Navigation from '../Navigation';
 import Displayer from '../Displayer/Displayer';
+import TopBar from '../TopBar/TopBar';
+import Navigation from './Navigation';
 import HistoryButtons from './HistoryButtons';
-import AppBar from 'material-ui/AppBar';
-import TopBar from '../TopBar';
 
+const barHeight = 64;
 const drawerWidth = 350;
-const appBarHeight = 64;
 const styles = {
     frame: {
         width: '100%',
-        height: '100%',
         display: 'flex',
         flexDirection: 'row',
         overflow: 'hidden'
     },
-    container: {
+    left: {
+        display: 'flex',
+        flexDirection: 'column',
+        width: drawerWidth
+    },
+    right: {
         maxWidth: `calc(100% - ${drawerWidth}px)`,
         flexGrow: 1,
         display: 'flex',
         flexDirection: 'column'
     },
-    appBar: {
-        position: 'static',
-        display: 'flex',
-        flexDirection: 'row',
-        boxShadow: 'none'
-    },
-    navigation: {
-        width: drawerWidth
-    },
     drawer: {
-        height: `calc(100% - ${appBarHeight}px)`
+        height: `calc(100% - ${barHeight}px)`
     },
     drawerPaper: {
         height: '100%',
-        width: 350,
+        width: drawerWidth,
         position: 'static',
         borderRight: '1px solid rgba(136, 136, 136, 0.16)'
     },
@@ -50,10 +44,8 @@ const styles = {
 
 const DesktopUI = ({ classes }) => (
     <div className={classes.frame}>
-        <div>
-            <AppBar classes={{ root: classes.appBar }}>
-                <Navigation className={classes.navigation} />
-            </AppBar>
+        <div className={classes.left}>
+            <Navigation height={barHeight} />
             <Drawer
                 classes={{
                     docked: classes.drawer,
@@ -65,8 +57,8 @@ const DesktopUI = ({ classes }) => (
                 <Editor/>
             </Drawer>
         </div>
-        <div className={classes.container}>
-            <TopBar />
+        <div className={classes.right}>
+            <TopBar isMobile={false} />
             <Displayer className={classes.displayer} />
             <HistoryButtons />
         </div>
