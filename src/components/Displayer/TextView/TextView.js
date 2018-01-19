@@ -22,28 +22,41 @@ class TextView extends React.Component {
         ...storeTypes
     };
     state = {
-        fontFamily: null,
+        opacity: 1,
         sizerRerun: 0
     };
     _isMounted = false;
+    previousFailedFont = null;
+    timeout = null;
     styleSheet = jss.createStyleSheet(styles, { link: true });
     classes = this.styleSheet.classes;
     stylesUpdate = (updateObj = this.props.textEdits) => {
         this.styleSheet.update(updateObj).attach();
     };
-    loadFont = (fontFamily) => {
-        if (!fontFamily || fontFamily === this.state.fontFamily) return;
+    loadFont = (fontFamily, previousFF, keepOpacity) => {
+        if (!fontFamily
+            || fontFamily === previousFF
+            || fontFamily === this.previousFailedFont) {
+            return;
+        }
+        if (!keepOpacity) this.setState({ opacity: 0 });
         fontLoad(fontFamily)
             .then(() => {
                 if (!this._isMounted
                     || this.props.textEdits.fontFamily !== fontFamily) {
                     return;
                 }
-                this.setState({
-                    fontFamily: fontFamily,
-                    sizerRerun: this.state.sizerRerun + 1
-                });
-            }, () => {
+
+                this.previousFailedFont = null;
+                this.setState({ sizerRerun: this.state.sizerRerun + 1 });
+
+                if (this.timeout) clearTimeout(this.timeout);
+                this.timeout = setTimeout(() => {
+                    if (this._isMounted) this.setState({ opacity: 1 });
+                }, 250);
+            })
+            .catch(() => {
+                this.previousFailedFont = fontFamily;
                 this.props.addAlert(`Font could not be loaded. \
                     Do you have an active internet connection?`);
             });
@@ -52,15 +65,17 @@ class TextView extends React.Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.isRendering) return;
 
-        this.loadFont(nextProps.textEdits.fontFamily);
+        this.loadFont(
+            nextProps.textEdits.fontFamily, this.props.textEdits.fontFamily
+        );
         this.stylesUpdate(nextProps.textEdits);
         this.setState({ sizerRerun: this.state.sizerRerun + 1 });
     }
     componentWillMount() {
         this._isMounted = true;
-        this.loadFont(this.props.textEdits.fontFamily);
+
+        this.loadFont(this.props.textEdits.fontFamily, null, true);
         this.stylesUpdate();
-        this.setState({ fontFamily: this.props.textEdits.fontFamily });
     }
     shouldComponentUpdate(nextProps) {
         return !nextProps.isRendering;
@@ -73,16 +88,16 @@ class TextView extends React.Component {
         const textString = this.props.textEdits.textString
             || config.defaults.text.textString;
         return (
-            <div
-                className={classnames(classes.root, classes.text)}
-                style={{ fontFamily: `"${this.state.fontFamily}"` }}
-            >
+            <div className={classnames(classes.root, classes.text)}>
                 <div className={
                     classnames(classes.overlay, classes.overlayPosition)
                 }>
-                    <div className={classnames(
-                        classes.contain, classes.containPosition
-                    )}>
+                    <div
+                        className={classnames(
+                            classes.contain, classes.containPosition
+                        )}
+                        style={{ opacity: this.state.opacity }}
+                    >
                         <TextResizer
                             text={textString}
                             rerun={this.state.sizerRerun}

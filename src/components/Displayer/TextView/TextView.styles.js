@@ -20,10 +20,11 @@ export default {
         flexDirection: 'column'
     },
     text: {
+        fontFamily: ({ fontFamily }) => fontFamily,
+        fontWeight: ({ fontWeight }) => fontWeight,
         color: ({ colorScheme }) => (colorScheme === 'dark')
             ? '#f2f2f2'
             : '#150f05',
-        fontWeight: ({ fontWeight }) => fontWeight,
         textAlign: ({ alignment }) => alignment,
         '&::selection': {
             background: 'transparent'

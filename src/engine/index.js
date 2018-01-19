@@ -1,38 +1,23 @@
 import resize from './resize';
 import rotate from './rotate';
 import flip from './flip';
+import scale from './scale';
 
 function drawEngine(canvas, imageEdits) {
     canvas = resize.draw(canvas, imageEdits.resize);
-    canvas = flip.draw(canvas, imageEdits.flip);
     canvas = rotate.draw(canvas, imageEdits.rotate);
+    canvas = flip.draw(canvas, imageEdits.flip);
     return canvas;
 }
 
 function dimensionsEngine(dimensions, imageEdits) {
     dimensions = resize.getDimensions(dimensions, imageEdits.resize);
     dimensions = rotate.getDimensions(dimensions, imageEdits.rotate);
+    dimensions = scale.getDimensions(dimensions, imageEdits.scale);
     return dimensions;
 }
 
-function draw(canvasOrImage, { imageEdits, textEdits } = {}) {
-    let canvas;
-    switch (canvasOrImage.nodeName) {
-    case 'CANVAS':
-        canvas = canvasOrImage;
-        break;
-    case 'IMG':
-        canvas = document.createElement('canvas');
-        canvas.width = canvasOrImage.naturalWidth;
-        canvas.height = canvasOrImage.naturalHeight;
-        canvas.getContext('2d').drawImage(
-            canvasOrImage, 0, 0, canvas.width, canvas.height
-        );
-        break;
-    default:
-        return canvasOrImage;
-    }
-
+function draw(canvas, imageEdits, textEdits) {
     if (imageEdits) canvas = drawEngine(canvas, imageEdits);
     return canvas;
 }
@@ -44,20 +29,7 @@ function getDimensions(dimensions = {}, imageEdits) {
     return dimensionsEngine(dimensions, imageEdits);
 }
 
-function scale({ width, height, maxWidth, maxHeight }) {
-    const scaledWidth = Math.ceil(width * (maxHeight / height));
-    return (scaledWidth > maxWidth)
-        ? {
-            width: maxWidth,
-            height: Math.ceil(height * (maxWidth / width))
-        } : {
-            width: scaledWidth,
-            height: maxHeight
-        };
-}
-
 export default {
     draw,
-    getDimensions,
-    scale
+    getDimensions
 };

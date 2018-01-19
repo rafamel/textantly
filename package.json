@@ -48,7 +48,8 @@
     "redux-logic": "^0.12.3",
     "resize-observer-polyfill": "^1.5.0",
     "typeface-playfair-display-sc": "0.0.45",
-    "typeface-roboto": "0.0.45"
+    "typeface-roboto": "0.0.45",
+    "webfont-preloader": "^3.0.3"
   },
   "devDependencies": {
     "@types/jest": "^21.1.8",

@@ -3,14 +3,12 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { withState, compose } from 'store/utils';
 import withBroadcast from 'utils/withBroadcast';
-import isEqual from 'lodash.isequal';
-import engine from 'engine';
+import CanvasEngine from 'engine/CanvasEngine';
 
 const styles = {
     root: {
         textAlign: 'center',
         '& canvas': {
-            maxWidth: '100%',
             display: 'none',
             margin: '0 auto',
             '&:last-child': {
@@ -39,99 +37,54 @@ class ImageRender extends React.Component {
         ...storeTypes,
         exclude: PropTypes.string,
         freeze: PropTypes.bool,
-        getDimensions: PropTypes.func,
+        scale: PropTypes.bool,
         available: PropTypes.object,
         // JSS
         classes: PropTypes.object.isRequired
     };
+    static defaultProps = {
+        scale: true
+    };
     rootNode = null;
-    src = { current: null, loading: null };
-    drawn = {
-        canvas: null,
-        image: null,
-        for: null
-    };
-    updateAvailable = (props = this.props) => {
-        const canvas = this.drawn.canvas;
-        if (!canvas) return;
-
-        let available;
-        if (props.available) available = props.available;
-        else if (props.dimensions) available = props.dimensions;
-        if (!available) return;
-
-        let { width, height } = engine.scale({
-            width: canvas.width,
-            height: canvas.height,
-            maxWidth: available.width,
-            maxHeight: available.height
-        });
-
-        if (width < canvas.width) {
-            canvas.style.maxHeight = `${height}px`;
-            canvas.style.width = `${width}px`;
-        } else if (canvas.style.width) {
-            canvas.style.maxHeight = null;
-            canvas.style.width = null;
-        }
-    };
-    drawCanvas = ({ image, force, props }) => {
-        if (!props) props = this.props;
-        if (!image) image = this.drawn.image;
-        else this.drawn.image = image;
-
+    sourceId = { current: null, loading: null };
+    canvasEngine = null;
+    latest = { available: null, imageEdits: null, scale: true };
+    drawCanvas = ({ canvas, maxDimensions }) => {
         const rootNode = this.rootNode;
-        if (!rootNode || !image) return;
+        if (!rootNode) return;
 
-        const imageEdits = (!props.exclude)
-            ? props.imageEdits
-            : {
-                ...props.imageEdits,
-                [props.exclude]: undefined
-            };
-
-        if (
-            !force
-            && this.drawn.for
-            && isEqual(imageEdits, this.drawn.for)
-        ) {
-            return this.updateAvailable(props);
-        }
-
-        const canvas = engine.draw(image, { imageEdits });
-        if (props.getDimensions) {
-            props.getDimensions({ width: canvas.width, height: canvas.height });
-        }
-        this.drawn.canvas = canvas;
-        this.drawn.for = imageEdits;
-        this.updateAvailable(props);
         rootNode.prepend(canvas);
         if (rootNode.children[1]) rootNode.children[1].remove();
-        props.setRendering(false);
+        this.props.setRendering(false);
     };
-    loadImage = (source) => {
+    loadImage = (source = this.props.source) => {
         const loadFailed = () => {
-            this.src.loading = null;
+            if (source.id !== this.sourceId.loading) return;
             this.props.addAlert('Image could not be loaded');
             this.props.tempForget();
+            return true;
         };
         if (!this.rootNode) return;
-        this.src.loading = source.src;
+
+        this.sourceId.loading = source.id;
 
         const img = new Image();
         img.src = source.src;
+        setTimeout(loadFailed, 10000);
         img.onerror = () => {
-            // Load fail
-            loadFailed();
+            if (loadFailed()) this.sourceId.loading = null;
         };
         img.onload = () => {
-            // Load success
-            this.src.loading = null;
-            this.src.current = source.src;
-            this.drawCanvas({
-                image: img,
-                force: true
-            });
+            if (this.sourceId.loading !== source.id) return;
+            this.sourceId = { current: source.id, loading: null };
+
+            const canvasEngine = new CanvasEngine(img, this.drawCanvas);
+            canvasEngine.setAvailable(this.latest.available);
+            canvasEngine.setEdits(this.latest.imageEdits);
+            canvasEngine.scale(this.latest.scale);
+            canvasEngine.init();
+            this.canvasEngine = canvasEngine;
+
             this.props.setSourceHard({
                 ...source,
                 dimensions: {
@@ -140,22 +93,38 @@ class ImageRender extends React.Component {
                 }
             });
         };
-        setTimeout(() => {
-            if (this.src.loading === source.src) {
-                loadFailed();
-            }
-        }, 5000);
+    };
+    customUpdate = (props = this.props) => {
+        const available = props.available || props.dimensions || null;
+        const imageEdits = (!props.exclude)
+            ? props.imageEdits
+            : {
+                ...props.imageEdits,
+                [props.exclude]: undefined
+            };
+        this.latest = { available, imageEdits, scale: props.scale };
+
+        // Alaways load and redraw if it's a new image
+        if (props.source.id !== this.sourceId.current
+            && props.source.id !== this.sourceId.loading) {
+            return this.loadImage(props.source);
+        }
+
+        // Don't continue if it's still loading (freeze is
+        // broadcasted when rendering a new image and stops once loaded)
+        if (props.freeze) return;
+
+        if (this.canvasEngine) {
+            this.canvasEngine.scale(props.scale);
+            this.canvasEngine.setAvailable(available);
+            this.canvasEngine.setEdits(imageEdits);
+        }
     };
     componentWillReceiveProps(nextProps) {
-        if (nextProps.source.src !== this.src.current
-            && nextProps.source.src !== this.src.loading) {
-            this.loadImage(nextProps.source);
-        } else if (!nextProps.freeze) {
-            this.drawCanvas({ props: nextProps });
-        }
+        this.customUpdate(nextProps);
     }
     componentDidMount() {
-        this.loadImage(this.props.source);
+        this.customUpdate();
     }
     shouldComponentUpdate() {
         return false;

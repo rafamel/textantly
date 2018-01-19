@@ -11,9 +11,16 @@ const data = Object.keys(fonts).reduce((acc, key) => {
     return acc;
 }, {});
 
-function load(fontName, timeout = 3000) {
+function preload(fontName, weight, timeout) {
+    return (new FontFaceObserver(fontName, { weight }))
+        .load(null, timeout);
+}
+
+function load(fontName, timeout = 4000) {
     googleFonts.add({ [fontName]: true });
-    return (new FontFaceObserver(fontName)).load(null, timeout);
+    return Promise.all(
+        data[fontName].map(weight => preload(fontName, weight, timeout))
+    );
 }
 
 export {

@@ -12,9 +12,9 @@ import isEqual from 'lodash.isequal';
 
 const initialState = {
     _history: historianDefaults,
-    _forView: null,
     source: {
         ...config.defaults.src,
+        id: 0,
         from: false,
         dimensions: { width: 668, height: 367 }
     },
@@ -107,7 +107,12 @@ main.logic = createLogic({
                     image: (payload.src && payload.src !== state.source.src)
                         ? initialState.image
                         : state.image,
-                    source: { ...state.source, ...payload }
+                    source: {
+                        ...state.source,
+                        ...payload,
+                        id: (state.source.src === payload.src)
+                            ? state.source.id : state.source.id + 1
+                    }
                 };
             case is(main.typesBy.type.SET_TEXT):
                 return {
