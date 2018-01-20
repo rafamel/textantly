@@ -40,7 +40,7 @@ const styles = (theme) => ({
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         text: state.edits.text,
-        isMobile: state._activeViews.isMobile
+        isMobile: state.views.isMobile
     }), (actions) => ({
         setTextHard: actions.edits.setTextHard,
         setTextTemp: actions.edits.setTextTemp,

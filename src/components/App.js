@@ -26,11 +26,11 @@ const styles = {
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        isMobile: state._activeViews.isMobile
+        isMobile: state.views.isMobile
     }),
     (actions) => ({
         setLoading: actions._loading.setLoading,
-        setMobile: actions._activeViews.setMobile
+        setMobile: actions.views.setMobile
     })
 );
 

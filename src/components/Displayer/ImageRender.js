@@ -23,7 +23,7 @@ const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         source: state.edits.source,
         imageEdits: state.edits.image,
-        dimensions: state._activeViews.dimensions
+        dimensions: state.views.dimensions
     }), (actions) => ({
         setRendering: actions._loading.setRendering,
         setSourceHard: actions.edits.setSourceHard,

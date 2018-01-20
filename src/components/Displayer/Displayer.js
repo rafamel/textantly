@@ -33,10 +33,10 @@ const styles = {
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        mainView: state._activeViews.main,
-        imageView: state._activeViews.image
+        mainView: state.views.main,
+        imageView: state.views.image
     }), (actions) => ({
-        setDimensions: actions._activeViews.setDimensions
+        setDimensions: actions.views.setDimensions
     })
 );
 

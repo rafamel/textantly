@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import { typesActions } from './utils';
 
 const { types: t, actions } = typesActions({
-    pre: 'ACTIVE_VIEWS',
-    types: ['SET_MOBILE', 'CHANGE_MAIN', 'CHANGE_IMAGE', 'SET_DIMENSIONS']
+    pre: 'VIEWS',
+    types: ['SET_MOBILE', 'SET_MAIN', 'SET_IMAGE', 'SET_DIMENSIONS']
 });
 
 const initialState = {
@@ -35,12 +35,12 @@ function reducer(state = initialState, { type, payload }) {
             ...state,
             isMobile: payload
         };
-    case t.CHANGE_MAIN:
+    case t.SET_MAIN:
         return {
             ...state,
             main: payload
         };
-    case t.CHANGE_IMAGE:
+    case t.SET_IMAGE:
         return {
             ...state,
             image: {
@@ -61,6 +61,5 @@ function reducer(state = initialState, { type, payload }) {
 export default {
     propTypes,
     reducer,
-    actions,
-    types: t
+    actions
 };

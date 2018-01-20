@@ -18,11 +18,11 @@ import engine from 'engine';
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         imageEdits: state.edits.image,
-        imageViews: state._activeViews.image,
+        imageViews: state.views.image,
         sourceDimensions: state.edits.source.dimensions,
-        isMobile: state._activeViews.isMobile
+        isMobile: state.views.isMobile
     }), (actions) => ({
-        changeImageViews: actions._activeViews.changeImage,
+        setImageViews: actions.views.setImage,
         setImageHard: actions.edits.setImageHard,
         setImageTemp: actions.edits.setImageTemp
     })
@@ -65,7 +65,7 @@ class ImageEditor extends React.Component {
         const view = this.tabDict.toString[index];
         if (view === 'flip') return this.doFlip();
 
-        this.props.changeImageViews({ main: view });
+        this.props.setImageViews({ main: view });
     };
     componentWillReceiveProps(nextProps) {
         this.setActiveIndex(nextProps);
@@ -77,7 +77,7 @@ class ImageEditor extends React.Component {
         const {
             theme,
             imageViews,
-            changeImageViews,
+            setImageViews,
             imageEdits,
             setImageHard,
             setImageTemp,
@@ -89,7 +89,7 @@ class ImageEditor extends React.Component {
             crop: (<CropSelector
                 key="crop"
                 cropView={imageViews.crop}
-                changeImageViews={changeImageViews}
+                setImageViews={setImageViews}
             />),
             rotate: (<RotateSlider
                 key="rotate"

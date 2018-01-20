@@ -35,6 +35,5 @@ function reducer(state = initialState, { type, payload }) {
 export default {
     propTypes,
     reducer,
-    actions,
-    types: t
+    actions
 };

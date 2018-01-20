@@ -20,7 +20,7 @@ const styles = {
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        isMobile: state._activeViews.isMobile,
+        isMobile: state.views.isMobile,
         loading: state._loading.loading,
         rendering: state._loading.rendering
     })

@@ -22,12 +22,12 @@ const styles = {
 class CropSelector extends React.Component {
     static propTypes = {
         cropView: PropTypes.string,
-        changeImageViews: PropTypes.func.isRequired,
+        setImageViews: PropTypes.func.isRequired,
         // JSS
         classes: PropTypes.object.isRequired
     };
     handleChange = (event, value) => {
-        this.props.changeImageViews({ crop: value });
+        this.props.setImageViews({ crop: value });
     };
     shouldComponentUpdate(nextProps) {
         return !isEqual(this.props, nextProps);

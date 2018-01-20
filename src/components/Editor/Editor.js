@@ -27,10 +27,10 @@ const styles = (theme) => ({
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        mainView: state._activeViews.main,
-        isMobile: state._activeViews.isMobile
+        mainView: state.views.main,
+        isMobile: state.views.isMobile
     }), (actions) => ({
-        changeMainView: actions._activeViews.changeMain
+        setMainView: actions.views.setMain
     })
 );
 
@@ -47,7 +47,7 @@ class Editor extends React.Component {
     };
     handleChange = (index) => {
         const view = this.tabDict.toString[index];
-        this.props.changeMainView(view);
+        this.props.setMainView(view);
     };
     render() {
         const { theme, classes, mainView, isMobile } = this.props;

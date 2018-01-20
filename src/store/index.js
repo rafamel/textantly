@@ -1,13 +1,13 @@
 import { combineReducers } from 'redux';
 import { createLogicMiddleware } from 'redux-logic';
 import loading from './loading';
-import activeViews from './active-views';
+import views from './views';
 import edits from './edits';
 import alerts from './alerts';
 
 const reducer = combineReducers({
     _loading: loading.reducer,
-    _activeViews: activeViews.reducer,
+    views: views.reducer,
     edits: edits.reducer,
     alerts: alerts.reducer
 });
@@ -18,14 +18,14 @@ const logic = createLogicMiddleware([
 
 const actions = {
     _loading: loading.actions,
-    _activeViews: activeViews.actions,
+    views: views.actions,
     edits: edits.actions,
     alerts: alerts.actions
 };
 
 const propTypes = {
     _loading: loading.propTypes,
-    _activeViews: activeViews.propTypes,
+    views: views.propTypes,
     edits: edits.propTypes,
     alerts: alerts.propTypes
 };

@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { diff, diffBackwards, diffForwards } from './diff';
 
 function addCan(history) {
@@ -26,24 +25,14 @@ const defaultValues = {
     index: -1,
     arr: [],
     temp: null,
+    checkpoint: null,
     can: {
         forwards: false,
         backwards: false
     }
 };
 
-const propTypes = {
-    index: () => PropTypes.number.isRequired,
-    arr: () => PropTypes.array.isRequired,
-    temp: () => PropTypes.object,
-    can: () => PropTypes.shape({
-        forwards: PropTypes.bool.isRequired,
-        backwards: PropTypes.bool.isRequired
-    }).isRequired
-};
-
-export { defaultValues, propTypes };
-
+export { defaultValues };
 export default function history({ key, exclude }) {
     if (!exclude) exclude = [];
 
@@ -55,12 +44,16 @@ export default function history({ key, exclude }) {
         const diffObj = diff(previous, updated, exclude.concat(key));
         if (!diffObj) return previous;
 
-        const currentHistory = previous[key];
-        const index = currentHistory.index;
+        const history = previous[key];
+        if (!history.arr.length) {
+            history.checkpoint = previous;
+        }
+        const index = history.index;
         const arr = (index === -1)
-            ? currentHistory.arr
-            : currentHistory.arr.slice(0, index);
+            ? history.arr
+            : history.arr.slice(0, index);
         updated[key] = addCan({
+            ...history,
             index: -1,
             arr: arr.concat([diffObj]),
             temp: null
@@ -74,8 +67,7 @@ export default function history({ key, exclude }) {
             updated[key] = history;
         } else {
             updated[key] = addCan({
-                index: history.index,
-                arr: history.arr,
+                ...history,
                 temp: previous
             });
         }
@@ -86,6 +78,20 @@ export default function history({ key, exclude }) {
         const history = current[key];
         if (history.temp) return history.temp;
         return current;
+    }
+
+    function checkpoint(current) {
+        current[key] = {
+            ...current[key],
+            checkpoint: current
+        };
+        return current;
+    }
+
+    function restoreCheckpoint(current) {
+        const history = current[key];
+        if (!history.checkpoint) return current;
+        return insert(current, history.checkpoint);
     }
 
     function backwards(current) {
@@ -99,28 +105,31 @@ export default function history({ key, exclude }) {
 
         const updated = diffBackwards(current, history.arr[select]);
         updated[key] = addCan({
-            index: select,
-            arr: history.arr
+            ...history,
+            index: select
         });
         return updated;
     }
 
     function forwards(current) {
         const history = current[key];
-        if (!history || !history.can.forwards) return current;
+        if (!history || !history.can.forwards || history.temp) return current;
 
         const updated = diffForwards(current, history.arr[history.index]);
         updated[key] = addCan({
-            index: history.index + 1,
-            arr: history.arr
+            ...history,
+            index: history.index + 1
         });
         return updated;
     }
 
     return {
+        key,
         insert,
         tempInsert,
         tempForget,
+        checkpoint,
+        restoreCheckpoint,
         backwards,
         forwards
     };

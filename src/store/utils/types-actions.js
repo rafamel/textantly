@@ -49,7 +49,9 @@ function createTypes({ pre: prefix, types: typesArr, post: postfixes }) {
     prefix = prefix.toUpperCase().replace(/ /g, '_');
     const ans = { types: {} };
     typesArr.forEach((type, i) => {
-        ans.types[type] = `${prefix}_${cleanTypesArr[i]}`;
+        ans.types[type] = (prefix)
+            ? `${prefix}_${cleanTypesArr[i]}`
+            : cleanTypesArr[i];
     });
     if (postfixes) {
         ans.typesBy = typesPostfix(

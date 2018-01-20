@@ -23,10 +23,10 @@ const styles = {
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        mainView: state._activeViews.main,
+        mainView: state.views.main,
         canBackwards: state.edits._history.can.backwards
     }), (actions) => ({
-        changeMainView: actions._activeViews.changeMain,
+        setMainView: actions.views.setMain,
         backwards: actions.edits.backwards
     })
 );
@@ -59,7 +59,7 @@ class MobileMenu extends React.Component {
             }, 300);
         };
 
-        const { changeMainView, backwards } = this.props;
+        const { setMainView, backwards } = this.props;
         this.setState({ value });
         const view = this.tabDict.toString[value];
         // eslint-disable-next-line
@@ -67,9 +67,9 @@ class MobileMenu extends React.Component {
         case 'open':
             return bounce(this.openFile);
         case 'text':
-            return changeMainView('text');
+            return setMainView('text');
         case 'image':
-            return changeMainView('image');
+            return setMainView('image');
         case 'undo':
             bounce();
             return backwards();
