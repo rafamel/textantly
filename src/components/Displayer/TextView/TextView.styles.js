@@ -40,8 +40,8 @@ export default {
         positioning[opposites[position]] = 'auto';
 
         const length = (position === 'top' || position === 'bottom')
-            ? { height: `${overlayHeight}%` }
-            : { width: `${overlayWidth}%` };
+            ? { height: `${overlayHeight}%`, width: 'auto' }
+            : { width: `${overlayWidth}%`, height: 'auto' };
 
         return { ...positioning, ...length };
     },

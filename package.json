@@ -46,6 +46,7 @@
     "react-swipeable-views": "^0.12.12",
     "redux": "^3.7.2",
     "redux-logic": "^0.12.3",
+    "reselect": "^3.0.1",
     "resize-observer-polyfill": "^1.5.0",
     "typeface-playfair-display-sc": "0.0.45",
     "typeface-roboto": "0.0.45",

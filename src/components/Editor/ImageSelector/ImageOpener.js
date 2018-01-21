@@ -6,7 +6,7 @@ import UrlDialog from './UrlDialog';
 const { connector, propTypes: storeTypes } = withState(
     null,
     (actions) => ({
-        setSourceTemp: actions.edits.setSourceTemp,
+        setSource: actions.edits.setSource,
         setLoading: actions._loading.setLoading,
         addAlert: actions.alerts.add
     })
@@ -28,7 +28,7 @@ class ImageOpener extends React.Component {
         if (!url) { return; }
 
         const imageName = (str) => str.split('/').slice(-1)[0];
-        this.props.setSourceTemp({
+        this.props.setSource({
             name: imageName(url),
             src: url,
             from: 'url'
@@ -62,7 +62,7 @@ class ImageOpener extends React.Component {
     };
     readFile = (name, src) => {
         this.props.setLoading(false);
-        this.props.setSourceTemp({
+        this.props.setSource({
             name,
             src,
             from: 'file'

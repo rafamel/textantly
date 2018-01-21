@@ -36,6 +36,7 @@ class ViewSwitcher extends React.Component {
     currentNode = null;
     interval = null;
     changeOn = (newEl, ms) => {
+        // if (ms > 750) return true;
         if (ms > 750) return true;
 
         const canvases = document.querySelectorAll(('canvas'));

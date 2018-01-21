@@ -9,13 +9,13 @@ const trig = (angleA, bLength) => {
 
 function getDimensions({ width, height }, degrees = 0) {
     let angle = degrees % 360;
-    if (!degrees || !width || !height) return { angle, width, height };
+    if (!degrees || !width || !height) return { width, height };
 
-    const ans = { angle };
     angle = Math.abs(angle);
     if (angle > 180) angle = 180 - (angle - 180);
     if (angle > 90) angle = 90 - (angle - 90);
 
+    const ans = {};
     if (angle === 0) {
         ans.width = width;
         ans.height = height;

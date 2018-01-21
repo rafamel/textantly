@@ -19,7 +19,7 @@ const initialState = {
 };
 
 const propTypes = {
-    current: () => PropTypes.instanceOf(Alert)
+    current: PropTypes.instanceOf(Alert)
 };
 
 function reducer(state = initialState, { type, payload }) {

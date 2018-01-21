@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { withState, compose } from 'store/utils';
 import withBroadcast from 'utils/withBroadcast';
-import CanvasEngine from 'engine/CanvasEngine';
+import isEqual from 'lodash.isequal';
+import engine from 'engine';
+import { selectors } from 'store';
 
 const styles = {
     root: {
@@ -21,103 +23,52 @@ const styles = {
 const broadcaster = withBroadcast('freeze');
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        source: state.edits.source,
-        imageEdits: state.edits.image,
-        dimensions: state.views.dimensions
-    }), (actions) => ({
-        setRendering: actions._loading.setRendering,
-        setSourceHard: actions.edits.setSourceHard,
-        tempForget: actions.edits.tempForget,
-        addAlert: actions.alerts.add
+        canvas: state.canvases.scaled.canvas,
+        canvasId: state.canvases.scaled.id,
+        lastScaled: selectors.canvases.lastScaled(state)
     })
 );
 
 class ImageRender extends React.Component {
     static propTypes = {
         ...storeTypes,
-        exclude: PropTypes.string,
         freeze: PropTypes.bool,
-        scale: PropTypes.bool,
-        available: PropTypes.object,
         // JSS
         classes: PropTypes.object.isRequired
     };
-    static defaultProps = {
-        scale: true
+    current = {
+        canvas: null,
+        canvasId: null,
+        dimensions: { width: 0, height: 0 }
     };
     rootNode = null;
-    sourceId = { current: null, loading: null };
-    canvasEngine = null;
-    latest = { available: null, imageEdits: null, scale: true };
-    drawCanvas = ({ canvas, maxDimensions }) => {
+    setDimensions = () => {
+        if (!this.canvas) return;
+        const dimensions = this.current.dimensions;
+        this.canvas.style.width = `${dimensions.width}px`;
+        this.canvas.style.height = `${dimensions.height}px`;
+    }
+    drawCanvas = (canvas) => {
         const rootNode = this.rootNode;
-        if (!rootNode) return;
-
+        if (!rootNode || !canvas) return;
+        this.canvas = canvas;
+        this.setDimensions();
         rootNode.prepend(canvas);
         if (rootNode.children[1]) rootNode.children[1].remove();
-        this.props.setRendering(false);
-    };
-    loadImage = (source = this.props.source) => {
-        const loadFailed = () => {
-            if (source.id !== this.sourceId.loading) return;
-            this.props.addAlert('Image could not be loaded');
-            this.props.tempForget();
-            return true;
-        };
-        if (!this.rootNode) return;
-
-        this.sourceId.loading = source.id;
-
-        const img = new Image();
-        img.src = source.src;
-        setTimeout(loadFailed, 10000);
-        img.onerror = () => {
-            if (loadFailed()) this.sourceId.loading = null;
-        };
-        img.onload = () => {
-            if (this.sourceId.loading !== source.id) return;
-            this.sourceId = { current: source.id, loading: null };
-
-            const canvasEngine = new CanvasEngine(img, this.drawCanvas);
-            canvasEngine.setAvailable(this.latest.available);
-            canvasEngine.setEdits(this.latest.imageEdits);
-            canvasEngine.scale(this.latest.scale);
-            canvasEngine.init();
-            this.canvasEngine = canvasEngine;
-
-            this.props.setSourceHard({
-                ...source,
-                dimensions: {
-                    width: img.naturalWidth,
-                    height: img.naturalHeight
-                }
-            });
-        };
     };
     customUpdate = (props = this.props) => {
-        const available = props.available || props.dimensions || null;
-        const imageEdits = (!props.exclude)
-            ? props.imageEdits
-            : {
-                ...props.imageEdits,
-                [props.exclude]: undefined
-            };
-        this.latest = { available, imageEdits, scale: props.scale };
-
-        // Alaways load and redraw if it's a new image
-        if (props.source.id !== this.sourceId.current
-            && props.source.id !== this.sourceId.loading) {
-            return this.loadImage(props.source);
+        if (!isEqual(props.lastScaled, this.current.dimensions)) {
+            this.current.dimensions = props.lastScaled;
+            this.setDimensions();
         }
-
-        // Don't continue if it's still loading (freeze is
-        // broadcasted when rendering a new image and stops once loaded)
-        if (props.freeze) return;
-
-        if (this.canvasEngine) {
-            this.canvasEngine.scale(props.scale);
-            this.canvasEngine.setAvailable(available);
-            this.canvasEngine.setEdits(imageEdits);
+        if (
+            !props.freeze
+            && props.canvas
+            && props.canvasId !== this.current.canvasId
+        ) {
+            console.log('image render');
+            this.current.canvasId = props.canvasId;
+            this.drawCanvas(engine.makeCanvas(props.canvas));
         }
     };
     componentWillReceiveProps(nextProps) {

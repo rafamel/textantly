@@ -30,7 +30,8 @@ const { connector, propTypes: storeTypes } = withState(
     }),
     (actions) => ({
         setLoading: actions._loading.setLoading,
-        setMobile: actions.views.setMobile
+        setMobile: actions.views.setMobile,
+        loadSource: actions.edits.loadSource
     })
 );
 
@@ -57,8 +58,11 @@ class App extends React.Component {
             }, 500);
         }
     };
-    componentDidMount() {
+    componentWillMount() {
+        this.props.loadSource();
         this.props.setLoading(true);
+    }
+    componentDidMount() {
         const startAt = Date.now();
         const interval = setInterval(() => {
             if (document.readyState === 'complete' || (Date.now() - startAt) > 7500) {

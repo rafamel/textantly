@@ -11,8 +11,8 @@ const initialState = {
     rendering: true
 };
 const propTypes = {
-    loading: () => PropTypes.bool.isRequired,
-    rendering: () => PropTypes.bool.isRequired
+    loading: PropTypes.bool.isRequired,
+    rendering: PropTypes.bool.isRequired
 };
 
 function reducer(state = initialState, { type, payload }) {

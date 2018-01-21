@@ -3,19 +3,20 @@ import { createLogic } from 'redux-logic';
 import typesActions, { values } from '../utils/types-actions';
 import { defaultValues } from '../historian';
 import views from '../views';
-import loading from '../loading';
+import canvases from '../canvases';
+import source from './source';
 import { typesPre, historian, OVERWRITE } from './init';
 import isEqual from 'lodash.isequal';
 
 const propTypes = {
-    index: () => PropTypes.number.isRequired,
-    arr: () => PropTypes.array.isRequired,
-    temp: () => PropTypes.object,
-    checkpoint: () => PropTypes.object,
-    can: () => PropTypes.shape({
+    index: PropTypes.number.isRequired,
+    arr: PropTypes.array.isRequired,
+    temp: PropTypes.object,
+    checkpoint: PropTypes.object,
+    can: {
         forwards: PropTypes.bool.isRequired,
         backwards: PropTypes.bool.isRequired
-    }).isRequired
+    }
 };
 
 const { types: t, actions } = typesActions({
@@ -54,9 +55,10 @@ logic.push(createLogic({
             dispatch(views.actions.setMain('text'));
         }
 
-        if (state.source.id !== payload.source.id
-        || !isEqual(state.image, payload.image)) {
-            dispatch(loading.actions.setRendering(true));
+        if (state.source.id !== payload.source.id) {
+            dispatch(source.actions.loadSource());
+        } else if (!isEqual(state.image, payload.image)) {
+            dispatch(canvases.actions.draw());
         }
 
         dispatch({ type: OVERWRITE, payload });

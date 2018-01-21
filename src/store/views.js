@@ -1,9 +1,17 @@
 import PropTypes from 'prop-types';
 import { typesActions } from './utils';
+import { createLogic } from 'redux-logic';
+import isEqual from 'lodash.isequal';
+import canvases from './canvases';
 
 const { types: t, actions } = typesActions({
     pre: 'VIEWS',
-    types: ['SET_MOBILE', 'SET_MAIN', 'SET_IMAGE', 'SET_DIMENSIONS']
+    types: [
+        'SET_MOBILE',
+        'SET_MAIN',
+        'SET_IMAGE',
+        'SET_DIMENSIONS'
+    ]
 });
 
 const initialState = {
@@ -17,14 +25,15 @@ const initialState = {
 };
 
 const propTypes = {
-    main: () => PropTypes.string.isRequired,
+    isMobile: PropTypes.bool.isRequired,
+    main: PropTypes.string.isRequired,
     image: {
-        main: () => PropTypes.string,
-        crop: () => PropTypes.string.isRequired
+        main: PropTypes.string,
+        crop: PropTypes.string.isRequired
     },
     dimensions: {
-        width: () => PropTypes.number.isRequired,
-        height: () => PropTypes.number.isRequired
+        width: PropTypes.number.isRequired,
+        height: PropTypes.number.isRequired
     }
 };
 
@@ -58,8 +67,34 @@ function reducer(state = initialState, { type, payload }) {
     }
 }
 
+const logic = [];
+logic.push(createLogic({
+    type: t.SET_DIMENSIONS,
+    cancelType: t.SET_DIMENSIONS,
+    validate({ getState, action }, allow, reject) {
+        const dimensions = getState().views.dimensions;
+        const payload = action.payload;
+        if (
+            !payload
+            || !payload.width
+            || !payload.height
+            || isEqual(payload, dimensions)
+        ) {
+            return reject(action);
+        }
+        allow(action);
+    },
+    process({ getState, action }, dispatch, done) {
+        setTimeout(() => {
+            dispatch(canvases.actions.scale(action.payload));
+            done();
+        }, 300);
+    }
+}));
+
 export default {
     propTypes,
     reducer,
-    actions
+    actions,
+    logic
 };

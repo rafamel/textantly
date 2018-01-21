@@ -15,18 +15,15 @@ const initialState = {
 };
 
 const propTypes = {
-    textString: () => PropTypes.string.isRequired,
-    fontFamily: () => PropTypes.string.isRequired,
-    fontWeight: () => PropTypes
-        .oneOfType([
-            PropTypes.string,
-            PropTypes.number
-        ]).isRequired,
-    alignment: () => PropTypes.string.isRequired,
-    overlayPosition: () => PropTypes.string.isRequired,
-    overlayWidth: () => PropTypes.number.isRequired,
-    overlayHeight: () => PropTypes.number.isRequired,
-    colorScheme: () => PropTypes.string.isRequired
+    textString: PropTypes.string.isRequired,
+    fontFamily: PropTypes.string.isRequired,
+    fontWeight: PropTypes
+        .oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    alignment: PropTypes.string.isRequired,
+    overlayPosition: PropTypes.string.isRequired,
+    overlayWidth: PropTypes.number.isRequired,
+    overlayHeight: PropTypes.number.isRequired,
+    colorScheme: PropTypes.string.isRequired
 };
 
 const logic = [];

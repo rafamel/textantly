@@ -19,7 +19,6 @@ const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         imageEdits: state.edits.image,
         imageViews: state.views.image,
-        sourceDimensions: state.edits.source.dimensions,
         isMobile: state.views.isMobile
     }), (actions) => ({
         setImageViews: actions.views.setImage,
@@ -81,7 +80,6 @@ class ImageEditor extends React.Component {
             imageEdits,
             setImageHard,
             setImageTemp,
-            sourceDimensions,
             isMobile
         } = this.props;
 
@@ -91,22 +89,24 @@ class ImageEditor extends React.Component {
                 cropView={imageViews.crop}
                 setImageViews={setImageViews}
             />),
-            rotate: (<RotateSlider
-                key="rotate"
-                value={imageEdits.rotate}
-                setImageHard={setImageHard}
-                setImageTemp={setImageTemp}
-            />),
-            resize: (<ResizeSliders
-                key="resize"
-                resize={imageEdits.resize}
-                dimensions={engine.getDimensions(
-                    sourceDimensions,
-                    { ...imageEdits, resize: undefined }
-                )}
-                setImageHard={setImageHard}
-                setImageTemp={setImageTemp}
-            />)
+            // rotate: (<RotateSlider
+            //     key="rotate"
+            //     value={imageEdits.rotate}
+            //     setImageHard={setImageHard}
+            //     setImageTemp={setImageTemp}
+            // />),
+            rotate: (<div>Rotate</div>),
+            // resize: (<ResizeSliders
+            //     key="resize"
+            //     resize={imageEdits.resize}
+            //     // dimensions={engine.getDimensions(
+            //     //     sourceDimensions,
+            //     //     { ...imageEdits, resize: undefined }
+            //     // )}
+            //     setImageHard={setImageHard}
+            //     setImageTemp={setImageTemp}
+            // />)
+            resize: (<div>Resize</div>)
         };
 
         const isOpen = (name) => imageViews.main === name;

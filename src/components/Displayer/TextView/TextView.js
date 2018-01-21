@@ -7,11 +7,13 @@ import ImageRender from '../ImageRender';
 import styles from './TextView.styles';
 import { load as fontLoad } from 'services/fonts';
 import TextResizer from './TextResizer';
+import { selectors } from 'store';
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         textEdits: state.edits.text,
-        isRendering: state._loading.rendering
+        isRendering: state._loading.rendering,
+        doUpdate: selectors.edits.doUpdate(state)
     }), (actions) => ({
         addAlert: actions.alerts.add
     })
@@ -64,11 +66,11 @@ class TextView extends React.Component {
     // Lifecycle
     componentWillReceiveProps(nextProps) {
         if (nextProps.isRendering) return;
+        if (nextProps.doUpdate) this.stylesUpdate(nextProps.textEdits);
 
         this.loadFont(
             nextProps.textEdits.fontFamily, this.props.textEdits.fontFamily
         );
-        this.stylesUpdate(nextProps.textEdits);
         this.setState({ sizerRerun: this.state.sizerRerun + 1 });
     }
     componentWillMount() {
