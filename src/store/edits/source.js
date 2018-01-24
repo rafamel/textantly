@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { createLogic } from 'redux-logic';
 import typesActions, { values } from '../utils/types-actions';
-import { typesPre, insert } from './init';
+import { typesPre, actions as editsActions } from './init';
 import engine from 'engine';
 import loading from '../loading';
 import alerts from '../alerts';
@@ -9,7 +9,7 @@ import canvases from '../canvases';
 import image from './image';
 import config from 'config';
 
-const { types, actions } = typesActions({
+const { types: t, actions } = typesActions({
     pre: `${typesPre}_SOURCE`,
     types: ['SET_SOURCE', 'LOAD_SOURCE']
 });
@@ -24,7 +24,8 @@ const propTypes = {
     name: PropTypes.string.isRequired,
     src: PropTypes.string.isRequired,
     from: PropTypes
-        .oneOfType([PropTypes.bool, PropTypes.string]).isRequired
+        .oneOfType([PropTypes.bool, PropTypes.string]).isRequired,
+    id: PropTypes.number.isRequired
 };
 
 function loadImage(src, dispatch) {
@@ -33,7 +34,7 @@ function loadImage(src, dispatch) {
             dispatch(alerts.actions.add('Image could not be loaded'));
             dispatch(loading.actions.setRendering(false));
             reject(Error());
-        }
+        };
         dispatch(loading.actions.setRendering(true));
         const image = new Image();
         image.src = src;
@@ -45,8 +46,8 @@ function loadImage(src, dispatch) {
 
 const logic = [];
 logic.push(createLogic({
-    type: types.SET_SOURCE,
-    cancelType: types.SET_SOURCE,
+    type: t.SET_SOURCE,
+    cancelType: t.SET_SOURCE,
     process({ getState, action }, dispatch, done) {
         const state = getState().edits;
         let payload = action.payload;
@@ -62,9 +63,7 @@ logic.push(createLogic({
                         id: payload.id + 1
                     }
                 };
-                insert({
-                    action: { ...action, payload }, mode: 'HARD', getState, dispatch
-                });
+                dispatch(editsActions.writeHard(payload));
                 dispatch(canvases.actions.setSource(canvas));
                 done();
             })
@@ -72,8 +71,8 @@ logic.push(createLogic({
     }
 }));
 logic.push(createLogic({
-    type: types.LOAD_SOURCE,
-    cancelType: values(types),
+    type: t.LOAD_SOURCE,
+    cancelType: values(t),
     process({ getState, action }, dispatch, done) {
         loadImage(getState().edits.source.src, dispatch)
             .then(canvas => {

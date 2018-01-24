@@ -31,7 +31,7 @@ const { connector, propTypes: storeTypes } = withState(
     (actions) => ({
         setLoading: actions._loading.setLoading,
         setMobile: actions.views.setMobile,
-        loadSource: actions.edits.loadSource
+        loadSource: actions.edits.source.loadSource
     })
 );
 

@@ -25,7 +25,6 @@ const defaultValues = {
     index: -1,
     arr: [],
     temp: null,
-    checkpoint: null,
     can: {
         forwards: false,
         backwards: false
@@ -45,53 +44,33 @@ export default function history({ key, exclude }) {
         if (!diffObj) return previous;
 
         const history = previous[key];
-        if (!history.arr.length) {
-            history.checkpoint = previous;
-        }
         const index = history.index;
         const arr = (index === -1)
             ? history.arr
             : history.arr.slice(0, index);
-        updated[key] = addCan({
-            ...history,
-            index: -1,
-            arr: arr.concat([diffObj]),
-            temp: null
-        });
-        return updated;
+
+        return {
+            ...updated,
+            [key]: addCan({
+                ...history,
+                index: -1,
+                arr: arr.concat([diffObj]),
+                temp: null,
+                checkpoints: (!history.arr.length) ? { '0': previous } : {}
+            })
+        };
     }
 
     function tempInsert(previous, updated) {
         const history = previous[key];
-        if (history.temp) {
-            updated[key] = history;
-        } else {
-            updated[key] = addCan({
-                ...history,
-                temp: previous
-            });
-        }
-        return updated;
-    }
-
-    function tempForget(current) {
-        const history = current[key];
-        if (history.temp) return history.temp;
-        return current;
-    }
-
-    function checkpoint(current) {
-        current[key] = {
-            ...current[key],
-            checkpoint: current
-        };
-        return current;
-    }
-
-    function restoreCheckpoint(current) {
-        const history = current[key];
-        if (!history.checkpoint) return current;
-        return insert(current, history.checkpoint);
+        return (history.temp)
+            ? {
+                ...updated,
+                [key]: history
+            } : {
+                ...updated,
+                [key]: addCan({ ...history, temp: previous })
+            };
     }
 
     function backwards(current) {
@@ -127,9 +106,6 @@ export default function history({ key, exclude }) {
         key,
         insert,
         tempInsert,
-        tempForget,
-        checkpoint,
-        restoreCheckpoint,
         backwards,
         forwards
     };

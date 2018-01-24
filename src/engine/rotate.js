@@ -33,9 +33,10 @@ function getDimensions({ width, height }, degrees = 0) {
 
 function draw(canvas, degrees) {
     if (!degrees) return canvas;
-    const { angle, width, height } = getDimensions(
+    const { width, height } = getDimensions(
         { width: canvas.width, height: canvas.height }, degrees
     );
+    const angle = degrees % 360;
     if (angle === 0) return canvas;
 
     const rotCanvas = document.createElement('canvas');

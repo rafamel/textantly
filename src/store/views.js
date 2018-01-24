@@ -1,17 +1,18 @@
 import PropTypes from 'prop-types';
-import { typesActions } from './utils';
+import { typesActions, selectorWithType } from './utils';
 import { createLogic } from 'redux-logic';
 import isEqual from 'lodash.isequal';
 import canvases from './canvases';
 
-const { types: t, actions } = typesActions({
+const { types: t, typesBy, actions } = typesActions({
     pre: 'VIEWS',
     types: [
         'SET_MOBILE',
         'SET_MAIN',
         'SET_IMAGE',
         'SET_DIMENSIONS'
-    ]
+    ],
+    post: 'PRIVATE'
 });
 
 const initialState = {
@@ -57,7 +58,7 @@ function reducer(state = initialState, { type, payload }) {
                 ...payload
             }
         };
-    case t.SET_DIMENSIONS:
+    case typesBy.post.PRIVATE.SET_DIMENSIONS:
         return {
             ...state,
             dimensions: payload
@@ -85,16 +86,30 @@ logic.push(createLogic({
         allow(action);
     },
     process({ getState, action }, dispatch, done) {
+        dispatch(actions.setDimensionsPrivate(action.payload));
         setTimeout(() => {
-            dispatch(canvases.actions.scale(action.payload));
+            dispatch(canvases.actions.scale());
             done();
         }, 300);
     }
 }));
 
+const selectors = {};
+selectors.doUpdate = selectorWithType({
+    propType: PropTypes.bool.isRequired,
+    select: [
+        state => state.edits._history.temp,
+        state => state.views.isMobile
+    ],
+    result: (temp, isMobile) => {
+        return (!isMobile || !temp);
+    }
+});
+
 export default {
     propTypes,
     reducer,
     actions,
-    logic
+    logic,
+    selectors
 };

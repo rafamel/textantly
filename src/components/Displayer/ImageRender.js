@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import { withState, compose } from 'store/utils';
+import { withState, compose, selectorWithType } from 'store/utils';
 import withBroadcast from 'utils/withBroadcast';
 import isEqual from 'lodash.isequal';
-import engine from 'engine';
+import engine, { Operation } from 'engine';
 import { selectors } from 'store';
 
 const styles = {
@@ -20,12 +20,39 @@ const styles = {
     }
 };
 
+const lastScaledSelector = selectorWithType({
+    propType: PropTypes.shape({
+        width: PropTypes.number,
+        height: PropTypes.number
+    }),
+    select: [
+        state => state.views.dimensions,
+        state => selectors.canvases.drawnDimensions(state),
+        state => state.edits.image.last,
+        (_, props) => (props) ? props.exclude : null
+    ],
+    result: (viewsDimensions, drawnDimensions, lastOp, exclude) => {
+        const lastDimensions = (!lastOp || (exclude && lastOp.is(exclude)))
+            ? drawnDimensions
+            : engine.getDimensions(drawnDimensions, [lastOp]);
+
+        return engine.getDimensions(
+            lastDimensions,
+            [new Operation('scale', viewsDimensions)]
+        );
+    }
+});
+
 const broadcaster = withBroadcast('freeze');
 const { connector, propTypes: storeTypes } = withState(
-    (state) => ({
-        canvas: state.canvases.scaled.canvas,
-        canvasId: state.canvases.scaled.id,
-        lastScaled: selectors.canvases.lastScaled(state)
+    (state, props) => ({
+        scaled: state.canvases.scaled.canvas,
+        scaledId: state.canvases.scaled.id,
+        drawnDimensions: selectors.canvases.drawnDimensions(state),
+        lastDimensions: lastScaledSelector(state, props),
+        isScaledSynced: selectors.canvases.isScaledSynced(state),
+        lastOp: state.edits.image.last,
+        doUpdate: selectors.views.doUpdate(state)
     })
 );
 
@@ -33,43 +60,67 @@ class ImageRender extends React.Component {
     static propTypes = {
         ...storeTypes,
         freeze: PropTypes.bool,
+        onUpdate: PropTypes.func,
         // JSS
         classes: PropTypes.object.isRequired
     };
+    scaled = {
+        id: -1,
+        canvas: null
+    };
     current = {
         canvas: null,
-        canvasId: null,
-        dimensions: { width: 0, height: 0 }
+        dimensions: { width: 0, height: 0 },
+        forLast: null
     };
+    _queuedSetDimensions = false;
     rootNode = null;
     setDimensions = () => {
-        if (!this.canvas) return;
+        if (!this.current.canvas) return;
         const dimensions = this.current.dimensions;
-        this.canvas.style.width = `${dimensions.width}px`;
-        this.canvas.style.height = `${dimensions.height}px`;
-    }
+        this.current.canvas.style.width = `${dimensions.width}px`;
+        this.current.canvas.style.height = `${dimensions.height}px`;
+    };
     drawCanvas = (canvas) => {
         const rootNode = this.rootNode;
         if (!rootNode || !canvas) return;
-        this.canvas = canvas;
+        this.current.canvas = canvas;
         this.setDimensions();
         rootNode.prepend(canvas);
+        if (this.props.onUpdate) this.props.onUpdate();
         if (rootNode.children[1]) rootNode.children[1].remove();
     };
     customUpdate = (props = this.props) => {
-        if (!isEqual(props.lastScaled, this.current.dimensions)) {
-            this.current.dimensions = props.lastScaled;
-            this.setDimensions();
+        if (!isEqual(props.lastDimensions, this.current.dimensions)) {
+            this.current.dimensions = props.lastDimensions;
+            this._queuedSetDimensions = true;
         }
-        if (
-            !props.freeze
-            && props.canvas
-            && props.canvasId !== this.current.canvasId
-        ) {
-            console.log('image render');
-            this.current.canvasId = props.canvasId;
-            this.drawCanvas(engine.makeCanvas(props.canvas));
+
+        if (props.freeze || !props.scaled
+            || !props.isScaledSynced || !props.doUpdate) {
+            return;
         }
+
+        let doLast = false;
+        if (props.scaledId !== this.scaled.id) {
+            doLast = true;
+            this.scaled = {
+                id: props.scaledId,
+                canvas: props.scaled
+            };
+        }
+        if (doLast || !isEqual(props.lastOp, this.current.forLast)) {
+            this._queuedSetDimensions = false;
+            this.current.forLast = props.lastOp;
+            const canvas = engine.draw(
+                engine.makeCanvas(this.scaled.canvas),
+                [props.lastOp],
+                props.drawnDimensions
+            );
+            this.drawCanvas(canvas);
+        }
+
+        if (this._queuedSetDimensions) this.setDimensions();
     };
     componentWillReceiveProps(nextProps) {
         this.customUpdate(nextProps);

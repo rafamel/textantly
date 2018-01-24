@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import { createLogic } from 'redux-logic';
 import typesActions, { values } from '../utils/types-actions';
-import { typesPre, insert } from './init';
+import { typesPre, writeAction } from './init';
 import config from 'config';
 
-const { types, typesBy, actions } = typesActions({
+const { types: t, typesBy, actions } = typesActions({
     pre: `${typesPre}_TEXT`,
     types: ['SET_TEXT'],
-    post: ['HARD', 'TEMP']
+    post: ['TEMP']
 });
 
 const initialState = {
@@ -28,13 +28,13 @@ const propTypes = {
 
 const logic = [];
 logic.push(createLogic({
-    type: values(types),
+    type: values(t),
     process({ getState, action }, dispatch, done) {
-        action.payload = {
+        const payload = {
             ...getState().edits.text,
             ...action.payload
         };
-        insert({ key: 'text', action, typesBy, getState, dispatch });
+        dispatch(writeAction(action.type, typesBy)({ text: payload }));
         done();
     }
 }));

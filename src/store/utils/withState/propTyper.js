@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 
 function getType(obj, firstKey, actions) {
-    // eslint-ignore-next-line
     const msg = () => {
+        // eslint-disable-next-line
         console.error(`withState couldn't get the types for some key '${firstKey}'`);
     };
     if (!obj) return msg();

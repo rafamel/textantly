@@ -1,22 +1,17 @@
-function getPc({ width: widthPc, height: heightPc }) {
-    return {
-        // eslint-disable-next-line
-        width: Math.min(100, (widthPc != undefined) ? widthPc : 100),
-        // eslint-disable-next-line
-        height: Math.min(100, (heightPc != undefined) ? heightPc : 100)
-    };
-}
-
 function getDimensions(dimensions, resize = {}) {
-    const pc = getPc(resize);
     return {
-        width: Math.ceil((dimensions.width * pc.width) / 100),
-        height: Math.ceil((dimensions.height * pc.height) / 100)
+        width: (resize.width || resize.width === 0)
+            ? resize.width : dimensions.width,
+        height: (resize.height || resize.height === 0)
+            ? resize.height : dimensions.height
     };
 }
 
 function draw(canvas, resize, nonScaledDimensions) {
-    if (!resize || (resize.width === 100 && resize.height === 100)) {
+    if (
+        !resize
+        || (resize.width === canvas.width && resize.height === canvas.height)
+    ) {
         return canvas;
     }
 
@@ -54,7 +49,6 @@ function draw(canvas, resize, nonScaledDimensions) {
 }
 
 export default {
-    getPc,
     getDimensions,
     draw
 };

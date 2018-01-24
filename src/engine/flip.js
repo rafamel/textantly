@@ -12,5 +12,6 @@ function draw(canvas, flip) {
 }
 
 export default {
+    getDimensions: (d) => d,
     draw
 };

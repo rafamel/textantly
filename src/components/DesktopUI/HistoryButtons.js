@@ -6,6 +6,7 @@ import { withStyles } from 'material-ui/styles';
 import Undo from 'material-ui-icons/Undo';
 import Redo from 'material-ui-icons/Redo';
 import Restore from 'material-ui-icons/SettingsBackupRestore';
+import { selectors } from 'store';
 
 const styles = theme => ({
     root: {
@@ -29,7 +30,7 @@ const styles = theme => ({
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        historyCan: state.edits._history.can
+        historyCan: selectors.edits.can(state)
     }), (actions) => ({
         reset: actions.edits.reset,
         backwards: actions.edits.backwards,

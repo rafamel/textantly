@@ -13,7 +13,7 @@ const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         textEdits: state.edits.text,
         isRendering: state._loading.rendering,
-        doUpdate: selectors.edits.doUpdate(state)
+        doUpdate: selectors.views.doUpdate(state)
     }), (actions) => ({
         addAlert: actions.alerts.add
     })
@@ -63,6 +63,9 @@ class TextView extends React.Component {
                     Do you have an active internet connection?`);
             });
     };
+    onImageUpdate = () => {
+        this.setState({ sizerRerun: this.state.sizerRerun + 1 });
+    };
     // Lifecycle
     componentWillReceiveProps(nextProps) {
         if (nextProps.isRendering) return;
@@ -106,7 +109,7 @@ class TextView extends React.Component {
                         />
                     </div>
                 </div>
-                <ImageRender />
+                <ImageRender onUpdate={this.onImageUpdate} />
             </div>
         );
     }

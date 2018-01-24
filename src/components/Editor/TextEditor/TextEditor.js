@@ -42,9 +42,8 @@ const { connector, propTypes: storeTypes } = withState(
         text: state.edits.text,
         isMobile: state.views.isMobile
     }), (actions) => ({
-        setTextHard: actions.edits.setTextHard,
-        setTextTemp: actions.edits.setTextTemp,
-        tempForget: actions.edits.tempForget
+        setText: actions.edits.text.setText,
+        setTextTemp: actions.edits.text.setTextTemp
     })
 );
 
@@ -61,7 +60,7 @@ class TextEditor extends React.Component {
         this.setState({ value });
     };
     handleChange = (e) => {
-        this.props.setTextHard({
+        this.props.setText({
             [e.target.name]: e.target.value
         });
     };

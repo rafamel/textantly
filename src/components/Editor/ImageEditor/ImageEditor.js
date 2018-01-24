@@ -13,17 +13,16 @@ import PhotoSizeSelectLarge from 'material-ui-icons/PhotoSizeSelectLarge';
 import CropSelector from './Fields/CropSelector';
 import RotateSlider from './Fields/RotateSlider';
 import ResizeSliders from './Fields/ResizeSliders';
-import engine from 'engine';
+import { selectors } from 'store';
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        imageEdits: state.edits.image,
         imageViews: state.views.image,
-        isMobile: state.views.isMobile
+        isMobile: state.views.isMobile,
+        flipVal: selectors.edits.image.flip(state)
     }), (actions) => ({
         setImageViews: actions.views.setImage,
-        setImageHard: actions.edits.setImageHard,
-        setImageTemp: actions.edits.setImageTemp
+        flip: actions.edits.image.flip
     })
 );
 
@@ -51,10 +50,7 @@ class ImageEditor extends React.Component {
         this.lockIndex = true;
         this.setState({ activeIndex: this.tabDict.toIndex.flip });
 
-        this.props.setImageHard({
-            flip: !this.props.imageEdits.flip
-        });
-
+        this.props.flip(!this.props.flipVal);
         setTimeout(() => {
             this.lockIndex = false;
             this.setActiveIndex();
@@ -77,9 +73,6 @@ class ImageEditor extends React.Component {
             theme,
             imageViews,
             setImageViews,
-            imageEdits,
-            setImageHard,
-            setImageTemp,
             isMobile
         } = this.props;
 
@@ -89,24 +82,8 @@ class ImageEditor extends React.Component {
                 cropView={imageViews.crop}
                 setImageViews={setImageViews}
             />),
-            // rotate: (<RotateSlider
-            //     key="rotate"
-            //     value={imageEdits.rotate}
-            //     setImageHard={setImageHard}
-            //     setImageTemp={setImageTemp}
-            // />),
-            rotate: (<div>Rotate</div>),
-            // resize: (<ResizeSliders
-            //     key="resize"
-            //     resize={imageEdits.resize}
-            //     // dimensions={engine.getDimensions(
-            //     //     sourceDimensions,
-            //     //     { ...imageEdits, resize: undefined }
-            //     // )}
-            //     setImageHard={setImageHard}
-            //     setImageTemp={setImageTemp}
-            // />)
-            resize: (<div>Resize</div>)
+            rotate: (<RotateSlider key="rotate" />),
+            resize: (<ResizeSliders key="resize" />)
         };
 
         const isOpen = (name) => imageViews.main === name;

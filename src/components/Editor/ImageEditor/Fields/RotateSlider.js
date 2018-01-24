@@ -1,27 +1,27 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { withState } from 'store/utils';
 import Slider from '../../Fields/Slider';
-import isEqual from 'lodash.isequal';
+import { selectors } from 'store';
+
+const { connector, propTypes: storeTypes } = withState(
+    (state) => ({
+        value: selectors.edits.image.rotate(state)
+    }), (actions) => ({
+        rotate: actions.edits.image.rotate,
+        rotateTemp: actions.edits.image.rotateTemp
+    })
+);
 
 class RotateSlider extends React.Component {
     static propTypes = {
-        value: PropTypes.number.isRequired,
-        setImageHard: PropTypes.func.isRequired,
-        setImageTemp: PropTypes.func.isRequired
+        ...storeTypes
     };
     handleTempChange = (e) => {
-        this.props.setImageTemp({
-            rotate: e.target.value
-        });
+        this.props.rotateTemp(e.target.value);
     };
     handleChange = (e) => {
-        this.props.setImageHard({
-            rotate: e.target.value
-        });
+        this.props.rotate(e.target.value);
     };
-    shouldComponentUpdate(nextProps) {
-        return !isEqual(this.props, nextProps);
-    }
     render() {
         return (
             <Slider
@@ -37,4 +37,4 @@ class RotateSlider extends React.Component {
     }
 }
 
-export default RotateSlider;
+export default connector(RotateSlider);

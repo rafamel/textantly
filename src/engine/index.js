@@ -3,7 +3,17 @@ import rotate from './rotate';
 import flip from './flip';
 import scale from './scale';
 
-const operations = {resize, rotate, flip, scale};
+const opEngines = {resize, rotate, flip, scale};
+
+class Operation {
+    constructor(type, value) {
+        this.type = type;
+        this.value = value;
+    }
+    is(ofType) {
+        return this.type === ofType;
+    }
+}
 
 function makeCanvas(canvasOrImage) {
     const canvas = document.createElement('canvas');
@@ -27,25 +37,24 @@ function makeCanvas(canvasOrImage) {
     }
 }
 
-function draw(canvas, imageEdits = [], textEdits) {
-    return imageEdits.reduce((newCanvas, edit) => {
-        if (!edit) return newCanvas;
-        const op = Object.keys(edit)[0];
-        return operations[op].draw(newCanvas, edit[op]);
+function draw(canvas, operations = [], nonScaledDimensions) {
+    return operations.reduce((newCanvas, op) => {
+        if (!op) return newCanvas;
+        return opEngines[op.type].draw(newCanvas, op.value, nonScaledDimensions);
     }, canvas);
 }
 
-function getDimensions(dimensions = {}, imageEdits = []) {
+function getDimensions(dimensions = {}, operations = []) {
     if (!dimensions.width || !dimensions.height) {
         return { width: 0, height: 0 };
     }
-    return imageEdits.reduce((newDimensions, edit) => {
-        if (!edit) return dimensions;
-        const op = Object.keys(edit)[0];
-        return operations[op].getDimensions(newDimensions, edit[op]);
+    return operations.reduce((newDimensions, op) => {
+        if (!op) return dimensions;
+        return opEngines[op.type].getDimensions(newDimensions, op.value);
     }, dimensions);
 }
 
+export { Operation };
 export default {
     makeCanvas,
     draw,

@@ -29,9 +29,10 @@ const actions = {
 };
 
 const selectors = {
+    views: views.selectors,
     edits: edits.selectors,
     canvases: canvases.selectors
-}
+};
 
 const propTypes = {
     _loading: loading.propTypes,

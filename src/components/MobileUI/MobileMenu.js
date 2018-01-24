@@ -8,6 +8,7 @@ import TextFormat from 'material-ui-icons/TextFormat';
 import Image from 'material-ui-icons/Image';
 import Undo from 'material-ui-icons/Undo';
 import ImageOpener from '../Editor/ImageSelector/ImageOpener';
+import { selectors } from 'store';
 
 const styles = {
     root: {
@@ -24,7 +25,7 @@ const styles = {
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         mainView: state.views.main,
-        canBackwards: state.edits._history.can.backwards
+        historyCan: selectors.edits.can(state)
     }), (actions) => ({
         setMainView: actions.views.setMain,
         backwards: actions.edits.backwards
@@ -91,7 +92,7 @@ class MobileMenu extends React.Component {
         this._isMounted = false;
     }
     render() {
-        const { classes, canBackwards } = this.props;
+        const { classes, historyCan } = this.props;
         const value = this.state.value;
         const view = this.tabDict.toString[value];
 
@@ -124,7 +125,7 @@ class MobileMenu extends React.Component {
                         icon={<Undo />}
                         label="Undo"
                         classes={{ root: classes.tab }}
-                        disabled={!canBackwards && view !== 'undo'}
+                        disabled={!historyCan.backwards && view !== 'undo'}
                     />
                 </Tabs>
             </Paper>

@@ -20,7 +20,6 @@ function selectorWithType(
 
 export { selectorWithType };
 export default function withState(...args) {
-
     if (args[1] && typeof args[1] === 'function') {
         args[1] = args[1](actions);
     }
@@ -30,7 +29,6 @@ export default function withState(...args) {
         if (args[0]) {
             propTypes[ptSymbol] = true;
             Object.assign(types, propTyper(args[0](propTypes)));
-
         }
         if (args[1]) {
             Object.assign(types, propTyper(

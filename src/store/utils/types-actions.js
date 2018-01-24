@@ -16,11 +16,15 @@ function checkDuplicates(arr, id) {
     if (duplicates) throw Error(`There is a duplicate type for ${id}`);
 }
 
-function typesPostfix({ post: postfixes, types }) {
+function typesPostfix({ post: postfixes, types }, includeAll = true) {
     if (!Array.isArray(postfixes)) postfixes = [postfixes];
-    postfixes = postfixes.map(x => cleanType(x));
+    const cleanPostfixes = postfixes.map(x => {
+        x = cleanType(x);
+        if (x === 'BASE') throw Error(`Postfix can't be 'BASE'`);
+        return x;
+    });
     checkDuplicates(postfixes, 'postfixes');
-    const flat = {};
+    const flat = (includeAll) ? { ...types } : {};
     const byType = {};
     const byPost = postfixes.reduce((acc, x) => {
         acc[x] = {};
@@ -28,9 +32,9 @@ function typesPostfix({ post: postfixes, types }) {
     }, {});
     Object.keys(types).forEach(key => {
         const base = types[key];
-        byType[key] = {};
-        postfixes.forEach(post => {
-            const value = `${base}_${post}`;
+        byType[key] = (includeAll) ? { 'BASE': base } : {};
+        postfixes.forEach((post, i) => {
+            const value = `${base}_${cleanPostfixes[i]}`;
             flat[`${key}_${post}`] = value;
             byType[key][post] = value;
             byPost[post][key] = value;
@@ -43,7 +47,10 @@ function typesPostfix({ post: postfixes, types }) {
     };
 }
 
-function createTypes({ pre: prefix, types: typesArr, post: postfixes }) {
+function createTypes(
+    { pre: prefix, types: typesArr, post: postfixes },
+    includeAll
+) {
     const cleanTypesArr = typesArr.map(cleanType);
     checkDuplicates(cleanTypesArr, prefix);
     prefix = prefix.toUpperCase().replace(/ /g, '_');
@@ -55,7 +62,8 @@ function createTypes({ pre: prefix, types: typesArr, post: postfixes }) {
     });
     if (postfixes) {
         ans.typesBy = typesPostfix(
-            { types: ans.types, post: postfixes }
+            { types: ans.types, post: postfixes },
+            includeAll
         );
         ans.types = ans.typesBy.all;
     }
@@ -83,8 +91,8 @@ function createActions(types) {
     return ans;
 }
 
-function typesActions({ pre, types, post }) {
-    const ans = createTypes({ pre, types, post });
+function typesActions({ pre, types, post }, includeAll) {
+    const ans = createTypes({ pre, types, post }, includeAll);
     ans.actions = createActions(ans.types);
     return ans;
 }

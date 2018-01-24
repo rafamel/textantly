@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withState, compose } from 'store/utils';
 import { withStyles } from 'material-ui/styles';
 import Button from 'material-ui/Button';
 import LinkIcon from 'material-ui-icons/Link';
 import Slider from '../../Fields/Slider';
 import isEqual from 'lodash.isequal';
-import resizeEngine from 'engine/resize';
+import { selectors } from 'store';
 
 const styles = {
     root: {
@@ -21,45 +22,53 @@ const styles = {
     }
 };
 
+const selector = selectors.edits.image.creators.dimensions('resize');
+const { connector, propTypes: storeTypes } = withState(
+    (state) => ({
+        dimensions: selector(state)
+    }), (actions) => ({
+        resize: actions.edits.image.resize,
+        resizeTemp: actions.edits.image.resizeTemp
+    })
+);
+
 class ResizeSliders extends React.Component {
     static propTypes = {
-        resize: PropTypes.object.isRequired,
-        dimensions: PropTypes.object.isRequired,
-        setImageHard: PropTypes.func.isRequired,
-        setImageTemp: PropTypes.func.isRequired,
+        ...storeTypes,
         // JSS
         classes: PropTypes.object.isRequired
     };
     state = {
         linked: false
     };
+    pc = () => {
+        const dimensions = this.props.dimensions;
+        return {
+            height: (dimensions.value.height / dimensions.max.height) || 0,
+            width: (dimensions.value.width / dimensions.max.width) || 0
+        };
+    };
     reLink = () => {
-        const pc = resizeEngine.getPc(this.props.resize);
-        if (!pc.width && !pc.height) return;
-
-        this.props.setImageHard({
-            resize: (pc.height > pc.width)
-                ? {
-                    height: pc.height,
-                    width: pc.height
-                } : {
-                    height: pc.width,
-                    width: pc.width
-                }
-        });
+        const dimensions = this.props.dimensions;
+        const pc = this.pc();
+        const name = (pc.height > pc.width) ? 'height' : 'width';
+        this.props.resize(
+            this.resizeDimensions(name, dimensions.value[name], true)
+        );
     };
     resizeDimensions = (name, value, forceLink) => {
         const opposites = { width: 'height', height: 'width' };
         const opposite = opposites[name];
         const dimensions = this.props.dimensions;
-        const pc = (value * 100) / dimensions[name];
         return (this.state.linked || forceLink)
             ? {
-                height: pc,
-                width: pc
+                [name]: value,
+                [opposite]: Math.round(
+                    (dimensions.max[opposite] * value) / dimensions.max[name]
+                )
             } : {
-                [name]: pc,
-                [opposite]: this.props.resize[opposite]
+                [name]: value,
+                [opposite]: dimensions.value[opposite]
             };
     };
     toggleLink = () => {
@@ -69,18 +78,18 @@ class ResizeSliders extends React.Component {
         this.setState({ linked: !linked });
     };
     handleTempChange = (e) => {
-        this.props.setImageTemp({
-            resize: this.resizeDimensions(e.target.name, e.target.value)
-        });
+        this.props.resizeTemp(
+            this.resizeDimensions(e.target.name, e.target.value)
+        );
     };
     handleChange = (e) => {
-        this.props.setImageHard({
-            resize: this.resizeDimensions(e.target.name, e.target.value)
-        });
+        this.props.resize(
+            this.resizeDimensions(e.target.name, e.target.value)
+        );
     };
     componentWillMount() {
-        const resize = this.props.resize;
-        if (resize.height === resize.width) {
+        const pc = this.pc();
+        if (Math.abs(pc.height - pc.width) < 0.01) {
             this.setState({ linked: true });
         }
     }
@@ -89,9 +98,7 @@ class ResizeSliders extends React.Component {
             || !isEqual(this.state, nextState));
     }
     render() {
-        const { classes, resize, dimensions } = this.props;
-        const values = resizeEngine.getDimensions(dimensions, resize);
-
+        const { classes, dimensions } = this.props;
         return (
             <div className={classes.root}>
                 <Button
@@ -107,9 +114,9 @@ class ResizeSliders extends React.Component {
                 <Slider
                     name="width"
                     label="Width"
-                    value={values.width}
+                    value={dimensions.value.width}
                     min={0}
-                    max={dimensions.width}
+                    max={dimensions.max.width}
                     step={1}
                     onChange={this.handleTempChange}
                     onAfterChange={this.handleChange}
@@ -117,9 +124,9 @@ class ResizeSliders extends React.Component {
                 <Slider
                     name="height"
                     label="Height"
-                    value={values.height}
+                    value={dimensions.value.height}
                     min={0}
-                    max={dimensions.height}
+                    max={dimensions.max.height}
                     step={1}
                     onChange={this.handleTempChange}
                     onAfterChange={this.handleChange}
@@ -129,4 +136,7 @@ class ResizeSliders extends React.Component {
     }
 }
 
-export default withStyles(styles)(ResizeSliders);
+export default compose(
+    withStyles(styles),
+    connector
+)(ResizeSliders);

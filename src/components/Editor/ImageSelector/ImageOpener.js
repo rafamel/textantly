@@ -6,7 +6,7 @@ import UrlDialog from './UrlDialog';
 const { connector, propTypes: storeTypes } = withState(
     null,
     (actions) => ({
-        setSource: actions.edits.setSource,
+        setSource: actions.edits.source.setSource,
         setLoading: actions._loading.setLoading,
         addAlert: actions.alerts.add
     })
