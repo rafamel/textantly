@@ -17,7 +17,8 @@ const styles = {
         position: 'relative',
         flexDirection: 'column',
         justifyContent: 'center',
-        textAlign: 'center'
+        textAlign: 'center',
+        overflow: 'hidden'
     },
     view: {
         width: '100%',
