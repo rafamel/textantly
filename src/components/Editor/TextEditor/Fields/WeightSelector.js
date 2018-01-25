@@ -23,7 +23,7 @@ class WeightSelector extends React.Component {
             PropTypes.string,
             PropTypes.number
         ]).isRequired,
-        fontFamilyWeights: PropTypes.array.isRequired,
+        weights: PropTypes.array.isRequired,
         className: PropTypes.string,
         onChange: PropTypes.func
     };
@@ -31,7 +31,8 @@ class WeightSelector extends React.Component {
         if (this.props.onChange) this.props.onChange(e);
     };
     shouldComponentUpdate(nextProps) {
-        return !isEqual(this.props, nextProps);
+        return this.props.value !== nextProps.value
+            || !isEqual(this.props.weights, nextProps.weights);
     }
     render() {
         return (
@@ -40,7 +41,7 @@ class WeightSelector extends React.Component {
                 onChange={this.handleChange}
                 value={String(this.props.value)}
                 options={
-                    this.props.fontFamilyWeights
+                    this.props.weights
                         .map(weight => (
                             { display: weightsDict[weight], value: weight }
                         ))

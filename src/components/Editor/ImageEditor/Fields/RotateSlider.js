@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { withState } from 'store/utils';
 import Slider from '../../Fields/Slider';
 import { selectors } from 'store';
@@ -14,7 +15,11 @@ const { connector, propTypes: storeTypes } = withState(
 
 class RotateSlider extends React.Component {
     static propTypes = {
-        ...storeTypes
+        ...storeTypes,
+        active: PropTypes.bool
+    };
+    static defaultProps = {
+        active: true
     };
     handleTempChange = (e) => {
         this.props.rotateTemp(e.target.value);
@@ -22,6 +27,9 @@ class RotateSlider extends React.Component {
     handleChange = (e) => {
         this.props.rotate(e.target.value);
     };
+    shouldComponentUpdate(nextProps) {
+        return nextProps.active;
+    }
     render() {
         return (
             <Slider

@@ -21,6 +21,9 @@ class FreeLabel extends React.Component {
         // JSS
         classes: PropTypes.object.isRequired
     };
+    shouldComponentUpdate(nextProps) {
+        return this.props.label !== nextProps.label;
+    }
     render() {
         const { classes, className, style, label } = this.props;
         if (!label) return null;

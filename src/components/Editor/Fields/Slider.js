@@ -5,7 +5,6 @@ import classnames from 'classnames';
 import FreeLabel from './FreeLabel';
 import RCSlider, { createSliderWithTooltip } from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import isEqual from 'lodash.isequal';
 
 const SliderWithTooltip = createSliderWithTooltip(RCSlider);
 
@@ -81,7 +80,10 @@ class Slider extends React.Component {
         );
     };
     shouldComponentUpdate(nextProps) {
-        return !isEqual(this.props, nextProps);
+        return this.props.value !== nextProps.value
+            || this.props.min !== nextProps.min
+            || this.props.max !== nextProps.max
+            || this.props.step !== nextProps.step;
     }
     render() {
         const props = this.props;

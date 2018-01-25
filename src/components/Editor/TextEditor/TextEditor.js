@@ -105,9 +105,9 @@ class TextEditor extends React.Component {
                 name="fontWeight"
                 label={lb('Font Weight')}
                 value={text.fontWeight}
+                weights={fontData[text.fontFamily]}
                 className={classes.textField}
                 onChange={this.handleChange}
-                fontFamilyWeights={fontData[text.fontFamily]}
             />,
             <Selector
                 key="alignment"

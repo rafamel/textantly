@@ -15,7 +15,8 @@ class Selector extends React.Component {
         onChange: PropTypes.func
     };
     shouldComponentUpdate(nextProps) {
-        return !isEqual(this.props, nextProps);
+        return this.props.value !== nextProps.value
+            || !isEqual(this.props.options, nextProps.options);
     }
     render() {
         const label = (!this.props.label) ? null : (

@@ -76,17 +76,23 @@ class ImageEditor extends React.Component {
             isMobile
         } = this.props;
 
+        const isActive = (name) => imageViews.main === name;
+        const actives = {
+            crop: isActive('crop'),
+            rotate: isActive('rotate'),
+            resize: isActive('resize')
+        };
         const fields = {
             crop: (<CropSelector
                 key="crop"
                 cropView={imageViews.crop}
                 setImageViews={setImageViews}
+                active={actives.crop}
             />),
-            rotate: (<RotateSlider key="rotate" />),
-            resize: (<ResizeSliders key="resize" />)
+            rotate: (<RotateSlider key="rotate" active={actives.rotate} />),
+            resize: (<ResizeSliders key="resize" active={actives.resize} />)
         };
 
-        const isOpen = (name) => imageViews.main === name;
         return (isMobile)
             ? (
                 <React.Fragment>
@@ -118,21 +124,21 @@ class ImageEditor extends React.Component {
                         label="Crop"
                         icon={<Crop />}
                     />
-                    <Collapse isOpened={isOpen('crop')}>
+                    <Collapse isOpened={actives.crop}>
                         {fields.crop}
                     </Collapse>
                     <VerticalTab
                         label="Rotate"
                         icon={<Rotate90DegreesCcw />}
                     />
-                    <Collapse isOpened={isOpen('rotate')}>
+                    <Collapse isOpened={actives.rotate}>
                         {fields.rotate}
                     </Collapse>
                     <VerticalTab
                         label="Resize"
                         icon={<PhotoSizeSelectLarge />}
                     />
-                    <Collapse isOpened={isOpen('resize')}>
+                    <Collapse isOpened={actives.resize}>
                         {fields.resize}
                     </Collapse>
                     <VerticalTab

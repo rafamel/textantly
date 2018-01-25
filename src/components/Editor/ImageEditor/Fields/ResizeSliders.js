@@ -5,7 +5,6 @@ import { withStyles } from 'material-ui/styles';
 import Button from 'material-ui/Button';
 import LinkIcon from 'material-ui-icons/Link';
 import Slider from '../../Fields/Slider';
-import isEqual from 'lodash.isequal';
 import { selectors } from 'store';
 
 const styles = {
@@ -35,8 +34,12 @@ const { connector, propTypes: storeTypes } = withState(
 class ResizeSliders extends React.Component {
     static propTypes = {
         ...storeTypes,
+        active: PropTypes.bool,
         // JSS
         classes: PropTypes.object.isRequired
+    };
+    static defaultProps = {
+        active: true
     };
     state = {
         linked: false
@@ -93,9 +96,8 @@ class ResizeSliders extends React.Component {
             this.setState({ linked: true });
         }
     }
-    shouldComponentUpdate(nextProps, nextState) {
-        return (!isEqual(this.props, nextProps)
-            || !isEqual(this.state, nextState));
+    shouldComponentUpdate(nextProps) {
+        return nextProps.active;
     }
     render() {
         const { classes, dimensions } = this.props;

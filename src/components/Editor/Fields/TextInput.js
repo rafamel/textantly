@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from 'material-ui/TextField';
-import isEqual from 'lodash.isequal';
 
 class TextInput extends React.Component {
     static propTypes = {
@@ -25,11 +24,11 @@ class TextInput extends React.Component {
         this.setState({
             timeout: setTimeout(() => {
                 this.props.onAfterChange(e);
-            }, 300)
+            }, 500)
         });
     };
     shouldComponentUpdate(nextProps) {
-        return !isEqual(this.props, nextProps);
+        return this.props.value !== nextProps.value;
     }
     render() {
         return (

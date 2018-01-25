@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Slider from '../../Fields/Slider';
-import isEqual from 'lodash.isequal';
 
 class OverlayLengthSlider extends React.Component {
     static propTypes = {
@@ -14,7 +13,9 @@ class OverlayLengthSlider extends React.Component {
         addLabel: PropTypes.bool
     };
     shouldComponentUpdate(nextProps) {
-        return !isEqual(this.props, nextProps);
+        return this.props.overlayPosition !== nextProps.overlayPosition
+            || this.props.overlayWidth !== nextProps.overlayWidth
+            || this.props.overlayHeight !== nextProps.overlayHeight;
     }
     render() {
         const commonProps = {
