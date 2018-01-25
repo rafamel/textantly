@@ -27,43 +27,9 @@ class WeightSelector extends React.Component {
         className: PropTypes.string,
         onChange: PropTypes.func
     };
-    weights = {
-        lastIntentionalWeight: this.props.value,
-        isIntentional: true
-    };
     handleChange = (e) => {
-        this.props.onChange(e);
-        this.weights = {
-            lastIntentionalWeight: e.target.value,
-            isIntentional: true
-        };
+        if (this.props.onChange) this.props.onChange(e);
     };
-    componentWillReceiveProps(nextProps) {
-        const { lastIntentionalWeight, isIntentional } = this.weights;
-        const { fontFamilyWeights, onChange, name } = nextProps;
-        const weightInWeights = fontFamilyWeights
-            .map(String)
-            .indexOf(String(lastIntentionalWeight)) !== -1;
-
-        if (isIntentional) {
-            if (!weightInWeights) {
-                const lastIntentionalWeightN = Number(lastIntentionalWeight);
-                const closestWeight = fontFamilyWeights
-                    .map(Number)
-                    .reduce((acc, weight) => {
-                        const distance = Math.abs(lastIntentionalWeightN - weight);
-                        return (acc[1] === -1 || acc[1] > distance)
-                            ? [weight, distance]
-                            : acc;
-                    }, [-1, -1]);
-                this.weights.isIntentional = false;
-                onChange({ target: { name, value: String(closestWeight[0]) } });
-            }
-        } else if (weightInWeights) {
-            this.weights.isIntentional = true;
-            onChange({ target: { name, value: lastIntentionalWeight } });
-        }
-    }
     shouldComponentUpdate(nextProps) {
         return !isEqual(this.props, nextProps);
     }
