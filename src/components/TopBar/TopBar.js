@@ -116,7 +116,7 @@ const TopBar = ({ classes, isMobile }) => (
                 onClick={() => {
                     window.open('https://github.com/rafamel/textantly');
                 }}
-                color="contrast"
+                color="inherit"
                 className={classnames('fa fa-github', classes.github)}
             />
         </Toolbar>

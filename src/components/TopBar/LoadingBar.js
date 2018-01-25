@@ -84,7 +84,7 @@ class LoadingBar extends React.Component {
                 style={style}
             >
                 <LinearProgress
-                    color="accent"
+                    color="secondary"
                     className={classes.bar}
                 />
             </div>

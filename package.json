@@ -15,25 +15,21 @@
     "test": "npm run lint:test && react-app-rewired test --env=jsdom --coverage",
     "test:watch": "nodemon --watch test --exec \"clear && npm t\"",
     "checks": "run-s lint lint:* && react-app-rewired test --env=jsdom --coverage",
-    "update:packages": "rm -rf node_modules && rm package-lock.json && npm update --save/save-dev && npm install && npm outdated",
-    "eject": "react-scripts eject"
+    "update:packages": "rm -rf node_modules && rm package-lock.json && npm update --save/save-dev && npm install && npm outdated"
   },
   "author": "Rafa Mel",
   "license": "MIT",
   "dependencies": {
-    "babel": "^6.23.0",
     "classnames": "^2.2.5",
     "deep-diff": "^0.3.8",
-    "dom4": "^2.0.0",
     "font-awesome": "^4.7.0",
     "fontfaceobserver": "^2.0.13",
     "google-fonts": "^1.0.0",
     "google-fonts-complete": "^1.2.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.isequal": "^4.5.0",
-    "lodash.merge": "^4.6.0",
     "lodash.values": "^4.3.0",
-    "material-ui": "^1.0.0-beta.29",
+    "material-ui": "^1.0.0-beta.30",
     "material-ui-icons": "^1.0.0-beta.17",
     "rc-collapse": "^1.7.7",
     "rc-slider": "^8.5.0",
@@ -49,17 +45,17 @@
     "redux-logic": "^0.12.3",
     "reselect": "^3.0.1",
     "resize-observer-polyfill": "^1.5.0",
-    "typeface-playfair-display-sc": "0.0.45",
-    "typeface-roboto": "0.0.45",
-    "webfont-preloader": "^3.0.3"
+    "typeface-playfair-display-sc": "0.0.54",
+    "typeface-roboto": "0.0.54"
   },
   "devDependencies": {
-    "@types/jest": "^21.1.8",
+    "@types/jest": "^22.1.0",
     "@types/react": "^16.0.31",
+    "babel": "^6.23.0",
     "babel-eslint": "^8.0.3",
     "babel-polyfill": "^6.26.0",
     "chalk": "^2.3.0",
-    "chokidar": "^1.7.0",
+    "chokidar": "^2.0.0",
     "clear": "0.0.1",
     "eslint": "^4.13.1",
     "eslint-config-standard": "^11.0.0-beta.0",
@@ -71,13 +67,11 @@
     "eslint-plugin-react": "^7.5.1",
     "eslint-plugin-react-app": "^1.0.2",
     "eslint-plugin-standard": "^3.0.1",
-    "markdownlint-cli": "^0.5.0",
+    "markdownlint-cli": "^0.6.0",
     "nodemon": "^1.13.3",
     "npm-run-all": "^4.1.2",
-    "react-app-rewire-eslint": "^0.2.3",
-    "react-app-rewire-polyfills": "^0.2.0",
     "react-app-rewired": "^1.4.0",
     "react-scripts": "^1.0.17",
-    "yargs": "^10.0.3"
+    "yargs": "^11.0.0"
   }
 }

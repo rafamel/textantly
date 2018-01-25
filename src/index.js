@@ -3,9 +3,8 @@ import ReactDOM from 'react-dom';
 import App from './components/App';
 import registerServiceWorker from './registerServiceWorker';
 
-// Polyfills
+// Polyfill
 import 'babel-polyfill';
-import 'dom4';
 
 import 'typeface-playfair-display-sc';
 import 'typeface-roboto';
