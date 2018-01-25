@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-'use strict';
+/* eslint-disable no-console */
 const yargs = require('yargs');
 const chalk = require('chalk');
 const clear = require('clear');
@@ -43,8 +43,8 @@ if (watch) {
     }, 500);
 
     const watcher = chokidar.watch(argv.w);
-    watcher.on('ready', function() {
-        watcher.on('all', function() {
+    watcher.on('ready', function () {
+        watcher.on('all', function () {
             if (stopper) stopper();
             cleanDraw();
             stopper = runner();
@@ -73,7 +73,7 @@ function draw() {
     if (argv.rd) {
         console.log(chalk.blue(`${argv.rd}:`));
         console.log(`${toDraw.rd || ''}\n`);
-        console.log(chalk.blue(`${argv.r.join(' && ')}:`))
+        console.log(chalk.blue(`${argv.r.join(' && ')}:`));
     }
     console.log(toDraw.r || '');
 };
@@ -86,7 +86,7 @@ function chalker(property) {
             .map(line => {
                 return line
                     .split(' ')
-                    .map((x,i) => {
+                    .map((x, i) => {
                         return (x.match(/^(error|err!?)$/i))
                             ? chalk.red(x)
                             : x;
@@ -116,7 +116,7 @@ function runner() {
                 run(pending);
             } else if (!watch) process.exit(code);
         });
-    }
+    };
     run(argv.r.concat());
     return function stopper() {
         running.stop = true;

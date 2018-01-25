@@ -10,6 +10,7 @@
     "build:unsafe": "react-app-rewired build",
     "lint": "eslint ./src --ext .js",
     "lint:test": "eslint ./test --ext .js",
+    "lint:utils": "eslint ./utils --ext .js",
     "lint:md": "markdownlint *.md --config markdown.json",
     "test": "npm run lint:test && react-app-rewired test --env=jsdom --coverage",
     "test:watch": "nodemon --watch test --exec \"clear && npm t\"",
