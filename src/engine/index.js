@@ -3,7 +3,7 @@ import rotate from './rotate';
 import flip from './flip';
 import scale from './scale';
 
-const opEngines = {resize, rotate, flip, scale};
+const opEngines = { resize, rotate, flip, scale };
 
 class Operation {
     constructor(type, value) {

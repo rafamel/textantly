@@ -52,7 +52,8 @@ const { connector, propTypes: storeTypes } = withState(
         lastDimensions: lastScaledSelector(state, props),
         isScaledSynced: selectors.canvases.isScaledSynced(state),
         lastOp: state.edits.image.last,
-        doUpdate: selectors.views.doUpdate(state)
+        doUpdate: selectors.views.doUpdate(state),
+        isMobile: state.views.isMobile
     })
 );
 
@@ -75,13 +76,19 @@ class ImageRender extends React.Component {
     };
     _queuedSetDimensions = false;
     rootNode = null;
+    isActive = (props = this.props) => {
+        return !props.freeze
+            && props.scaled
+            && props.isScaledSynced
+            && props.doUpdate;
+    };
     setDimensions = () => {
         if (!this.current.canvas) return;
         const dimensions = this.current.dimensions;
         this.current.canvas.style.width = `${dimensions.width}px`;
         this.current.canvas.style.height = `${dimensions.height}px`;
     };
-    drawCanvas = (canvas) => {
+    drawCanvas = (canvas = this.current.canvas) => {
         const rootNode = this.rootNode;
         if (!rootNode || !canvas) return;
         this.current.canvas = canvas;
@@ -90,16 +97,26 @@ class ImageRender extends React.Component {
         if (this.props.onUpdate) this.props.onUpdate();
         if (rootNode.children[1]) rootNode.children[1].remove();
     };
+    redraw = () => {
+        // Mobile browsers dispose the canvas when inactive
+        const rootNode = this.rootNode;
+        if (
+            !this.props.isMobile
+            || !rootNode
+            || !this.current.canvas
+            || !this.isActive()
+        ) {
+            return;
+        }
+        this.drawCanvas();
+    };
     customUpdate = (props = this.props) => {
         if (!isEqual(props.lastDimensions, this.current.dimensions)) {
             this.current.dimensions = props.lastDimensions;
             this._queuedSetDimensions = true;
         }
 
-        if (props.freeze || !props.scaled
-            || !props.isScaledSynced || !props.doUpdate) {
-            return;
-        }
+        if (!this.isActive(props)) return;
 
         let doLast = false;
         if (props.scaledId !== this.scaled.id) {
@@ -127,6 +144,10 @@ class ImageRender extends React.Component {
     }
     componentDidMount() {
         this.customUpdate();
+        window.addEventListener('focus', this.redraw);
+    }
+    componentWillUnmount() {
+        window.removeEventListener('focus', this.redraw);
     }
     shouldComponentUpdate() {
         return false;
