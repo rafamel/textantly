@@ -10,13 +10,20 @@ import config from 'config';
 
 const styles = theme => ({
     root: {
-        width: '100%',
-        left: 0,
-        right: 0,
-        transform: 'none',
-        '& > *': {
-            width: '100%'
+        [theme.breakpoints._q.desktop]: {
+            width: '600px',
+            '& > *': {
+                width: '100%',
+                maxWidth: '100%'
+            }
         }
+    },
+    contentRoot: {
+        width: '100%'
+    },
+    contentMessage: {
+        width: 'calc(100% - 48px)',
+        textAlign: 'center'
     },
     close: {
         width: theme.spacing.unit * 4,
@@ -62,7 +69,7 @@ class SnackBar extends React.Component {
         if (!this.state._isOpen) return null;
         return (
             <Snackbar
-                className={classes.root}
+                classes={{ root: classes.root }}
                 anchorOrigin={{
                     vertical: 'bottom',
                     horizontal: 'center'
@@ -71,8 +78,9 @@ class SnackBar extends React.Component {
                 autoHideDuration={config.snackbarDuration}
                 onClose={this.handleClose}
                 SnackbarContentProps={{
-                    style: {
-                        width: '100%'
+                    classes: {
+                        root: classes.contentRoot,
+                        message: classes.contentMessage
                     },
                     'aria-describedby': 'message-id'
                 }}
