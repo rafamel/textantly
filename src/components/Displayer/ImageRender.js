@@ -32,7 +32,7 @@ const lastScaledSelector = selectorWithType({
         (_, props) => (props) ? props.exclude : null
     ],
     result: (viewsDimensions, drawnDimensions, lastOp, exclude) => {
-        const lastDimensions = (!lastOp || (exclude && lastOp.is(exclude)))
+        const lastDimensions = (!lastOp || (exclude && lastOp.type === exclude))
             ? drawnDimensions
             : engine.getDimensions(drawnDimensions, [lastOp]);
 

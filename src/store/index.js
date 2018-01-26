@@ -6,32 +6,12 @@ import edits from './edits';
 import canvases from './canvases';
 import alerts from './alerts';
 
-const reducer = combineReducers({
-    _loading: loading.reducer,
-    views: views.reducer,
-    edits: edits.reducer,
-    canvases: canvases.reducer,
-    alerts: alerts.reducer
-});
-
-const logic = createLogicMiddleware([
-    ...edits.logic,
-    ...views.logic,
-    ...canvases.logic
-]);
-
-const actions = {
-    _loading: loading.actions,
-    views: views.actions,
-    edits: edits.actions,
-    canvases: canvases.actions,
-    alerts: alerts.actions
-};
-
-const selectors = {
-    views: views.selectors,
-    edits: edits.selectors,
-    canvases: canvases.selectors
+const initialState = {
+    _loading: loading.initialState,
+    views: views.initialState,
+    edits: edits.initialState,
+    canvases: canvases.initialState,
+    alerts: alerts.initialState
 };
 
 const propTypes = {
@@ -42,10 +22,45 @@ const propTypes = {
     alerts: alerts.propTypes
 };
 
+const reducer = combineReducers({
+    _loading: loading.reducer,
+    views: views.reducer,
+    edits: edits.reducer,
+    canvases: canvases.reducer,
+    alerts: alerts.reducer
+});
+
+const actions = {
+    _loading: loading.actions,
+    views: views.actions,
+    edits: edits.actions,
+    canvases: canvases.actions,
+    alerts: alerts.actions
+};
+
+const logic = createLogicMiddleware([
+    ...edits.logic,
+    ...views.logic,
+    ...canvases.logic
+]);
+
+const selectors = {
+    views: views.selectors,
+    edits: edits.selectors,
+    canvases: canvases.selectors
+};
+
+const persist = [
+    'views',
+    'edits'
+];
+
 export {
+    initialState,
+    propTypes,
     reducer,
+    actions,
     logic,
     selectors,
-    actions,
-    propTypes
+    persist
 };

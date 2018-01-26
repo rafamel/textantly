@@ -107,6 +107,7 @@ selectors.doUpdate = selectorWithType({
 });
 
 export default {
+    initialState,
     propTypes,
     reducer,
     actions,

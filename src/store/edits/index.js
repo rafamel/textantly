@@ -25,6 +25,7 @@ function reducer(state = initialState, { type, payload }) {
 }
 
 export default {
+    initialState,
     reducer,
     propTypes: {
         source: source.propTypes,
@@ -37,14 +38,14 @@ export default {
         text: text.actions,
         image: image.actions
     },
-    selectors: {
-        ...history.selectors,
-        image: image.selectors
-    },
     logic: [
         ...history.logic,
         ...source.logic,
         ...text.logic,
         ...image.logic
-    ]
+    ],
+    selectors: {
+        ...history.selectors,
+        image: image.selectors
+    }
 };

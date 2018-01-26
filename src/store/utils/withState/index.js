@@ -2,8 +2,8 @@ import { connect } from 'react-redux';
 import propTyper from './propTyper';
 import { actions, propTypes } from '../../index';
 import { createSelector } from 'reselect';
+import config from 'config';
 
-const isProduction = (process.env.NODE_ENV === 'production');
 const ptSymbol = Symbol('proptypes');
 
 function selectorWithType(
@@ -25,7 +25,7 @@ export default function withState(...args) {
     }
 
     const types = {};
-    if (!isProduction) {
+    if (!config.production) {
         if (args[0]) {
             propTypes[ptSymbol] = true;
             Object.assign(types, propTyper(args[0](propTypes)));

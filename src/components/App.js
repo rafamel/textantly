@@ -2,8 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { MuiThemeProvider, withStyles } from 'material-ui/styles';
 import { Provider } from 'react-redux';
-import store from 'store/_store';
+import store, { persistor } from 'store/_store';
+import { PersistGate } from 'redux-persist/lib/integration/react';
 import { withState, compose } from 'store/utils';
+import { load as fontLoad } from 'services/fonts';
 import Reboot from 'material-ui/Reboot';
 import DesktopUI from './DesktopUI/DesktopUI';
 import MobileUI from './MobileUI/MobileUI';
@@ -66,13 +68,14 @@ class App extends React.Component {
         const startAt = Date.now();
         const interval = setInterval(() => {
             if (document.readyState === 'complete' || (Date.now() - startAt) > 7500) {
+                clearInterval(interval);
                 this.setState({ hasLoaded: true });
                 this.props.setLoading(false);
-                clearInterval(interval);
             }
         }, 50);
 
         this.setUI();
+        fontLoad(config.defaults.text.fontFamily);
         window.addEventListener('resize', (e) => {
             this.setUI(e.target.innerWidth);
         });
@@ -98,10 +101,12 @@ class App extends React.Component {
 const wrapApp = (App) => function AppWrapper() {
     return (
         <Provider store={store}>
-            <MuiThemeProvider theme={theme}>
-                <Reboot />
-                <App />
-            </MuiThemeProvider>
+            <PersistGate loading={null} persistor={persistor}>
+                <MuiThemeProvider theme={theme}>
+                    <Reboot />
+                    <App />
+                </MuiThemeProvider>
+            </PersistGate>
         </Provider>
     );
 };

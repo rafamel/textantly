@@ -143,6 +143,7 @@ logic.push(createLogic({
 }));
 
 export default {
+    initialState,
     propTypes,
     reducer,
     actions,

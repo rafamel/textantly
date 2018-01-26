@@ -9,7 +9,7 @@ selectors.rotate = selectorWithType({
         state => state.edits.image.last
     ],
     result: (lastOp) => {
-        return (lastOp && lastOp.is('rotate'))
+        return (lastOp && lastOp.type === 'rotate')
             ? lastOp.value
             : 0;
     }
@@ -20,7 +20,7 @@ selectors.flip = selectorWithType({
         state => state.edits.image.last
     ],
     result: (last) => {
-        return (last && last.is('flip')) ? last.value : false;
+        return (last && last.type === 'flip') ? last.value : false;
     }
 });
 
@@ -61,7 +61,7 @@ creators.dimensions = (op) => selectorWithType({
     ],
     result: (last, dimensions) => {
         if (!last) return { max: dimensions, value: dimensions };
-        if (last.is(op)) return { max: dimensions, value: last.value };
+        if (last.type === op) return { max: dimensions, value: last.value };
 
         const max = engine.getDimensions(dimensions, [last]);
         return { max, value: max };

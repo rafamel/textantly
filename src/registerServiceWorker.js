@@ -1,6 +1,7 @@
 // Users will only see deployed updates on the "N+1" visit to a page.
 // Read: https://goo.gl/KwvDNy.
 // This link also includes instructions on opting out of this behavior.
+import config from 'config';
 
 const isLocalhost = Boolean(
     window.location.hostname === 'localhost'
@@ -69,8 +70,7 @@ function registerValidSW(swUrl) {
 }
 
 export default function register() {
-    if (process.env.NODE_ENV === 'production'
-        && 'serviceWorker' in navigator) {
+    if (config.production && 'serviceWorker' in navigator) {
         // The URL constructor is available in all browsers that support SW.
         const publicUrl = new URL(process.env.PUBLIC_URL, window.location);
         // Service worker won't work if PUBLIC_URL is on a different

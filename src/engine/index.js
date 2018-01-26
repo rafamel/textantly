@@ -10,9 +10,6 @@ class Operation {
         this.type = type;
         this.value = value;
     }
-    is(ofType) {
-        return this.type === ofType;
-    }
 }
 
 function makeCanvas(canvasOrImage) {

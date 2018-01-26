@@ -53,6 +53,7 @@ function reducer(state = initialState, { type, payload }) {
 }
 
 export default {
+    initialState,
     propTypes,
     reducer,
     actions

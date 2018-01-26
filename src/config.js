@@ -1,4 +1,5 @@
 export default {
+    storePersist: true,
     snackbarDuration: 3500,
     mobileBreakpoint: 'md',
     defaults: {

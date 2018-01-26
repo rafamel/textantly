@@ -25,7 +25,7 @@ const initialState = {
 const propTypes = {
     operations: {
         id: PropTypes.number.isRequired,
-        list: PropTypes.arrayOf(PropTypes.instanceOf(Operation)).isRequired
+        list: PropTypes.arrayOf(PropTypes.object).isRequired
     },
     last: PropTypes.object
 };
@@ -38,7 +38,7 @@ const opsId = (state, list) => ({
 function opSetter({ state, payload }) {
     return function setOp({ type, nullValue }) {
         const opsList = state.operations.list;
-        const isLast = () => (state.last) ? state.last.is(type) : false;
+        const isLast = () => (state.last) ? state.last.type === type : false;
         const lastPayload = () => new Operation(type, payload);
 
         if (isEqual(payload, nullValue)) {
