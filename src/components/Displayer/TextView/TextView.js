@@ -52,7 +52,7 @@ class TextView extends React.Component {
                 this.previousFailedFont = null;
                 this.setState({ sizerRerun: this.state.sizerRerun + 1 });
 
-                if (this.timeout) clearTimeout(this.timeout);
+                clearTimeout(this.timeout);
                 this.timeout = setTimeout(() => {
                     if (this._isMounted) this.setState({ opacity: 1 });
                 }, 250);

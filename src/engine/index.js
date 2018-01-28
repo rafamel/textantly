@@ -1,16 +1,7 @@
-import resize from './resize';
-import rotate from './rotate';
+import fit from './fit';
 import flip from './flip';
-import scale from './scale';
-
-const opEngines = { resize, rotate, flip, scale };
-
-class Operation {
-    constructor(type, value) {
-        this.type = type;
-        this.value = value;
-    }
-}
+import rotate from './rotate';
+import resize from './resize';
 
 function makeCanvas(canvasOrImage) {
     const canvas = document.createElement('canvas');
@@ -34,24 +25,35 @@ function makeCanvas(canvasOrImage) {
     }
 }
 
-function draw(canvas, operations = [], nonScaledDimensions) {
-    return operations.reduce((newCanvas, op) => {
-        if (!op) return newCanvas;
-        return opEngines[op.type].draw(newCanvas, op.value, nonScaledDimensions);
-    }, canvas);
-}
+function draw(canvas, ops, sourceDims) {
+    if (!ops) return canvas;
+    const nonScaledDims = (!sourceDims || canvas.width === sourceDims.width)
+        ? null
+        : getDimensions(sourceDims, ops);
 
-function getDimensions(dimensions = {}, operations = []) {
-    if (!dimensions.width || !dimensions.height) {
-        return { width: 0, height: 0 };
+    if (ops.fit) canvas = fit.draw(canvas, ops.fit);
+    if (ops.flip) canvas = flip.draw(canvas, ops.flip);
+    if (ops.rotate) canvas = rotate.draw(canvas, ops.rotate);
+    // if (ops.crop) canvas = crop.draw(canvas, ops.crop);
+    if (ops.resize) {
+        canvas = resize.draw(canvas, ops.resize, nonScaledDims);
     }
-    return operations.reduce((newDimensions, op) => {
-        if (!op) return dimensions;
-        return opEngines[op.type].getDimensions(newDimensions, op.value);
-    }, dimensions);
+
+    return canvas;
 }
 
-export { Operation };
+function getDimensions(dimensions, ops) {
+    if (!dimensions) return { width: 0, height: 0 };
+    if (!ops) return dimensions;
+
+    if (ops.fit) dimensions = fit.getDimensions(dimensions, ops.fit);
+    if (ops.rotate) dimensions = rotate.getDimensions(dimensions, ops.rotate);
+    // if (ops.crop) canvas = crop.getDimensions(dimensions, ops.crop);
+    if (ops.resize) dimensions = resize.getDimensions(dimensions, ops.resize);
+
+    return dimensions;
+}
+
 export default {
     makeCanvas,
     draw,

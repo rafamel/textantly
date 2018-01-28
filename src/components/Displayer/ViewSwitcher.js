@@ -5,7 +5,6 @@ import { Broadcast } from 'react-broadcast';
 
 const styles = () => ({
     root: {
-        overflow: 'hidden',
         width: '100%'
     },
     outer: {

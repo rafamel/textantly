@@ -53,7 +53,7 @@ class ImageSelector extends React.Component {
         this.lock = true;
         this.setState({ value });
 
-        if (this.openTimeout) clearTimeout(this.openTimeout);
+        clearTimeout(this.openTimeout);
         const openTimeout = setTimeout(() => {
             if (!this._isMounted) return;
 

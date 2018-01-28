@@ -3,9 +3,6 @@ import { createLogic } from 'redux-logic';
 import typesActions, { typeInTypes, values } from '../../utils/types-actions';
 import { typesPre, writeAction } from '../init';
 import selectors from './selectors';
-import isEqual from 'lodash.isequal';
-import { Operation } from 'engine';
-import canvases from '../../canvases';
 
 const pre = `${typesPre}_IMAGE`;
 const { types: t, typesBy, actions } = typesActions({
@@ -15,86 +12,76 @@ const { types: t, typesBy, actions } = typesActions({
 });
 
 const initialState = {
-    operations: {
-        id: -1,
-        list: []
-    },
-    last: null
+    rotate: 0,
+    resize: { width: null, height: null, widthRatio: 100, heightRatio: 100 },
+    flip: false,
+    crop: { x: null, y: null, width: null, height: null }
 };
 
 const propTypes = {
-    operations: {
-        id: PropTypes.number.isRequired,
-        list: PropTypes.arrayOf(PropTypes.object).isRequired
-    },
-    last: PropTypes.object
+    rotate: PropTypes.number.isRequired,
+    resize: PropTypes.shape({
+        width: PropTypes.number,
+        height: PropTypes.number,
+        widthRatio: PropTypes.number.isRequired,
+        heightRatio: PropTypes.number.isRequired
+    }).isRequired,
+    flip: PropTypes.bool.isRequired,
+    crop: {
+        x: PropTypes.number,
+        y: PropTypes.number,
+        width: PropTypes.number,
+        height: PropTypes.number
+    }
 };
 
-const opsId = (state, list) => ({
-    id: state.operations.id + 1,
-    list
-});
+function main(state, { type, payload }) {
+    const is = typeInTypes(type);
 
-function opSetter({ state, payload }) {
-    return function setOp({ type, nullValue }) {
-        const opsList = state.operations.list;
-        const isLast = () => (state.last) ? state.last.type === type : false;
-        const lastPayload = () => new Operation(type, payload);
-
-        if (isEqual(payload, nullValue)) {
-            return (isLast())
-                ? { ...state, last: null }
-                : state;
-        }
-        if (!state.last) return { ...state, last: lastPayload() };
-        return (isLast())
-            ? { ...state, last: lastPayload() }
-            : {
-                operations: opsId(state, opsList.concat(state.last)),
-                last: lastPayload()
-            };
-    };
+    switch (true) {
+    case is(typesBy.type.FLIP):
+        return {
+            ...state,
+            flip: !state.flip
+        };
+    case is(typesBy.type.ROTATE):
+        return {
+            ...state,
+            rotate: payload,
+            resize: {
+                ...state.resize,
+                width: null,
+                height: null
+            }
+        };
+    case is(typesBy.type.CROP):
+        return {
+            ...state,
+            crop: payload,
+            resize: {
+                ...state.resize,
+                width: null,
+                height: null
+            }
+        };
+    case is(typesBy.type.RESIZE):
+        return {
+            ...state,
+            resize: payload
+        };
+    default:
+        return state;
+    }
 }
 
 const logic = [];
 logic.push(createLogic({
     type: values(t),
     process({ getState, action }, dispatch, done) {
-        const gState = getState();
-        const state = gState.edits.image;
-        const setOp = opSetter({ state, payload: action.payload });
-        const type = action.type;
-        const is = typeInTypes(type);
+        const state = getState().edits.image;
+        const payload = main(state, action);
 
-        let payload = (() => {
-            switch (true) {
-            case t.FLIP === type:
-                return setOp({ type: 'flip', nullValue: false });
-            case is(typesBy.type.ROTATE):
-                return setOp({ type: 'rotate', nullValue: 0 });
-            case is(typesBy.type.RESIZE):
-                return setOp({
-                    type: 'resize',
-                    nullValue: selectors.opsDimensions(gState)
-                });
-            default:
-                return state;
-            }
-        })();
-
-        let forceRedraw = false;
-        const opsList = payload.operations.list;
-        if (!is(typesBy.post.TEMP) && !payload.last && opsList.length) {
-            forceRedraw = true;
-            payload = {
-                operations: opsId(payload, opsList.slice(0, -1)),
-                last: opsList.slice(-1)[0]
-            };
-        }
-
-        dispatch(writeAction(type, typesBy)({ image: payload }));
-
-        dispatch(canvases.actions.draw({ force: forceRedraw }));
+        dispatch(writeAction(action.type, typesBy)({ image: payload }));
         done();
     }
 }));

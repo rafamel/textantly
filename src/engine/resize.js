@@ -1,42 +1,43 @@
-function getDimensions(dimensions, resize = {}) {
+function getDimFromRatio(dim, ratio) {
+    const alpha = 0.025;
+    if (Math.abs(1 - ratio) <= alpha) ratio = 100;
+    if (Math.abs(0 - ratio) <= alpha) ratio = 0;
+    return Math.round(dim * ratio);
+};
+
+function getDimensions(dimensions, resize) {
+    if (!resize) return dimensions;
+
+    let r = {};
+    if (resize.width == null && resize.height == null) {
+        r.width = getDimFromRatio(dimensions.width, resize.widthRatio);
+        r.height = getDimFromRatio(dimensions.height, resize.heightRatio);
+    } else if (resize.width == null) {
+        r.width = getDimFromRatio(dimensions.width, resize.widthRatio);
+        r.height = resize.height;
+    } else if (resize.height == null) {
+        r.width = resize.width;
+        r.height = getDimFromRatio(dimensions.height, resize.heightRatio);
+    } else {
+        r = resize;
+    }
+
     return {
-        width: (resize.width || resize.width === 0)
-            ? resize.width : dimensions.width,
-        height: (resize.height || resize.height === 0)
-            ? resize.height : dimensions.height
+        width: Math.min(r.width, dimensions.width),
+        height: Math.min(r.height, dimensions.height)
     };
 }
 
-function draw(canvas, resize, nonScaledDimensions) {
-    if (
-        !resize
-        || (resize.width === canvas.width && resize.height === canvas.height)
-    ) {
-        return canvas;
-    }
-
-    let resized = getDimensions(
-        { width: canvas.width, height: canvas.height }, resize
-    );
-
-    if (nonScaledDimensions
-        && nonScaledDimensions.width !== canvas.width
-        && nonScaledDimensions.height !== canvas.height) {
-        const real = getDimensions(nonScaledDimensions, resize);
-        if (real.width < canvas.width || real.height < canvas.height) {
-            resized = real;
-        } else if (resize.width !== resize.height) {
-            resized = (resize.width > resize.height)
-                ? {
-                    width: canvas.width,
-                    height: canvas.height * (resize.height / resize.width)
-                } : {
-                    height: canvas.height,
-                    width: canvas.width * (resize.width / resize.height)
-                };
-        } else {
-            return canvas;
-        }
+function draw(canvas, resize, nonScaledDims) {
+    let resized;
+    if (nonScaledDims) {
+        if (nonScaledDims.width > canvas.width) return canvas;
+        resized = nonScaledDims;
+    } else {
+        resized = getDimensions(
+            { width: canvas.width, height: canvas.height },
+            resize
+        );
     }
 
     const newCanvas = document.createElement('canvas');

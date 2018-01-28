@@ -1,5 +1,6 @@
 export default {
-    storePersist: true,
+    production: process.env.NODE_ENV === 'production',
+    devStorePersist: true,
     snackbarDuration: 3500,
     mobileBreakpoint: 'md',
     defaults: {

@@ -38,18 +38,16 @@ class LoadingBar extends React.Component {
     };
     state = {
         _opacity: 1,
-        _hidden: false,
-        timeout: null
+        _hidden: false
     };
+    timeout = null;
     updateOpacity(props = this.props) {
         const _opacity = Number(props.loading || props.rendering);
         if (_opacity === this.state._opacity) return;
 
-        if (this.state.timeout) clearTimeout(this.state.timeout);
-
-        let timeout = null;
+        clearTimeout(this.timeout);
         if (_opacity === 0) {
-            timeout = setTimeout(() => {
+            this.timeout = setTimeout(() => {
                 if (this.state._opacity === 0) {
                     this.setState({ _hidden: true });
                 }
@@ -58,8 +56,7 @@ class LoadingBar extends React.Component {
 
         this.setState({
             _opacity,
-            _hidden: false,
-            timeout
+            _hidden: false
         });
     }
     componentWillReceiveProps(nextProps) {
@@ -69,7 +66,7 @@ class LoadingBar extends React.Component {
         this.updateOpacity();
     }
     componentWillUnmount() {
-        if (this.state.timeout) clearTimeout(this.state.timeout);
+        clearTimeout(this.timeout);
     }
     render() {
         const { classes, top } = this.props;

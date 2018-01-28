@@ -11,7 +11,4 @@ function draw(canvas, flip) {
     return newCanvas;
 }
 
-export default {
-    getDimensions: (d) => d,
-    draw
-};
+export default { draw };

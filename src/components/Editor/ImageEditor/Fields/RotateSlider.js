@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withState } from 'store/utils';
 import Slider from '../../Fields/Slider';
-import { selectors } from 'store';
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        value: selectors.edits.image.rotate(state)
+        value: state.edits.image.rotate
     }), (actions) => ({
         rotate: actions.edits.image.rotate,
         rotateTemp: actions.edits.image.rotateTemp
@@ -37,7 +36,7 @@ class RotateSlider extends React.Component {
                 value={this.props.value}
                 min={-180}
                 max={180}
-                step={1}
+                step={2}
                 onChange={this.handleTempChange}
                 onAfterChange={this.handleChange}
             />

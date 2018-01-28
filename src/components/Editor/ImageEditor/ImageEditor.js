@@ -12,14 +12,12 @@ import Rotate90DegreesCcw from 'material-ui-icons/Rotate90DegreesCcw';
 import PhotoSizeSelectLarge from 'material-ui-icons/PhotoSizeSelectLarge';
 import CropSelector from './Fields/CropSelector';
 import RotateSlider from './Fields/RotateSlider';
-import ResizeSliders from './Fields/ResizeSliders';
-import { selectors } from 'store';
+// import ResizeSliders from './Fields/ResizeSliders';
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         imageViews: state.views.image,
-        isMobile: state.views.isMobile,
-        flipVal: selectors.edits.image.flip(state)
+        isMobile: state.views.isMobile
     }), (actions) => ({
         setImageViews: actions.views.setImage,
         flip: actions.edits.image.flip
@@ -50,7 +48,7 @@ class ImageEditor extends React.Component {
         this.lockIndex = true;
         this.setState({ activeIndex: this.tabDict.toIndex.flip });
 
-        this.props.flip(!this.props.flipVal);
+        this.props.flip();
         setTimeout(() => {
             this.lockIndex = false;
             this.setActiveIndex();
@@ -90,7 +88,8 @@ class ImageEditor extends React.Component {
                 active={actives.crop}
             />),
             rotate: (<RotateSlider key="rotate" active={actives.rotate} />),
-            resize: (<ResizeSliders key="resize" active={actives.resize} />)
+            // resize: (<ResizeSliders key="resize" active={actives.resize} />)
+            resize: (<div key="resize">Resize</div>)
         };
 
         return (isMobile)

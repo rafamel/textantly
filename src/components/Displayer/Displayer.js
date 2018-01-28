@@ -7,8 +7,8 @@ import Button from 'material-ui/Button';
 import SaveIcon from 'material-ui-icons/Save';
 import ResizeObserver from 'resize-observer-polyfill';
 import ViewSwitcher from './ViewSwitcher';
-import ImageRender from './ImageRender';
 import TextView from './TextView/TextView';
+import ImageView from './ImageView/ImageView';
 
 const styles = {
     root: {
@@ -60,19 +60,11 @@ class Displayer extends React.Component {
         this.observer.unobserve(this.rootNode);
     }
     render() {
-        const { classes, className } = this.props;
+        const { classes, className, mainView } = this.props;
 
-        const activeView = () => {
-            const { mainView, imageView } = this.props;
-            if (!mainView || mainView !== 'image') {
-                return 'text-view';
-            }
-            // Image Views
-            switch (imageView.main) {
-            default:
-                return 'image-render-view';
-            }
-        };
+        const activeView = (!mainView || mainView !== 'image')
+            ? 'text-view'
+            : 'image-view';
 
         return (
             <main
@@ -81,10 +73,10 @@ class Displayer extends React.Component {
             >
                 <div className={classes.view}>
                     <ViewSwitcher
-                        active={activeView()}
+                        active={activeView}
                     >
                         <TextView key="text-view" />
-                        <ImageRender key="image-render-view" />
+                        <ImageView key="image-view" />
                     </ViewSwitcher>
                 </div>
                 <Button
