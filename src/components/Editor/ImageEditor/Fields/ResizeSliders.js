@@ -1,30 +1,46 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withState, compose } from 'store/utils';
-import { withStyles } from 'material-ui/styles';
-import Button from 'material-ui/Button';
-import LinkIcon from 'material-ui-icons/Link';
+import { withState, selectorWithType } from 'store/utils';
 import Slider from '../../Fields/Slider';
 import { selectors } from 'store';
 
-const styles = {
-    root: {
-        position: 'relative'
-    },
-    linkButton: {
-        width: 36,
-        height: 36,
-        position: 'absolute',
-        top: 'calc(50% + 8px)',
-        left: '50%',
-        transform: 'translate(-50%, -50%)'
+const currentMin = selectorWithType({
+    propType: PropTypes.string.isRequired,
+    select: [
+        state => selectors.edits.image.dimensions.notResized(state)
+    ],
+    result: (maxDimensions) => {
+        return (maxDimensions.width > maxDimensions.height)
+            ? 'height'
+            : 'width';
     }
-};
+});
 
-const selector = selectors.edits.image.creators.dimensions('resize');
+const values = selectorWithType({
+    propType: PropTypes.shape({
+        width: PropTypes.number.isRequired,
+        height: PropTypes.number.isRequired
+    }).isRequired,
+    select: [
+        state => currentMin(state),
+        state => state.edits.image.resize,
+        state => selectors.edits.image.dimensions.notResized(state)
+    ],
+    result: (currentMin, resize, maxDimensions) => {
+        return (resize.width && resize.height)
+            ? resize
+            : {
+                width: Math.round(maxDimensions.width * resize.ratio),
+                height: Math.round(maxDimensions.height * resize.ratio)
+            };
+    }
+});
+
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        dimensions: selector(state)
+        maxDimensions: selectors.edits.image.dimensions.notResized(state),
+        values: values(state),
+        currentMin: currentMin(state)
     }), (actions) => ({
         resize: actions.edits.image.resize,
         resizeTemp: actions.edits.image.resizeTemp
@@ -34,51 +50,20 @@ const { connector, propTypes: storeTypes } = withState(
 class ResizeSliders extends React.Component {
     static propTypes = {
         ...storeTypes,
-        active: PropTypes.bool,
-        // JSS
-        classes: PropTypes.object.isRequired
+        active: PropTypes.bool
     };
     static defaultProps = {
         active: true
     };
-    state = {
-        linked: false
-    };
-    pc = () => {
-        const dimensions = this.props.dimensions;
-        return {
-            height: (dimensions.value.height / dimensions.max.height) || 0,
-            width: (dimensions.value.width / dimensions.max.width) || 0
-        };
-    };
-    reLink = () => {
-        const dimensions = this.props.dimensions;
-        const pc = this.pc();
-        const name = (pc.height > pc.width) ? 'height' : 'width';
-        this.props.resize(
-            this.resizeDimensions(name, dimensions.value[name], true)
-        );
-    };
-    resizeDimensions = (name, value, forceLink) => {
+    resizeDimensions = (name, value) => {
         const opposites = { width: 'height', height: 'width' };
-        const opposite = opposites[name];
-        const dimensions = this.props.dimensions;
-        return (this.state.linked || forceLink)
-            ? {
-                [name]: value,
-                [opposite]: Math.round(
-                    (dimensions.max[opposite] * value) / dimensions.max[name]
-                )
-            } : {
-                [name]: value,
-                [opposite]: dimensions.value[opposite]
-            };
-    };
-    toggleLink = () => {
-        const linked = this.state.linked;
-
-        if (!linked) this.reLink();
-        this.setState({ linked: !linked });
+        const { maxDimensions, currentMin } = this.props;
+        const ratio = (value / maxDimensions[currentMin]) || 0;
+        return {
+            ratio,
+            [currentMin]: value,
+            [opposites[currentMin]]: Math.round(maxDimensions * ratio)
+        };
     };
     handleTempChange = (e) => {
         this.props.resizeTemp(
@@ -90,55 +75,25 @@ class ResizeSliders extends React.Component {
             this.resizeDimensions(e.target.name, e.target.value)
         );
     };
-    componentWillMount() {
-        const pc = this.pc();
-        if (Math.abs(pc.height - pc.width) < 0.01) {
-            this.setState({ linked: true });
-        }
-    }
     shouldComponentUpdate(nextProps) {
         return nextProps.active;
     }
     render() {
-        const { classes, dimensions } = this.props;
+        const { maxDimensions, values, currentMin } = this.props;
+
         return (
-            <div className={classes.root}>
-                <Button
-                    className={classes.linkButton}
-                    onClick={this.toggleLink}
-                    color={(this.state.linked) ? 'primary' : null}
-                    aria-label="link"
-                    mini
-                    fab
-                >
-                    <LinkIcon />
-                </Button>
-                <Slider
-                    name="width"
-                    label="Width"
-                    value={dimensions.value.width}
-                    min={0}
-                    max={dimensions.max.width}
-                    step={1}
-                    onChange={this.handleTempChange}
-                    onAfterChange={this.handleChange}
-                />
-                <Slider
-                    name="height"
-                    label="Height"
-                    value={dimensions.value.height}
-                    min={0}
-                    max={dimensions.max.height}
-                    step={1}
-                    onChange={this.handleTempChange}
-                    onAfterChange={this.handleChange}
-                />
-            </div>
+            <Slider
+                name="width"
+                tooltip={`${values.width}:${values.height}`}
+                value={values[currentMin]}
+                min={0}
+                max={maxDimensions[currentMin]}
+                step={1}
+                onChange={this.handleTempChange}
+                onAfterChange={this.handleChange}
+            />
         );
     }
 }
 
-export default compose(
-    withStyles(styles),
-    connector
-)(ResizeSliders);
+export default connector(ResizeSliders);

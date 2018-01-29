@@ -29,15 +29,15 @@ function draw(canvas, ops, sourceDims) {
     if (!ops) return canvas;
     const nonScaledDims = (!sourceDims || canvas.width === sourceDims.width)
         ? null
-        : getDimensions(sourceDims, ops);
+        : getDimensions(sourceDims, { ...ops, fit: null });
 
-    if (ops.fit) canvas = fit.draw(canvas, ops.fit);
     if (ops.flip) canvas = flip.draw(canvas, ops.flip);
     if (ops.rotate) canvas = rotate.draw(canvas, ops.rotate);
-    // if (ops.crop) canvas = crop.draw(canvas, ops.crop);
     if (ops.resize) {
         canvas = resize.draw(canvas, ops.resize, nonScaledDims);
     }
+    // if (ops.crop) canvas = crop.draw(canvas, ops.crop);
+    if (ops.fit) canvas = fit.draw(canvas, ops.fit);
 
     return canvas;
 }
@@ -46,10 +46,10 @@ function getDimensions(dimensions, ops) {
     if (!dimensions) return { width: 0, height: 0 };
     if (!ops) return dimensions;
 
-    if (ops.fit) dimensions = fit.getDimensions(dimensions, ops.fit);
     if (ops.rotate) dimensions = rotate.getDimensions(dimensions, ops.rotate);
-    // if (ops.crop) canvas = crop.getDimensions(dimensions, ops.crop);
     if (ops.resize) dimensions = resize.getDimensions(dimensions, ops.resize);
+    // if (ops.crop) canvas = crop.getDimensions(dimensions, ops.crop);
+    if (ops.fit) dimensions = fit.getDimensions(dimensions, ops.fit);
 
     return dimensions;
 }

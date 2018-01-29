@@ -13,7 +13,7 @@ const { types: t, typesBy, actions } = typesActions({
 
 const initialState = {
     rotate: 0,
-    resize: { width: null, height: null, widthRatio: 100, heightRatio: 100 },
+    resize: { width: null, height: null, ratio: 1 },
     flip: false,
     crop: { x: null, y: null, width: null, height: null }
 };
@@ -23,8 +23,7 @@ const propTypes = {
     resize: PropTypes.shape({
         width: PropTypes.number,
         height: PropTypes.number,
-        widthRatio: PropTypes.number.isRequired,
-        heightRatio: PropTypes.number.isRequired
+        ratio: PropTypes.number.isRequired
     }).isRequired,
     flip: PropTypes.bool.isRequired,
     crop: {

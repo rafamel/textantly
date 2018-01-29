@@ -12,7 +12,7 @@ import Rotate90DegreesCcw from 'material-ui-icons/Rotate90DegreesCcw';
 import PhotoSizeSelectLarge from 'material-ui-icons/PhotoSizeSelectLarge';
 import CropSelector from './Fields/CropSelector';
 import RotateSlider from './Fields/RotateSlider';
-// import ResizeSliders from './Fields/ResizeSliders';
+import ResizeSliders from './Fields/ResizeSliders';
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
@@ -88,8 +88,7 @@ class ImageEditor extends React.Component {
                 active={actives.crop}
             />),
             rotate: (<RotateSlider key="rotate" active={actives.rotate} />),
-            // resize: (<ResizeSliders key="resize" active={actives.resize} />)
-            resize: (<div key="resize">Resize</div>)
+            resize: (<ResizeSliders key="resize" active={actives.resize} />)
         };
 
         return (isMobile)

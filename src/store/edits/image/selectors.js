@@ -1,37 +1,46 @@
 import PropTypes from 'prop-types';
-import { selectorWithType } from '../../utils/withState';
+import { selectorWithType } from 'store/utils';
 import engine from 'engine';
 
-const selectors = {};
-// selectors.rotate = selectorWithType({
-//     propType: PropTypes.number.isRequired,
-//     select: [
-//         state => state.edits.image.last
-//     ],
-//     result: (lastOp) => {
-//         return (lastOp && lastOp.type === 'rotate')
-//             ? lastOp.value
-//             : 0;
-//     }
-// });
+const dimensions = {};
+const dimensionsPropType = PropTypes.shape({
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired
+}).isRequired;
 
-// selectors.opsDimensions = selectorWithType({
-//     propType: PropTypes.shape({
-//         width: PropTypes.number.isRequired,
-//         height: PropTypes.number.isRequired
-//     }).isRequired,
-//     select: [
-//         state => state.canvases.source,
-//         state => state.edits.image.operations.list
-//     ],
-//     result: (source, opsList) => {
-//         return (!source)
-//             ? { width: 0, height: 0 }
-//             : engine.getDimensions(
-//                 { width: source.width, height: source.height },
-//                 opsList
-//             );
-//     }
-// });
+dimensions.source = selectorWithType({
+    propType: dimensionsPropType,
+    select: [
+        state => state.canvases.source.canvas
+    ],
+    result: (canvas) => (canvas)
+        ? { width: canvas.width, height: canvas.height }
+        : { width: 0, height: 0 }
+});
 
-export default selectors;
+dimensions.notResized = selectorWithType({
+    propType: dimensionsPropType,
+    select: [
+        state => dimensions.source(state),
+        state => state.edits.image.rotate,
+        state => state.edits.image.crop
+    ],
+    result: (source, rotate, crop) => {
+        return engine.getDimensions(
+            source, { rotate, crop }
+        );
+    }
+});
+
+dimensions.drawn = selectorWithType({
+    propType: dimensionsPropType,
+    select: [
+        state => dimensions.source(state),
+        state => state.edits.image
+    ],
+    result: (source, operations) => {
+        return engine.getDimensions(source, operations);
+    }
+});
+
+export default { dimensions };

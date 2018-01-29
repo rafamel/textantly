@@ -45,9 +45,7 @@ const logic = createLogicMiddleware([
 ]);
 
 const selectors = {
-    views: views.selectors,
-    edits: edits.selectors,
-    canvases: canvases.selectors
+    edits: edits.selectors
 };
 
 const persist = [

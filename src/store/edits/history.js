@@ -73,6 +73,15 @@ selectors.can = selectorWithType({
         return { forwards, backwards };
     }
 });
+selectors.isTemp = selectorWithType({
+    propType: PropTypes.bool.isRequired,
+    select: [
+        state => state.edits[historian.key].temp
+    ],
+    result: (temp) => {
+        return Boolean(temp);
+    }
+});
 
 export default {
     initialState: defaultValues,

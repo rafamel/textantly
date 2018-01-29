@@ -1,25 +1,18 @@
-function getDimFromRatio(dim, ratio) {
-    const alpha = 0.025;
-    if (Math.abs(1 - ratio) <= alpha) ratio = 100;
-    if (Math.abs(0 - ratio) <= alpha) ratio = 0;
-    return Math.round(dim * ratio);
-};
-
 function getDimensions(dimensions, resize) {
-    if (!resize) return dimensions;
+    const getDimFromRatio = (dim) => {
+        const alpha = 0.025;
+        let ratio = resize.ratio;
+        if (Math.abs(1 - ratio) <= alpha) ratio = 100;
+        if (Math.abs(0 - ratio) <= alpha) ratio = 0;
+        return Math.round(dim * ratio);
+    };
 
-    let r = {};
-    if (resize.width == null && resize.height == null) {
-        r.width = getDimFromRatio(dimensions.width, resize.widthRatio);
-        r.height = getDimFromRatio(dimensions.height, resize.heightRatio);
-    } else if (resize.width == null) {
-        r.width = getDimFromRatio(dimensions.width, resize.widthRatio);
-        r.height = resize.height;
-    } else if (resize.height == null) {
-        r.width = resize.width;
-        r.height = getDimFromRatio(dimensions.height, resize.heightRatio);
-    } else {
-        r = resize;
+    if (!resize || resize.ratio === 100) return dimensions;
+
+    let r = { ...resize };
+    if (r.width == null || r.height == null) {
+        r.width = getDimFromRatio(dimensions.width);
+        r.height = getDimFromRatio(dimensions.height);
     }
 
     return {

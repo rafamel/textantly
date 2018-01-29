@@ -57,6 +57,10 @@ class Slider extends React.Component {
         name: PropTypes.string.isRequired,
         label: PropTypes.string,
         value: PropTypes.number,
+        tooltip: PropTypes.oneOfType([
+            PropTypes.number,
+            PropTypes.string
+        ]),
         min: PropTypes.number,
         max: PropTypes.number,
         step: PropTypes.number,
@@ -109,7 +113,9 @@ class Slider extends React.Component {
                     onChange={this.onChange}
                     onAfterChange={this.onAfterChange}
                     tipFormatter={value => (
-                        <span className={classes.tooltip}>{value}</span>
+                        <span className={classes.tooltip}>
+                            {props.tooltip || value}
+                        </span>
                     )}
                 />
             </div>

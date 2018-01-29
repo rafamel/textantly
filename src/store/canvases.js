@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
-import typesActions from '../utils/types-actions';
+import typesActions from './utils/types-actions';
 import { createLogic } from 'redux-logic';
 import engine from 'engine';
-import selectors from './selectors';
-import loading from '../loading';
+import loading from './loading';
 
 const typesPre = 'CANVASES';
 const { types: t, actions } = typesActions({
@@ -115,6 +114,5 @@ export default {
     propTypes,
     reducer,
     actions,
-    logic,
-    selectors
+    logic
 };

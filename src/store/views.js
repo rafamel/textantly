@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { typesActions, selectorWithType } from './utils';
+import { typesActions } from './utils';
 import { createLogic } from 'redux-logic';
 import isEqual from 'lodash.isequal';
 import canvases from './canvases';
@@ -94,23 +94,10 @@ logic.push(createLogic({
     }
 }));
 
-const selectors = {};
-selectors.doUpdate = selectorWithType({
-    propType: PropTypes.bool.isRequired,
-    select: [
-        state => state.edits._history.temp,
-        state => state.views.isMobile
-    ],
-    result: (temp, isMobile) => {
-        return (!isMobile || !temp);
-    }
-});
-
 export default {
     initialState,
     propTypes,
     reducer,
     actions,
-    logic,
-    selectors
+    logic
 };

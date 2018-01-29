@@ -11,10 +11,19 @@ function maxDrawn(props = this.props) {
     };
 }
 
-function canvas(props = this.props) {
-    console.log('canvas save');
+function resetCanvas() {
+    this.data.canvas = {
+        position: { x: 0.5, y: 0.5 },
+        visible: {
+            width: { start: 0, end: 1 },
+            height: { start: 0, end: 1 }
+        }
+    };
+    this.load.data();
+}
 
-    const containerData = this.cropper.getContainerData();
+function canvas(props = this.props) {
+    const containerData = props.fitTo;
     const canvasData = this.cropper.getCanvasData();
 
     const A = 4; // Alpha in px
@@ -65,61 +74,84 @@ function canvas(props = this.props) {
         }
     };
 
+    const alpha = 0.01;
+    let reload = false;
+    if (
+        (1 - canvas.visible.width.start) < alpha
+        || (1 - canvas.visible.height.start) < alpha
+        || canvas.visible.width.end < alpha
+        || canvas.visible.height.end < alpha
+    ) {
+        reload = true;
+        canvas.position = { x: 0.5, y: 0.5 };
+        canvas.visible = {
+            width: { start: 0, end: 1 },
+            height: { start: 0, end: 1 }
+        };
+        this.data.crop = {
+            width: { start: 0, end: 1 },
+            height: { start: 0, end: 1 }
+        };
+    }
+
     this.data.canvas = canvas;
+    if (reload) this.load.data();
 }
 
 function crop(props = this.props) {
-    console.log('crop save');
-
     const cropBoxData = this.cropper.getCropBoxData();
     const canvasData = this.cropper.getCanvasData();
 
     const A = 0.01; // Alpha for ratio
-    const cropCalc = (approximateN, value) => {
+
+    const canvasRelative = {
+        left: cropBoxData.left - canvasData.left,
+        top: cropBoxData.top - canvasData.top
+    };
+
+    const approximate = (approximateN, value) => {
         if (!value) return 0;
         return (Math.abs(approximateN - value) <= A)
             ? approximateN
             : value;
     };
-    const values = {
-        left: cropCalc(0,
-            (cropBoxData.left - canvasData.left) / canvasData.width),
-        top: cropCalc(0,
-            (cropBoxData.top - canvasData.top) / canvasData.height),
-        width: cropCalc(1, (cropBoxData.width / canvasData.width)),
-        height: cropCalc(1, (cropBoxData.height / canvasData.height))
+
+    let values = {
+        width: {
+            start: approximate(0, canvasRelative.left / canvasData.width),
+            end: approximate(1,
+                (canvasRelative.left + cropBoxData.width) / canvasData.width
+            )
+        },
+        height: {
+            start: approximate(0, canvasRelative.top / canvasData.height),
+            end: approximate(1,
+                (canvasRelative.top + cropBoxData.height) / canvasData.height
+            )
+        }
     };
 
-    if (values.left + values.width < 0 || values.left > 1
-        || values.top + values.height < 0 || values.top > 1) {
-        this.data.crop = {
-            top: 0,
-            left: 0,
-            width: 1,
-            height: 1
+    let reload = false;
+    if (values.width.start >= 1 || values.width.end <= 0
+        || values.height.start >= 1 || values.height.end <= 0) {
+        reload = true;
+        values = {
+            width: { start: 0, end: 1 },
+            height: { start: 0, end: 1 }
         };
-        return;
+    } else {
+        if ((values.width.end - values.width.start) < A) {
+            reload = true;
+            values.width = { start: 0, end: 1 };
+        }
+        if ((values.height.end - values.height.start) < A) {
+            reload = true;
+            values.height = { start: 0, end: 1 };
+        }
     }
 
-    const ans = {};
-    ans.left = Math.min(Math.max(values.left, 0), 1);
-    if (ans.left !== values.left) values.width -= (ans.left - values.left);
-    ans.width = Math.min(values.width, 1 - ans.left);
-
-    ans.top = Math.min(Math.max(values.top, 0), 1);
-    if (ans.top !== values.top) values.height -= (ans.top - values.top);
-    ans.height = Math.min(values.height, 1 - ans.top);
-
-    if (ans.width <= A) {
-        ans.left = 0;
-        ans.width = 1;
-    }
-    if (ans.height <= A) {
-        ans.top = 0;
-        ans.height = 1;
-    }
-
-    this.data.crop = ans;
+    this.data.crop = values;
+    if (reload) this.load.crop();
 }
 
-export { maxDrawn, canvas, crop };
+export { maxDrawn, resetCanvas, canvas, crop };

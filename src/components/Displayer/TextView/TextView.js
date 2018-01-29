@@ -1,6 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { jss } from 'react-jss';
-import { withState } from 'store/utils';
+import { withState, selectorWithType } from 'store/utils';
 import classnames from 'classnames';
 import config from 'config';
 import ImageRender from '../ImageRender';
@@ -9,11 +10,22 @@ import { load as fontLoad } from 'services/fonts';
 import TextResizer from './TextResizer';
 import { selectors } from 'store';
 
+const doUpdate = selectorWithType({
+    propType: PropTypes.bool.isRequired,
+    select: [
+        state => selectors.edits.isTemp(state),
+        state => state.views.isMobile
+    ],
+    result: (temp, isMobile) => {
+        return (!isMobile || !temp);
+    }
+});
+
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         textEdits: state.edits.text,
         isRendering: state._loading.rendering,
-        doUpdate: selectors.views.doUpdate(state)
+        doUpdate: doUpdate(state)
     }), (actions) => ({
         addAlert: actions.alerts.add
     })
