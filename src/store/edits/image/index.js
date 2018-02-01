@@ -15,7 +15,11 @@ const initialState = {
     rotate: 0,
     resize: { width: null, height: null, ratio: 1 },
     flip: false,
-    crop: { x: null, y: null, width: null, height: null }
+    crop: {
+        ratio: null,
+        width: { start: 0, end: 1 },
+        height: { start: 0, end: 1 }
+    }
 };
 
 const propTypes = {
@@ -27,10 +31,15 @@ const propTypes = {
     }).isRequired,
     flip: PropTypes.bool.isRequired,
     crop: {
-        x: PropTypes.number,
-        y: PropTypes.number,
-        width: PropTypes.number,
-        height: PropTypes.number
+        ratio: PropTypes.number,
+        width: {
+            start: PropTypes.number.isRequired,
+            end: PropTypes.number.isRequired
+        },
+        height: {
+            start: PropTypes.number.isRequired,
+            end: PropTypes.number.isRequired
+        }
     }
 };
 

@@ -1,7 +1,9 @@
-function maxDrawn(props = this.props) {
+import isEqual from 'lodash.isequal';
+
+function maxDrawn() {
     const imageData = this.cropper.getImageData();
     const canvasData = this.cropper.getCanvasData();
-    const source = props.sourceDimensions;
+    const source = this.lastProps.sourceDimensions;
 
     this.data.maxDrawn = {
         width: (source.width * canvasData.naturalWidth)
@@ -11,17 +13,8 @@ function maxDrawn(props = this.props) {
     };
 }
 
-function resetCanvas() {
-    this.data.canvas = {
-        position: { x: 0.5, y: 0.5 },
-        visible: {
-            width: { start: 0, end: 1 },
-            height: { start: 0, end: 1 }
-        }
-    };
-}
-
-function canvas(props = this.props) {
+function canvas() {
+    const props = this.lastProps;
     const containerData = props.fitTo;
     const canvasData = this.cropper.getCanvasData();
 
@@ -98,11 +91,14 @@ function canvas(props = this.props) {
     if (reload) this.load.data();
 }
 
-function crop(props = this.props) {
-    const cropBoxData = this.cropper.getCropBoxData();
+function crop() {
+    if (!this._cropActive) return;
+    const props = this.lastProps;
+
+    let cropBoxData = this.cropper.getCropBoxData();
     const canvasData = this.cropper.getCanvasData();
 
-    const A = 0.01; // Alpha for ratio
+    const A = 0.005; // Alpha for ratio
 
     const canvasRelative = {
         left: cropBoxData.left - canvasData.left,
@@ -117,6 +113,7 @@ function crop(props = this.props) {
     };
 
     let values = {
+        ratio: props.cropRatio,
         width: {
             start: approximate(0, canvasRelative.left / canvasData.width),
             end: approximate(1,
@@ -130,6 +127,13 @@ function crop(props = this.props) {
             )
         }
     };
+
+    if (props.cropRatio) cropWithRatio.call(this, values, A);
+    else cropNoRatio.call(this, values, A);
+}
+
+function cropNoRatio(values, A) {
+    const props = this.lastProps;
 
     let reload = false;
     if (values.width.start >= 1 || values.width.end <= 0
@@ -150,8 +154,58 @@ function crop(props = this.props) {
         }
     }
 
-    this.data.crop = values;
-    if (reload) this.load.crop();
+    const valuesCanvasLimit = {
+        ratio: values.ratio,
+        width: {
+            start: Math.max(values.width.start, 0),
+            end: Math.min(values.width.end, 1)
+        },
+        height: {
+            start: Math.max(values.height.start, 0),
+            end: Math.min(values.height.end, 1)
+        }
+    };
+
+    this.data.crop = valuesCanvasLimit;
+    props.crop(valuesCanvasLimit);
+
+    if (reload || !isEqual(valuesCanvasLimit, values)) this.load.crop(true);
 }
 
-export { maxDrawn, resetCanvas, canvas, crop };
+function cropWithRatio(values, A) {
+    const props = this.lastProps;
+
+    if (
+        values.width.start >= 1
+        || values.width.end <= 0
+        || values.height.start >= 1
+        || values.height.end <= 0
+        || (values.width.end - values.width.start) < A
+        || (values.height.end - values.height.start) < A
+    ) {
+        this.cropper.setAspectRatio(props.cropRatio);
+        return crop.call(this);
+    }
+
+    const valuesCanvasLimit = {
+        ratio: values.ratio,
+        width: {
+            start: Math.max(values.width.start, 0),
+            end: Math.min(values.width.end, 1)
+        },
+        height: {
+            start: Math.max(values.height.start, 0),
+            end: Math.min(values.height.end, 1)
+        }
+    };
+
+    this.data.crop = valuesCanvasLimit;
+    if (!isEqual(valuesCanvasLimit, values)) {
+        this.load.crop(true);
+        crop.call(this);
+    } else {
+        props.crop(valuesCanvasLimit);
+    }
+}
+
+export { maxDrawn, canvas, crop };

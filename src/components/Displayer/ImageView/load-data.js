@@ -1,7 +1,17 @@
 import engine from 'engine';
 import isEqual from 'lodash.isequal';
 
-function crop(props = this.props) {
+function crop(preventSave = false) {
+    if (!this._cropActive) return;
+    const props = this.lastProps;
+
+    if (props.cropRatio !== this.data.crop.ratio) {
+        this.data.crop.ratio = props.cropRatio;
+        this.cropper.setAspectRatio(props.cropRatio);
+        this.save.crop();
+        return;
+    }
+
     const fitTo = props.fitTo;
     const canvasData = this.cropper.getCanvasData();
     const { width, height } = this.data.crop;
@@ -13,56 +23,37 @@ function crop(props = this.props) {
         height: (height.end - height.start) * canvasData.height
     };
 
-    if (props.viewMode) {
-        const previous = { ...toLoad };
-        toLoad.left = Math.max(canvasData.left, toLoad.left);
-        toLoad.top = Math.max(canvasData.top, toLoad.top);
+    if (toLoad.left < 0) toLoad.width += toLoad.left;
+    const wDiff = fitTo.width - (toLoad.left + toLoad.width);
+    if (wDiff < 0) {
+        toLoad.width += wDiff;
+        toLoad.left -= wDiff;
+    }
 
-        if (toLoad.left !== previous.left) {
-            toLoad.width += previous.left - toLoad.left;
-        }
-        if (toLoad.top !== previous.top) {
-            toLoad.height += previous.top - toLoad.top;
-        }
-
-        toLoad.width = Math.min(
-            toLoad.width,
-            canvasData.left + canvasData.width - toLoad.left
-        );
-        toLoad.height = Math.min(
-            toLoad.height,
-            canvasData.top + canvasData.height - toLoad.top
-        );
-    } else {
-        if (toLoad.left < 0) toLoad.width += toLoad.left;
-        const wDiff = fitTo.width - (toLoad.left + toLoad.width);
-        if (wDiff < 0) {
-            toLoad.width += wDiff;
-            toLoad.left -= wDiff;
-        }
-
-        if (toLoad.top < 0) toLoad.height += toLoad.top;
-        const hDiff = fitTo.height - (toLoad.top + toLoad.height);
-        if (hDiff < 0) {
-            toLoad.height += hDiff;
-            toLoad.top -= hDiff;
-        }
+    if (toLoad.top < 0) toLoad.height += toLoad.top;
+    const hDiff = fitTo.height - (toLoad.top + toLoad.height);
+    if (hDiff < 0) {
+        toLoad.height += hDiff;
+        toLoad.top -= hDiff;
     }
 
     this.cropper.setCropBoxData(toLoad);
+    if (props.cropRatio && !preventSave) this.save.crop();
 }
 
-function data(props = this.props) {
-    if (!props.isMobile || props.viewMode) viewModeCanvas.call(this, props);
-    else cropViewCanvas.call(this, props);
+function data() {
+    const props = this.lastProps;
 
-    crop.call(this, props);
+    if (!props.isMobile || props.viewMode) viewModeCanvas.call(this);
+    else cropViewCanvas.call(this);
+    crop.call(this);
 }
 
-function viewModeCanvas(props) {
-    const { fitTo } = props;
-    const maxDrawn = this.data.maxDrawn;
+function viewModeCanvas() {
+    const props = this.lastProps;
+    const fitTo = props.fitTo;
     const ratio = props.operations.resize.ratio;
+    const maxDrawn = this.data.maxDrawn;
 
     const dimensions = engine.getDimensions(
         { width: maxDrawn.width * ratio, height: maxDrawn.height * ratio },
@@ -79,7 +70,8 @@ function viewModeCanvas(props) {
     this.cropper.setCanvasData(toLoad);
 }
 
-function cropViewCanvas(props) {
+function cropViewCanvas() {
+    const props = this.lastProps;
     const fitTo = props.fitTo;
     const maxDrawn = this.data.maxDrawn;
     const {

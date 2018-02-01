@@ -8,67 +8,51 @@ import classnames from 'classnames';
 import { selectors } from 'store';
 import * as saveData from './save-data';
 import * as loadData from './load-data';
+import * as init from './init';
+import styles from './styles';
 import config from 'config';
-import isEqual from 'lodash.isequal';
 
-const styles = {
-    root: {
-        overflow: 'hidden',
-        position: 'relative',
-        '& .cropper-modal': {
-            background: 'none'
-        }
-    },
-    viewMode: {
-        '& .cropper-point': {
-            background: 'none'
-        },
-        '& .cropper-view-box': {
-            boxShadow: 'rgba(0, 0, 0, 0.5) 0px 0px 0px 9999px'
-        },
-        '&:before': {
-            content: '""',
-            position: 'absolute',
-            display: 'block',
-            zIndex: 1,
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0
-        }
-    },
-    hidden: {
-        '& .cropper-container > *': {
-            opacity: 0
-        }
-    },
-    noCropBox: {
-        '& .cropper-crop-box': {
-            display: 'none'
+const cropRatio = selectorWithType({
+    propType: PropTypes.number,
+    select: [
+        state => state.views.image.crop
+    ],
+    result: (cropView) => {
+        switch (cropView) {
+        case 'facebook':
+            return 1200 / 630;
+        case 'youtube':
+            return 1280 / 720;
+        case 'square':
+            return 1;
+        default:
+            return null;
         }
     }
-};
+});
 
 const viewMode = selectorWithType({
     propType: PropTypes.bool.isRequired,
     select: [
         state => state.views.image.main
     ],
-    result: (imageView) => {
-        return (imageView !== 'crop');
-    }
+    result: (imageView) => (imageView !== 'crop')
 });
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         scaled: state.canvases.scaled.canvas,
         scaledId: state.canvases.scaled.id,
+        sourceId: state.canvases.scaled.forSourceId,
         sourceDimensions: selectors.edits.image.dimensions.source(state),
         viewMode: viewMode(state),
+        cropRatio: cropRatio(state),
         rendering: state._loading.rendering,
         fitTo: state.views.dimensions,
         operations: state.edits.image,
         isMobile: state.views.isMobile
+    }), (actions) => ({
+        crop: actions.edits.image.crop
     })
 );
 
@@ -85,31 +69,13 @@ class ImageView extends Component {
         noCropBox: false
     };
     _isMounted = false;
+    lastProps = null;
     loading = true;
     timeouts = { zoom: null, resize: null };
     cropper = null;
-    operations = {
-        last: {},
-        current: {}
-    };
-    ratios = {
-        canvas: { width: 1, height: 1 }
-    };
-    data = {
-        maxDrawn: { width: 0, height: 0 },
-        canvas: {
-            position: { x: 0.5, y: 0.5 },
-            visible: {
-                width: { start: 0, end: 1 },
-                height: { start: 0, end: 1 }
-            }
-        },
-        crop: {
-            width: { start: 0, end: 1 },
-            height: { start: 0, end: 1 }
-        }
-    };
-
+    operations = null;
+    data = null;
+    _cropActive = false;
     ifm = (cb) => (...args) => {
         if (!this._isMounted) return;
         /* eslint-disable */
@@ -120,15 +86,18 @@ class ImageView extends Component {
         }
         /* eslint-enable */
     };
-    save = {
-        maxDrawn: this.ifm(saveData.maxDrawn.bind(this)),
-        canvas: this.ifm(saveData.canvas.bind(this)),
-        crop: this.ifm(saveData.crop.bind(this)),
-        resetCanvas: saveData.resetCanvas.bind(this)
+    init = {
+        up: init.up.bind(this),
+        update: init.update.bind(this)
     };
     load = {
         crop: this.ifm(loadData.crop.bind(this)),
         data: this.ifm(loadData.data.bind(this))
+    };
+    save = {
+        maxDrawn: this.ifm(saveData.maxDrawn.bind(this)),
+        canvas: this.ifm(saveData.canvas.bind(this)),
+        crop: this.ifm(saveData.crop.bind(this))
     };
     onResize = (props) => {
         this.setState({ hidden: true });
@@ -140,7 +109,8 @@ class ImageView extends Component {
             }
         }, 500);
     };
-    setContainer = (props = this.props) => {
+    setContainer = () => {
+        const props = this.lastProps;
         if (!this.cropper || !this.cropper.cropper
             || !this.cropper.cropper.cropper) {
             return;
@@ -168,30 +138,24 @@ class ImageView extends Component {
 
         clearTimeout(this.timeouts.zoom);
         this.timeouts.zoom = setTimeout(() => {
-            this.ifm(() => {
-                const canvasData = this.cropper.getCanvasData();
-                if (canvasData.width < 100 || canvasData.height < 100) {
-                    this.save.resetCanvas();
-                    this.load.data();
-                } else {
-                    this.save.canvas();
-                    this.load.crop();
-                }
-                this.setState({ noCropBox: false });
-            })();
+            this.save.canvas();
+            this.load.crop();
+            if (this._isMounted) this.setState({ noCropBox: false });
         }, 300);
     };
-    runOperations = (props = this.props, saveAll = true) => {
+    runOperations = (saveAll = true) => {
+        const props = this.lastProps;
         if (!this._isMounted) return;
 
         let modified = false;
         const modify = (key, cb) => {
             modified = true;
-            this.operations.current[key] = this.operations.last[key];
+            this.operations[key] = props.operations[key];
             this.ifm(cb)();
         };
 
-        const { last, current } = this.operations;
+        const current = this.operations;
+        const last = props.operations;
         if (last.rotate !== current.rotate) {
             modify('rotate', () => {
                 this.cropper.rotateTo(last.rotate);
@@ -211,8 +175,10 @@ class ImageView extends Component {
         }
         return false;
     };
-    setImage = (props = this.props) => {
+    setImage = () => {
+        const props = this.lastProps;
         if (!props.scaled) return;
+
         this.loading = true;
         this.setState({ hidden: true });
         // Will trigger onImageReady
@@ -220,7 +186,7 @@ class ImageView extends Component {
     };
     onImageReady = () => {
         this.setContainer();
-        this.operations.current = {};
+        this.operations = {};
         this.runOperations();
 
         this.loading = false;
@@ -228,41 +194,17 @@ class ImageView extends Component {
         if (this.props.onReady) this.props.onReady();
     };
     componentWillReceiveProps(nextProps) {
-        this.operations.last = nextProps.operations;
-
-        if (!this.cropper) return;
-        if (!this.loading && this.props.fitTo !== nextProps.fitTo) {
-            this.setContainer(nextProps);
-        }
-        if (nextProps.frozen || !nextProps.scaled) return;
-
-        if (this.props.scaledId !== nextProps.scaledId) {
-            this.setImage(nextProps);
-            return;
-        }
-
-        if (this.loading || nextProps.rendering) return;
-        if (this.runOperations(nextProps, false)) return;
-
-        const diffRatios = !isEqual(
-            this.props.operations.resize.ratio,
-            nextProps.operations.resize.ratio
-        );
-        if (diffRatios || this.props.viewMode !== nextProps.viewMode) {
-            this.load.data(nextProps);
-        }
+        this.lastProps = nextProps;
+        this.init.update(nextProps);
     }
     componentDidMount() {
         this._isMounted = true;
-        this.operations.last = this.props.operations;
-        this.setImage();
-
+        this.lastProps = this.props;
+        this.init.up();
         window.addEventListener('resize', this.onResize);
     }
     componentWillUnmount() {
         this._isMounted = false;
-        this.loading = true;
-        this.setState({ hidden: true });
         this.cropper.cropper.destroy();
         window.removeEventListener('resize', this.onResize);
     }
@@ -276,6 +218,7 @@ class ImageView extends Component {
         const { classes, viewMode, isMobile } = this.props;
 
         const activeCrop = () => {
+            if (!this.data) return false;
             const crop = this.data.crop;
             return (crop.width.start > 0 || crop.width.end < 1
                 || crop.height.start > 0 || crop.height.end < 1);
@@ -299,6 +242,7 @@ class ImageView extends Component {
                     zoomOnWheel={isMobile}
                     zoomOnTouch={isMobile}
                     toggleDragModeOnDblclick={false}
+                    autoCropArea={1}
                     guides={false}
                     ready={this.onImageReady}
                     zoom={this.onZoom}
