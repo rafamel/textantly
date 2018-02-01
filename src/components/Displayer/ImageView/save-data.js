@@ -19,7 +19,6 @@ function resetCanvas() {
             height: { start: 0, end: 1 }
         }
     };
-    this.load.data();
 }
 
 function canvas(props = this.props) {
@@ -42,6 +41,7 @@ function canvas(props = this.props) {
     const canvas = {};
     canvas.forFit = containerData;
     canvas.forMaxDrawn = { ...this.data.maxDrawn };
+    canvas.forRatio = props.operations.resize.ratio;
 
     canvas.dimensions = {
         width: canvasData.width,

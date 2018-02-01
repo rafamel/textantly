@@ -86,7 +86,7 @@ class ResizeSliders extends React.Component {
                 name="width"
                 tooltip={`${values.width}:${values.height}`}
                 value={values[currentMin]}
-                min={0}
+                min={1}
                 max={maxDimensions[currentMin]}
                 step={1}
                 onChange={this.handleTempChange}

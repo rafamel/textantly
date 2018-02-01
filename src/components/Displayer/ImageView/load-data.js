@@ -13,21 +13,7 @@ function crop(props = this.props) {
         height: (height.end - height.start) * canvasData.height
     };
 
-    if (props.viewMode.crop) {
-        if (toLoad.left < 0) toLoad.width += toLoad.left;
-        const wDiff = fitTo.width - (toLoad.left + toLoad.width);
-        if (wDiff < 0) {
-            toLoad.width += wDiff;
-            toLoad.left -= wDiff;
-        }
-
-        if (toLoad.top < 0) toLoad.height += toLoad.top;
-        const hDiff = fitTo.height - (toLoad.top + toLoad.height);
-        if (hDiff < 0) {
-            toLoad.height += hDiff;
-            toLoad.top -= hDiff;
-        }
-    } else {
+    if (props.viewMode) {
         const previous = { ...toLoad };
         toLoad.left = Math.max(canvasData.left, toLoad.left);
         toLoad.top = Math.max(canvasData.top, toLoad.top);
@@ -47,22 +33,41 @@ function crop(props = this.props) {
             toLoad.height,
             canvasData.top + canvasData.height - toLoad.top
         );
+    } else {
+        if (toLoad.left < 0) toLoad.width += toLoad.left;
+        const wDiff = fitTo.width - (toLoad.left + toLoad.width);
+        if (wDiff < 0) {
+            toLoad.width += wDiff;
+            toLoad.left -= wDiff;
+        }
+
+        if (toLoad.top < 0) toLoad.height += toLoad.top;
+        const hDiff = fitTo.height - (toLoad.top + toLoad.height);
+        if (hDiff < 0) {
+            toLoad.height += hDiff;
+            toLoad.top -= hDiff;
+        }
     }
 
     this.cropper.setCropBoxData(toLoad);
 }
 
 function data(props = this.props) {
-    if (props.viewMode.full) fullViewModeCanvas.call(this, props);
+    if (!props.isMobile || props.viewMode) viewModeCanvas.call(this, props);
     else cropViewCanvas.call(this, props);
 
     crop.call(this, props);
 }
 
-function fullViewModeCanvas(props) {
+function viewModeCanvas(props) {
     const { fitTo } = props;
+    const maxDrawn = this.data.maxDrawn;
+    const ratio = props.operations.resize.ratio;
 
-    const dimensions = engine.getDimensions(this.data.maxDrawn, { fit: fitTo });
+    const dimensions = engine.getDimensions(
+        { width: maxDrawn.width * ratio, height: maxDrawn.height * ratio },
+        { fit: fitTo }
+    );
     const toLoad = {
         left: (fitTo.width - dimensions.width) / 2,
         top: (fitTo.height - dimensions.height) / 2,
@@ -76,37 +81,44 @@ function fullViewModeCanvas(props) {
 
 function cropViewCanvas(props) {
     const fitTo = props.fitTo;
+    const maxDrawn = this.data.maxDrawn;
     const {
         dimensions,
         position,
-        forFit,
         visible,
-        forMaxDrawn
+        forFit,
+        forMaxDrawn,
+        forRatio
     } = this.data.canvas;
 
     const getToCalculate = () => {
         const A = 5; // Alpha in px
 
-        const isAdjusted = () => isEqual(position, { x: 0.5, y: 0.5 })
-            && (
-                Math.abs(dimensions.height - forFit.height) <= A
-                || Math.abs(dimensions.width - forFit.width) <= A
-            );
+        const isAdjusted = () => (
+            Math.abs(dimensions.height - forFit.height) <= A
+            || Math.abs(dimensions.width - forFit.width) <= A
+            || Math.abs(dimensions.width - (forMaxDrawn.width * forRatio)) <= A
+        );
         if (
             !dimensions
             || !position
             || !forFit
-            || Math.abs(dimensions.width - forMaxDrawn.width) <= A
+            || !forMaxDrawn
+            || !forRatio
             || isAdjusted()
         ) {
-            return this.data.maxDrawn;
+            const ratio = props.operations.resize.ratio;
+            return {
+                width: maxDrawn.width * ratio,
+                height: maxDrawn.height * ratio
+            };
         }
 
         const initialDims = {
             // Width:Height ratio could have changed
-            width: (dimensions.width * this.data.maxDrawn.width)
+            width: (dimensions.width * maxDrawn.width)
                 / forMaxDrawn.width,
-            height: (dimensions.height * this.data.maxDrawn.height)
+            height: (dimensions.height * maxDrawn.height)
                 / forMaxDrawn.height
         };
 
@@ -139,6 +151,7 @@ function cropViewCanvas(props) {
     };
 
     const toCalculate = getToCalculate();
+
     const diffPxForCalc = {
         width: (visible.width.end - visible.width.start) * toCalculate.width,
         height: (visible.height.end - visible.height.start) * toCalculate.height
@@ -149,6 +162,7 @@ function cropViewCanvas(props) {
         width: (toCalculate.width * visibleDims.width) / diffPxForCalc.width,
         height: (toCalculate.height * visibleDims.height) / diffPxForCalc.height
     };
+
     toLoad.left = (position.x * fitTo.width) - (toLoad.width / 2);
     toLoad.top = (position.y * fitTo.height) - (toLoad.height / 2);
 

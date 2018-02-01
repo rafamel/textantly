@@ -19,7 +19,7 @@ const styles = {
             background: 'none'
         }
     },
-    noCropViewMode: {
+    viewMode: {
         '& .cropper-point': {
             background: 'none'
         },
@@ -49,32 +49,13 @@ const styles = {
     }
 };
 
-const previous = { rotate: null, resize: null };
 const viewMode = selectorWithType({
-    propType: PropTypes.shape({
-        crop: PropTypes.bool.isRequired,
-        full: PropTypes.bool.isRequired
-    }).isRequired,
+    propType: PropTypes.bool.isRequired,
     select: [
-        state => state.views.isMobile,
-        state => state.views.image.main,
-        state => state.edits.image.rotate,
-        state => state.edits.image.resize.ratio,
-        state => selectors.edits.isTemp(state)
+        state => state.views.image.main
     ],
-    result: (isMobile, imageView, rotate, resize, isTemp) => {
-        let ans = { crop: true, full: false };
-
-        if (isMobile) {
-            if (imageView !== 'crop') ans = { crop: false, full: true };
-        } else if (isTemp
-            && (rotate !== previous.rotate || resize !== previous.resize)) {
-            ans.crop = false;
-        }
-
-        previous.rotate = rotate;
-        previous.resize = resize;
-        return ans;
+    result: (imageView) => {
+        return (imageView !== 'crop');
     }
 });
 
@@ -86,7 +67,8 @@ const { connector, propTypes: storeTypes } = withState(
         viewMode: viewMode(state),
         rendering: state._loading.rendering,
         fitTo: state.views.dimensions,
-        operations: state.edits.image
+        operations: state.edits.image,
+        isMobile: state.views.isMobile
     })
 );
 
@@ -190,10 +172,11 @@ class ImageView extends Component {
                 const canvasData = this.cropper.getCanvasData();
                 if (canvasData.width < 100 || canvasData.height < 100) {
                     this.save.resetCanvas();
+                    this.load.data();
                 } else {
                     this.save.canvas();
+                    this.load.crop();
                 }
-                this.load.crop();
                 this.setState({ noCropBox: false });
             })();
         }, 300);
@@ -259,14 +242,13 @@ class ImageView extends Component {
         }
 
         if (this.loading || nextProps.rendering) return;
+        if (this.runOperations(nextProps, false)) return;
 
-        if (
-            !this.runOperations(nextProps, false)
-            && (
-                !isEqual(this.props.viewMode, nextProps.viewMode)
-                || this.props.operations.resize !== nextProps.operations.resize
-            )
-        ) {
+        const diffRatios = !isEqual(
+            this.props.operations.resize.ratio,
+            nextProps.operations.resize.ratio
+        );
+        if (diffRatios || this.props.viewMode !== nextProps.viewMode) {
             this.load.data(nextProps);
         }
     }
@@ -291,7 +273,7 @@ class ImageView extends Component {
             || this.props.viewMode !== nextProps.viewMode;
     }
     render() {
-        const { classes, viewMode } = this.props;
+        const { classes, viewMode, isMobile } = this.props;
 
         const activeCrop = () => {
             const crop = this.data.crop;
@@ -304,8 +286,8 @@ class ImageView extends Component {
                 [classes.root]: true,
                 [classes.hidden]: this.state.hidden,
                 [classes.noCropBox]: this.state.noCropBox
-                    || (!viewMode.crop && !activeCrop()),
-                [classes.noCropViewMode]: !viewMode.crop
+                    || (viewMode && !activeCrop()),
+                [classes.viewMode]: viewMode
             })}>
                 <Cropper
                     ref={(ref) => { this.cropper = ref; }}
@@ -313,7 +295,9 @@ class ImageView extends Component {
                     restore={false}
                     // Cropper.js options
                     viewMode={0}
-                    dragMode="move"
+                    dragMode={(isMobile) ? 'move' : 'crop'}
+                    zoomOnWheel={isMobile}
+                    zoomOnTouch={isMobile}
                     toggleDragModeOnDblclick={false}
                     guides={false}
                     ready={this.onImageReady}
