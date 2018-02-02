@@ -4,9 +4,11 @@ import { defaultValues } from '../historian';
 import typesActions, { values } from '../utils/types-actions';
 import { selectorWithType } from '../utils/withState';
 import { typesPre, historian, actions as editsActions } from './init';
+import canvases from '../canvases';
 import source from './source';
 import image from './image';
 import text from './text';
+import isEqual from 'lodash.isequal';
 
 const { types: t, actions } = typesActions({
     pre: `${typesPre}_HISTORY`,
@@ -48,8 +50,11 @@ logic.push(createLogic({
         dispatch(editsActions.overwrite(payload));
         if (state.source.id !== payload.source.id) {
             dispatch(source.actions.loadSource());
+        } else if (payload.navigation.main !== 'image'
+            && !isEqual(state.image, payload.image)) {
+            // Can happen on resets
+            dispatch(canvases.actions.draw());
         }
-        if (state.navigation.image)
         done();
     }
 }));

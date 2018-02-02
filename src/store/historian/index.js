@@ -5,7 +5,7 @@ function addCan(history) {
         i += direction;
         if (i < 0) return false;
         if (i >= arr.length) return false;
-        if (arr[i].skip) return helper(arr, i, direction);
+        if (arr[i].onNext) return helper(arr, i, direction);
         return true;
     };
 
@@ -25,8 +25,9 @@ function addCan(history) {
 const defaultValues = {
     index: -1,
     arr: [],
-    tempSkips: [],
+    onNextArr: [],
     temp: null,
+    consolidateNext: null,
     can: {
         forwards: false,
         backwards: false
@@ -35,28 +36,17 @@ const defaultValues = {
 
 export { defaultValues };
 export default function history({ key, exclude }) {
-    if (!exclude) exclude = [];
+    if (!exclude) exclude = [].concat(key);
 
-    function insert(previous, updated, skip = false) {
+    function insert(previous, updated) {
         if (previous[key].temp) {
             return insert(previous[key].temp, updated);
         }
 
-        const diffObj = diff(previous, updated, exclude.concat(key));
+        const diffObj = diff(previous, updated, exclude);
         if (!diffObj) return previous;
 
         const history = previous[key];
-
-        if (skip) {
-            return {
-                ...updated,
-                [key]: {
-                    ...history,
-                    tempSkips: history.tempSkips
-                        .concat([{ diff: diffObj, skip: true }])
-                }
-            };
-        }
 
         const index = history.index;
         const arr = (index === -1)
@@ -68,15 +58,33 @@ export default function history({ key, exclude }) {
                 ...history,
                 index: -1,
                 arr: arr
-                    .concat(history.tempSkips)
-                    .concat([{ diff: diffObj, skip }]),
-                tempSkips: [],
+                    .concat(history.onNextArr)
+                    .concat({ diff: diffObj, onNext: false, skip: false }),
+                onNextArr: [],
                 temp: null
             })
         };
     }
 
-    function tempInsert(previous, updated) {
+    function insertNext(previous, updated, skip = false) {
+        if (previous[key].temp) {
+            return insertNext(previous[key].temp, updated);
+        }
+
+        const diffObj = diff(previous, updated, exclude);
+        if (!diffObj) return previous;
+
+        return {
+            ...updated,
+            [key]: {
+                ...previous[key],
+                onNextArr: previous[key].onNextArr
+                    .concat([{ diff: diffObj, onNext: true, skip }])
+            }
+        };
+    }
+
+    function insertTemp(previous, updated) {
         const history = previous[key];
         return (history.temp)
             ? {
@@ -90,16 +98,16 @@ export default function history({ key, exclude }) {
 
     function undoSkips(current) {
         const history = current[key];
-        if (!history.tempSkips.length) return current;
+        if (!history.onNextArr.length) return current;
 
-        const updated = diffBackwards(
-            current,
-            history.tempSkips.slice(-1)[0].diff
-        );
+        const selected = history.onNextArr.slice(-1)[0];
+        if (!selected.skip) return current;
+
+        const updated = diffBackwards(current, selected.diff);
 
         updated[key] = {
             ...history,
-            tempSkips: history.tempSkips.slice(0, -1)
+            onNextArr: history.onNextArr.slice(0, -1)
         };
         return undoSkips(updated);
     }
@@ -118,7 +126,7 @@ export default function history({ key, exclude }) {
         const updated = diffBackwards(current, selected.diff);
         updated[key] = addCan({
             ...history,
-            tempSkips: [],
+            onNextArr: [],
             index: select
         });
         return (selected.skip)
@@ -135,7 +143,7 @@ export default function history({ key, exclude }) {
         const updated = diffForwards(current, selected.diff);
         updated[key] = addCan({
             ...history,
-            tempSkips: [],
+            onNextArr: [],
             index: history.index + 1
         });
         return (selected.skip)
@@ -146,7 +154,8 @@ export default function history({ key, exclude }) {
     return {
         key,
         insert,
-        tempInsert,
+        insertNext,
+        insertTemp,
         backwards,
         forwards
     };

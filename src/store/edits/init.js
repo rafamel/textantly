@@ -4,7 +4,13 @@ import typesActions, { typeInTypes } from '../utils/types-actions';
 const typesPre = 'EDITS';
 const { types, actions } = typesActions({
     pre: typesPre,
-    types: ['OVERWRITE', 'WRITE_HARD', 'WRITE_SKIP', 'WRITE_TEMP']
+    types: [
+        'OVERWRITE',
+        'WRITE_HARD',
+        'WRITE_NEXT',
+        'WRITE_NEXT_SKIP',
+        'WRITE_TEMP'
+    ]
 });
 const historian = Historian({ key: '_history' });
 

@@ -41,22 +41,30 @@ const logic = [];
 logic.push(createLogic({
     type: values(t),
     process({ getState, action }, dispatch, done) {
-        const state = getState().edits.navigation;
-        const payload = ((payload) => {
-            switch (action.type) {
-            case t.SET_MAIN:
-                return { ...state, main: payload };
-            case t.SET_IMAGE:
-                return { ...state, image: payload };
-            case t.SET_CROP:
-                return { ...state, crop: payload };
-            default:
-                return state;
-            }
-        })(action.payload);
+        const deliver = (load, skip = true) => {
+            const payload = { navigation: load };
+            if (skip) dispatch(editsActions.writeNextSkip(payload));
+            else dispatch(editsActions.writeNext(payload));
+        };
 
-        dispatch(editsActions.writeSkip({ navigation: payload }));
-        if (action.type === t.SET_CROP) cropRatio(action.payload, dispatch);
+        const state = getState().edits.navigation;
+        const { type, payload } = action;
+
+        switch (type) {
+        case t.SET_MAIN:
+            deliver({ ...state, main: payload }, false);
+            break;
+        case t.SET_IMAGE:
+            deliver({ ...state, image: payload });
+            break;
+        case t.SET_CROP:
+            deliver({ ...state, crop: payload });
+            cropRatio(payload, dispatch);
+            break;
+        default:
+            return done();
+        }
+
         done();
     }
 }));

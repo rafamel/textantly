@@ -19,10 +19,12 @@ function reducer(state = initialState, { type, payload }) {
         return payload;
     case t.WRITE_HARD:
         return historian.insert(state, { ...state, ...payload });
-    case t.WRITE_SKIP:
-        return historian.insert(state, { ...state, ...payload }, true);
+    case t.WRITE_NEXT:
+        return historian.insertNext(state, { ...state, ...payload });
+    case t.WRITE_NEXT_SKIP:
+        return historian.insertNext(state, { ...state, ...payload }, true);
     case t.WRITE_TEMP:
-        return historian.tempInsert(state, { ...state, ...payload });
+        return historian.insertTemp(state, { ...state, ...payload });
     default:
         return state;
     }
