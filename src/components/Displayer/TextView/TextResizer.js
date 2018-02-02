@@ -27,7 +27,7 @@ const styles = {
 class TextResizer extends React.Component {
     static propTypes = {
         text: PropTypes.string.isRequired,
-        rerun: PropTypes.number,
+        actions: PropTypes.func,
         // JSS
         classes: PropTypes.object.isRequired
     };
@@ -55,11 +55,13 @@ class TextResizer extends React.Component {
         if (nextProps.text !== this.props.text) {
             this.setText(nextProps.text);
         }
-        if (nextProps.rerun !== this.props.rerun) {
-            this.fontResize();
-        }
     }
     componentDidMount() {
+        if (this.props.actions) {
+            this.props.actions({
+                fontResize: this.fontResize
+            });
+        }
         this.setObserver();
         this.fontResize();
     }

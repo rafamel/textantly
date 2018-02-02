@@ -25,8 +25,7 @@ const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         textEdits: state.edits.text,
         isRendering: state._loading.rendering,
-        doUpdate: doUpdate(state),
-        fitTo: state.views.dimensions
+        doUpdate: doUpdate(state)
     }), (actions) => ({
         addAlert: actions.alerts.add
     })
@@ -37,9 +36,9 @@ class TextView extends React.Component {
         ...storeTypes
     };
     state = {
-        opacity: 1,
-        sizerRerun: 0
+        opacity: 1
     };
+    fontResize = () => {};
     _isMounted = false;
     previousFailedFont = null;
     timeout = null;
@@ -63,7 +62,7 @@ class TextView extends React.Component {
                 }
 
                 this.previousFailedFont = null;
-                this.setState({ sizerRerun: this.state.sizerRerun + 1 });
+                this.fontResize();
 
                 clearTimeout(this.timeout);
                 this.timeout = setTimeout(() => {
@@ -76,8 +75,9 @@ class TextView extends React.Component {
                     Do you have an active internet connection?`);
             });
     };
-    onImageUpdate = () => {
-        this.setState({ sizerRerun: this.state.sizerRerun + 1 });
+    onImageUpdate = () => this.fontResize();
+    hookResizer = ({ fontResize }) => {
+        this.fontResize = fontResize;
     };
     // Lifecycle
     componentWillReceiveProps(nextProps) {
@@ -87,7 +87,7 @@ class TextView extends React.Component {
         this.loadFont(
             nextProps.textEdits.fontFamily, this.props.textEdits.fontFamily
         );
-        this.setState({ sizerRerun: this.state.sizerRerun + 1 });
+        this.fontResize();
     }
     componentWillMount() {
         this._isMounted = true;
@@ -118,7 +118,7 @@ class TextView extends React.Component {
                     >
                         <TextResizer
                             text={textString}
-                            rerun={this.state.sizerRerun}
+                            actions={this.hookResizer}
                         />
                     </div>
                 </div>
