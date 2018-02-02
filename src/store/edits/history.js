@@ -44,9 +44,16 @@ logic.push(createLogic({
         const state = globalState.edits;
         const payload = action.payload;
 
-        if (globalState.views.main !== 'text'
-            && !isEqual(state.text, payload.text)) {
+        if (
+            globalState.views.main !== 'text'
+            && !isEqual(state.text, payload.text)
+        ) {
             dispatch(views.actions.setMain('text'));
+        } else if (
+            globalState.views.main !== 'image'
+            && !isEqual(state.image, payload.image)
+        ) {
+            dispatch(views.actions.setMain('image'));
         }
 
         dispatch(editsActions.overwrite(payload));

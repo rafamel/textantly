@@ -9,14 +9,12 @@ const styles = {
     root: {
         textAlign: 'center',
         '& canvas': {
-            margin: '0 auto'
-            /*
-            background: 'rgba(255, 255, 255, 0.2)',
+            margin: '0 auto',
+            background: 'rgba(0, 0, 0, 0.025)',
             boxShadow: `
                 0px 2px 2px -1px rgba(0, 0, 0, 0.05),
                 0px 2px 2px 0px rgba(0, 0, 0, 0.05),
                 0px 1px 10px 0px rgba(0, 0, 0, 0.05)`
-            */
         }
     }
 };
@@ -60,6 +58,7 @@ class ImageRender extends React.Component {
         );
         canvas.style.width = `${dimensions.width}px`;
         canvas.style.height = `${dimensions.height}px`;
+        if (props.onUpdate) props.onUpdate();
     };
     drawCanvas = (canvas = this.current.canvas, props = this.props) => {
         const rootNode = this.rootNode;
@@ -87,7 +86,7 @@ class ImageRender extends React.Component {
                 props
             );
         } else if (props.fitTo !== this.current.fitTo && this.current.canvas) {
-            this.setDimensions();
+            this.setDimensions(props);
         }
     };
     redrawOnFocus = () => {

@@ -16,18 +16,27 @@ function up() {
                 width: { start: 0, end: 1 },
                 height: { start: 0, end: 1 }
             }
-        },
-        crop: { ...props.operations.crop }
+        }
     };
 
     const crop = props.operations.crop;
-    this._cropActive = !props.viewMode
+    this.active.crop = crop.ratio
         || crop.width.start > 0
         || crop.width.end < 1
         || crop.height.start > 0
         || crop.height.end < 1;
+    this.active.cropbox = !props.viewMode || this.active.crop;
 
-    if (this._isMounted) this.cropper.setAspectRatio(crop.ratio);
+    if (this._isMounted && this.active.cropbox) {
+        if (props.cropRatio !== crop.ratio) {
+            props.crop({
+                ratio: props.cropRatio,
+                width: { start: 0, end: 1 },
+                height: { start: 0, end: 1 }
+            });
+        }
+        this.cropper.setAspectRatio(props.cropRatio);
+    }
     this.forceUpdate();
 
     // Clear timeouts, if existing
@@ -40,12 +49,21 @@ function up() {
 
 function update() {
     const props = this.lastProps;
-    if (!props.viewMode) this._cropActive = true;
-
     if (!this.cropper || props.freeze || !props.scaled) return;
-    if (!this.loading && this.props.fitTo !== props.fitTo) {
-        this.setContainer();
+
+    if (!props.viewMode) {
+        this.active.cropbox = true;
+        if (props.cropRatio !== props.operations.crop.ratio) {
+            this.cropper.setAspectRatio(props.cropRatio);
+            props.crop({
+                ratio: props.cropRatio,
+                width: { start: 0, end: 1 },
+                height: { start: 0, end: 1 }
+            });
+            this.load.crop();
+        }
     }
+    if (!this.loading && this.props.fitTo !== props.fitTo) this.setContainer();
 
     if (this.props.scaledId !== props.scaledId) {
         if (this.props.sourceId !== props.sourceId) return up.call(this);
@@ -54,15 +72,12 @@ function update() {
 
     if (this.loading || props.rendering) return;
     if (this.runOperations(false)) return;
-
-    const diffRatios = !isEqual(
+    const diffRatios = () => !isEqual(
         this.props.operations.resize.ratio,
         props.operations.resize.ratio
     );
     if (diffRatios || this.props.viewMode !== props.viewMode) {
         this.load.data();
-    } else if (this.props.cropRatio !== props.cropRatio) {
-        this.load.crop();
     }
 }
 

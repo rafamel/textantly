@@ -78,7 +78,10 @@ class ImageView extends Component {
     cropper = null;
     operations = null;
     data = null;
-    _cropActive = false;
+    active = {
+        crop: false,
+        cropbox: false
+    };
     ifm = (cb) => (...args) => {
         if (!this._isMounted) return;
         /* eslint-disable */
@@ -133,8 +136,8 @@ class ImageView extends Component {
         this.load.data();
     };
     onCropEnd = () => {
-        this.save.crop();
         this.save.canvas();
+        this.save.crop();
     };
     onZoom = () => {
         this.setState({ noCropBox: true });
@@ -221,21 +224,15 @@ class ImageView extends Component {
     }
     render() {
         const { classes, viewMode, isMobile } = this.props;
-
-        const activeCrop = () => {
-            if (!this.data) return false;
-            const crop = this.data.crop;
-            return (crop.width.start > 0 || crop.width.end < 1
-                || crop.height.start > 0 || crop.height.end < 1);
-        };
-
         return (
             <div className={classnames({
                 [classes.root]: true,
                 [classes.hidden]: this.state.hidden,
                 [classes.noCropBox]: this.state.noCropBox
-                    || (viewMode && !activeCrop()),
-                [classes.viewMode]: viewMode
+                    || (viewMode && !this.active.crop),
+                [classes.viewMode]: viewMode,
+                [classes.hiddenViewMode]: this.state.hidden
+                    && viewMode && this.active.crop
             })}>
                 <Cropper
                     ref={(ref) => { this.cropper = ref; }}

@@ -43,6 +43,7 @@ function draw(canvas, scale) {
     return newCanvas;
 }
 
+export { maxScaled };
 export default {
     getDimensions,
     draw

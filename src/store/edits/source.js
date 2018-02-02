@@ -60,7 +60,7 @@ logic.push(createLogic({
                     source: {
                         ...state.source,
                         ...payload,
-                        id: payload.id + 1
+                        id: state.source.id + 1
                     }
                 };
                 dispatch(editsActions.writeHard(payload));

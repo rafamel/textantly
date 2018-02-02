@@ -1,4 +1,5 @@
 import isEqual from 'lodash.isequal';
+import deep from 'lodash.clonedeep';
 
 function maxDrawn() {
     const imageData = this.cropper.getImageData();
@@ -81,10 +82,12 @@ function canvas() {
             width: { start: 0, end: 1 },
             height: { start: 0, end: 1 }
         };
-        this.data.crop = {
+
+        props.crop({
+            ratio: props.operations.crop.ratio,
             width: { start: 0, end: 1 },
             height: { start: 0, end: 1 }
-        };
+        });
     }
 
     this.data.canvas = canvas;
@@ -92,7 +95,7 @@ function canvas() {
 }
 
 function crop() {
-    if (!this._cropActive) return;
+    if (!this.active.cropbox) return;
     const props = this.lastProps;
 
     let cropBoxData = this.cropper.getCropBoxData();
@@ -112,7 +115,7 @@ function crop() {
             : value;
     };
 
-    let values = {
+    const initialValues = {
         ratio: props.cropRatio,
         width: {
             start: approximate(0, canvasRelative.left / canvasData.width),
@@ -128,33 +131,21 @@ function crop() {
         }
     };
 
-    if (props.cropRatio) cropWithRatio.call(this, values, A);
-    else cropNoRatio.call(this, values, A);
-}
-
-function cropNoRatio(values, A) {
-    const props = this.lastProps;
-
-    let reload = false;
+    let values = deep(initialValues);
     if (values.width.start >= 1 || values.width.end <= 0
         || values.height.start >= 1 || values.height.end <= 0) {
-        reload = true;
-        values = {
-            width: { start: 0, end: 1 },
-            height: { start: 0, end: 1 }
-        };
+        values.width = { start: 0, end: 1 };
+        values.height = { start: 0, end: 1 };
     } else {
         if ((values.width.end - values.width.start) < A) {
-            reload = true;
             values.width = { start: 0, end: 1 };
         }
         if ((values.height.end - values.height.start) < A) {
-            reload = true;
             values.height = { start: 0, end: 1 };
         }
     }
 
-    const valuesCanvasLimit = {
+    values = {
         ratio: values.ratio,
         width: {
             start: Math.max(values.width.start, 0),
@@ -166,46 +157,9 @@ function cropNoRatio(values, A) {
         }
     };
 
-    this.data.crop = valuesCanvasLimit;
-    props.crop(valuesCanvasLimit);
+    props.crop(values);
 
-    if (reload || !isEqual(valuesCanvasLimit, values)) this.load.crop(true);
-}
-
-function cropWithRatio(values, A) {
-    const props = this.lastProps;
-
-    if (
-        values.width.start >= 1
-        || values.width.end <= 0
-        || values.height.start >= 1
-        || values.height.end <= 0
-        || (values.width.end - values.width.start) < A
-        || (values.height.end - values.height.start) < A
-    ) {
-        this.cropper.setAspectRatio(props.cropRatio);
-        return crop.call(this);
-    }
-
-    const valuesCanvasLimit = {
-        ratio: values.ratio,
-        width: {
-            start: Math.max(values.width.start, 0),
-            end: Math.min(values.width.end, 1)
-        },
-        height: {
-            start: Math.max(values.height.start, 0),
-            end: Math.min(values.height.end, 1)
-        }
-    };
-
-    this.data.crop = valuesCanvasLimit;
-    if (!isEqual(valuesCanvasLimit, values)) {
-        this.load.crop(true);
-        crop.call(this);
-    } else {
-        props.crop(valuesCanvasLimit);
-    }
+    if (!isEqual(initialValues, values)) this.load.crop();
 }
 
 export { maxDrawn, canvas, crop };

@@ -1,26 +1,31 @@
 import engine from 'engine';
+import { cropForRatio } from 'engine/crop';
 import isEqual from 'lodash.isequal';
 
-function crop(preventSave = false) {
-    if (!this._cropActive) return;
+function crop() {
+    if (!this.active.cropbox) return;
+
     const props = this.lastProps;
-
-    if (props.cropRatio !== this.data.crop.ratio) {
-        this.data.crop.ratio = props.cropRatio;
-        this.cropper.setAspectRatio(props.cropRatio);
-        this.save.crop();
-        return;
-    }
-
     const fitTo = props.fitTo;
     const canvasData = this.cropper.getCanvasData();
-    const { width, height } = this.data.crop;
+    const cropped = cropForRatio(
+        { width: canvasData.width, height: canvasData.height },
+        props.operations.crop
+    );
+    const { width, height } = cropped.crop;
+
+    if (width.start > 0 || width.end < 1
+        || height.start > 0 || height.end < 1) {
+        this.active.crop = true;
+    } else {
+        this.active.crop = false;
+    }
 
     const toLoad = {
         left: (width.start * canvasData.width) + canvasData.left,
         top: (height.start * canvasData.height) + canvasData.top,
-        width: (width.end - width.start) * canvasData.width,
-        height: (height.end - height.start) * canvasData.height
+        width: cropped.dimensions.width,
+        height: cropped.dimensions.height
     };
 
     if (toLoad.left < 0) toLoad.width += toLoad.left;
@@ -38,7 +43,6 @@ function crop(preventSave = false) {
     }
 
     this.cropper.setCropBoxData(toLoad);
-    if (props.cropRatio && !preventSave) this.save.crop();
 }
 
 function data() {

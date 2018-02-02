@@ -29,6 +29,11 @@ export default {
             opacity: 0
         }
     },
+    hiddenViewMode: {
+        '&:before': {
+            background: 'rgba(0, 0, 0, 0.5)'
+        }
+    },
     noCropBox: {
         '& .cropper-crop-box': {
             display: 'none'

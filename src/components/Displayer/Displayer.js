@@ -9,6 +9,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 import ViewSwitcher from './ViewSwitcher';
 import TextView from './TextView/TextView';
 import ImageView from './ImageView/ImageView';
+import isEqual from 'lodash.isequal';
 
 const styles = {
     root: {
@@ -49,15 +50,31 @@ class Displayer extends React.Component {
         classes: PropTypes.object
     };
     rootNode = null;
+    lastDimensions = { width: 0, height: 0 };
     observer = new ResizeObserver((entries) => {
         const { width, height } = entries[0].contentRect;
-        this.props.setDimensions({ width, height });
+        this.setDimensions({ width, height });
     });
+    onResize = () => {
+        if (!this.rootNode) return;
+        this.setDimensions({
+            width: this.rootNode.clientWidth,
+            height: this.rootNode.clientHeight
+        });
+    };
+    setDimensions = (dimensions) => {
+        if (!isEqual(dimensions, this.lastDimensions)) {
+            this.lastDimensions = dimensions;
+            this.props.setDimensions(dimensions);
+        }
+    };
     componentDidMount() {
+        window.addEventListener('resize', this.onResize);
         this.observer.observe(this.rootNode);
     }
     componentWillUnmount() {
         this.observer.unobserve(this.rootNode);
+        window.removeEventListener('resize', this.onResize);
     }
     render() {
         const { classes, className, mainView, loading, rendering } = this.props;
