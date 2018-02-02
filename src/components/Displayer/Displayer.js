@@ -60,7 +60,7 @@ class Displayer extends React.Component {
         this.observer.unobserve(this.rootNode);
     }
     render() {
-        const { classes, className, mainView } = this.props;
+        const { classes, className, mainView, loading, rendering } = this.props;
 
         const activeView = (!mainView || mainView !== 'image')
             ? 'text-view'
@@ -74,6 +74,7 @@ class Displayer extends React.Component {
                 <div className={classes.view}>
                     <ViewSwitcher
                         active={activeView}
+                        loading={loading || rendering}
                     >
                         <TextView key="text-view" />
                         <ImageView key="image-view" />

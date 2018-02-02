@@ -7,7 +7,7 @@ import loading from './loading';
 const typesPre = 'CANVASES';
 const { types: t, actions } = typesActions({
     pre: `${typesPre}_PUBLIC`,
-    types: ['SET_SOURCE', 'SCALE']
+    types: ['SET_SOURCE', 'SCALE', 'DRAW']
 });
 
 const initialState = {
@@ -19,6 +19,12 @@ const initialState = {
         id: -1,
         canvas: null,
         forSourceId: null
+    },
+    drawn: {
+        id: -1,
+        canvas: null,
+        forSourceId: null,
+        forOperations: null
     }
 };
 
@@ -31,6 +37,12 @@ const propTypes = {
         id: PropTypes.number.isRequired,
         canvas: PropTypes.object,
         forSourceId: PropTypes.number
+    },
+    drawn: {
+        id: PropTypes.number.isRequired,
+        canvas: PropTypes.object,
+        forSourceId: PropTypes.number,
+        forOperations: PropTypes.object
     }
 };
 
@@ -55,6 +67,7 @@ logic.push(createLogic({
             }
         }));
         dispatch(actions.scale());
+        dispatch(actions.draw());
         done();
     }
 }));
@@ -102,6 +115,38 @@ logic.push(createLogic({
                 id: scaled.id + 1,
                 canvas: engine.draw(source.canvas, { fit: scale }),
                 forSourceId: source.id
+            }
+        }));
+        dispatch(loading.actions.setRendering(false));
+        done();
+    }
+}));
+logic.push(createLogic({
+    type: t.DRAW,
+    cancelType: [t.SET_SOURCE, t.DRAW],
+    process({ getState, action }, dispatch, done) {
+        const state = getState();
+        const source = state.canvases.source;
+        const drawn = state.canvases.drawn;
+        const operations = state.edits.image;
+
+        if (
+            !source.canvas
+            || (
+                drawn.forOperations === operations
+                && drawn.forSourceId === source.id
+            )
+        ) {
+            return done();
+        }
+
+        dispatch(loading.actions.setRendering(true));
+        dispatch(internal.action({
+            drawn: {
+                id: drawn.id + 1,
+                canvas: engine.draw(source.canvas, operations),
+                forSourceId: source.id,
+                forOperations: operations
             }
         }));
         dispatch(loading.actions.setRendering(false));

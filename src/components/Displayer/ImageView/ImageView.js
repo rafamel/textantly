@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { withState, selectorWithType, compose } from 'store/utils';
+import withBroadcast from 'utils/withBroadcast';
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import classnames from 'classnames';
@@ -39,6 +40,7 @@ const viewMode = selectorWithType({
     result: (imageView) => (imageView !== 'crop')
 });
 
+const broadcaster = withBroadcast('freeze');
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         scaled: state.canvases.scaled.canvas,
@@ -52,15 +54,16 @@ const { connector, propTypes: storeTypes } = withState(
         operations: state.edits.image,
         isMobile: state.views.isMobile
     }), (actions) => ({
-        crop: actions.edits.image.crop
+        crop: actions.edits.image.crop,
+        setLoading: actions._loading.setLoading
     })
 );
 
 class ImageView extends Component {
     static propTypes = {
         ...storeTypes,
-        frozen: PropTypes.bool,
-        onReady: PropTypes.func,
+        freeze: PropTypes.bool,
+        onUpdate: PropTypes.func,
         // JSS
         classes: PropTypes.object.isRequired
     };
@@ -180,6 +183,7 @@ class ImageView extends Component {
         if (!props.scaled) return;
 
         this.loading = true;
+        this.props.setLoading(true);
         this.setState({ hidden: true });
         // Will trigger onImageReady
         this.ifm(() => this.cropper.replace(props.scaled.toDataURL()))();
@@ -190,8 +194,9 @@ class ImageView extends Component {
         this.runOperations();
 
         this.loading = false;
+        this.props.setLoading(false);
         this.setState({ hidden: false });
-        if (this.props.onReady) this.props.onReady();
+        if (this.props.onUpdate) this.props.onUpdate();
     };
     componentWillReceiveProps(nextProps) {
         this.lastProps = nextProps;
@@ -255,5 +260,6 @@ class ImageView extends Component {
 
 export default compose(
     withStyles(styles),
+    broadcaster,
     connector
 )(ImageView);

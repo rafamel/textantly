@@ -25,7 +25,8 @@ const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         textEdits: state.edits.text,
         isRendering: state._loading.rendering,
-        doUpdate: doUpdate(state)
+        doUpdate: doUpdate(state),
+        fitTo: state.views.dimensions
     }), (actions) => ({
         addAlert: actions.alerts.add
     })

@@ -62,7 +62,9 @@ class ResizeSliders extends React.Component {
         return {
             ratio,
             [currentMin]: value,
-            [opposites[currentMin]]: Math.round(maxDimensions * ratio)
+            [opposites[currentMin]]: Math.round(
+                maxDimensions[opposites[currentMin]] * ratio
+            )
         };
     };
     handleTempChange = (e) => {

@@ -12,7 +12,9 @@ const styles = () => ({
         display: 'flex'
     },
     inner: {
-        width: '50%'
+        width: '50%',
+        display: 'flex',
+        flexDirection: 'column'
     }
 });
 
@@ -25,6 +27,7 @@ class ViewSwitcher extends React.Component {
             PropTypes.string,
             PropTypes.number
         ]),
+        loading: PropTypes.bool,
         // JSS
         classes: PropTypes.object.isRequired
     };
@@ -35,13 +38,18 @@ class ViewSwitcher extends React.Component {
     currentNode = null;
     interval = null;
     changeOn = (newEl, ms) => {
-        // if (ms > 750) return true;
-        if (ms > 750) return true;
+        if (ms > 1000) return [true, 0];
+        if (this.props.loading) return [false];
 
-        const canvases = document.querySelectorAll(('canvas'));
+        const canvases = document.querySelectorAll('canvas');
+        const images = document.querySelectorAll('img');
         for (let canvas of canvases) {
-            if (newEl.contains(canvas)) return true;
+            if (newEl.contains(canvas)) return [true, 50];
         }
+        for (let image of images) {
+            if (newEl.contains(image)) return [true, 150];
+        }
+        return [false];
     };
     updateCurrent = (props = this.props) => {
         if (props.active === this.state.current) return;
@@ -68,12 +76,14 @@ class ViewSwitcher extends React.Component {
         const startAt = Date.now();
         this.interval = setInterval(() => {
             if (!this.currentNode) return;
-            const shouldChange = this.changeOn(
+            const [shouldChange, timeout] = this.changeOn(
                 this.currentNode, Date.now() - startAt
             );
             if (shouldChange) {
                 clearInterval(this.interval);
-                this.setState({ previous: null });
+                setTimeout(() => {
+                    if (this._isMounted) this.setState({ previous: null });
+                }, timeout);
             }
         }, 25);
     };
@@ -81,7 +91,11 @@ class ViewSwitcher extends React.Component {
         this.updateCurrent(nextProps);
     }
     componentWillMount() {
+        this._isMounted = true;
         this.updateCurrent();
+    }
+    componentWillUnmount() {
+        this._isMounted = false;
     }
     render() {
         const { classes, children } = this.props;

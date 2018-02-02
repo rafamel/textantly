@@ -26,18 +26,13 @@ function makeCanvas(canvasOrImage) {
     }
 }
 
-function draw(canvas, ops, sourceDims) {
+function draw(canvas, ops) {
     if (!ops) return canvas;
-    const nonScaledDims = (!sourceDims || canvas.width === sourceDims.width)
-        ? null
-        : getDimensions(sourceDims, { ...ops, fit: null });
 
     if (ops.flip) canvas = flip.draw(canvas, ops.flip);
     if (ops.rotate) canvas = rotate.draw(canvas, ops.rotate);
     if (ops.crop) canvas = crop.draw(canvas, ops.crop);
-    if (ops.resize) {
-        canvas = resize.draw(canvas, ops.resize, nonScaledDims);
-    }
+    if (ops.resize) canvas = resize.draw(canvas, ops.resize);
     if (ops.fit) canvas = fit.draw(canvas, ops.fit);
 
     return canvas;

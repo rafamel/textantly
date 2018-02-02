@@ -10,7 +10,19 @@ function getDimensions(dimensions, crop) {
 }
 
 function draw(canvas, crop) {
-    return canvas;
+    const x = canvas.width * crop.width.start;
+    const y = canvas.height * crop.height.start;
+    const dimensions = getDimensions(
+        { width: canvas.width, height: canvas.height }, crop
+    );
+
+    const newCanvas = document.createElement('canvas');
+    newCanvas.width = dimensions.width;
+    newCanvas.height = dimensions.height;
+    const ctx = newCanvas.getContext('2d');
+    ctx.drawImage(canvas, x, y, dimensions.width, dimensions.height,
+        0, 0, dimensions.width, dimensions.height);
+    return newCanvas;
 }
 
 export default {

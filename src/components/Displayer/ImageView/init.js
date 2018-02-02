@@ -42,11 +42,10 @@ function update() {
     const props = this.lastProps;
     if (!props.viewMode) this._cropActive = true;
 
-    if (!this.cropper) return;
+    if (!this.cropper || props.freeze || !props.scaled) return;
     if (!this.loading && this.props.fitTo !== props.fitTo) {
         this.setContainer();
     }
-    if (props.frozen || !props.scaled) return;
 
     if (this.props.scaledId !== props.scaledId) {
         if (this.props.sourceId !== props.sourceId) return up.call(this);

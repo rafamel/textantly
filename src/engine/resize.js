@@ -21,18 +21,11 @@ function getDimensions(dimensions, resize) {
     };
 }
 
-function draw(canvas, resize, nonScaledDims) {
-    let resized;
-    if (nonScaledDims) {
-        if (nonScaledDims.width > canvas.width) return canvas;
-        resized = nonScaledDims;
-    } else {
-        resized = getDimensions(
-            { width: canvas.width, height: canvas.height },
-            resize
-        );
-    }
-
+function draw(canvas, resize) {
+    const resized = getDimensions(
+        { width: canvas.width, height: canvas.height },
+        resize
+    );
     const newCanvas = document.createElement('canvas');
     newCanvas.width = resized.width;
     newCanvas.height = resized.height;
