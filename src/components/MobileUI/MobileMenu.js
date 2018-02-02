@@ -24,10 +24,10 @@ const styles = {
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        mainView: state.views.main,
+        navMain: state.edits.navigation.main,
         historyCan: selectors.edits.can(state)
     }), (actions) => ({
-        setMainView: actions.views.setMain,
+        setNavMain: actions.edits.navigation.setMain,
         backwards: actions.edits.backwards
     })
 );
@@ -45,9 +45,9 @@ class MobileMenu extends React.Component {
         toIndex: { open: 0, text: 1, image: 2, undo: 3 },
         toString: { 0: 'open', 1: 'text', 2: 'image', 3: 'undo' }
     };
-    syncTab = (mainView = this.props.mainView) => {
+    syncTab = (navMain = this.props.navMain) => {
         if (this.lock) return;
-        this.setState({ value: this.tabDict.toIndex[mainView] });
+        this.setState({ value: this.tabDict.toIndex[navMain] });
     };
     handleChange = (event, value) => {
         const bounce = (cb) => {
@@ -60,7 +60,7 @@ class MobileMenu extends React.Component {
             }, 300);
         };
 
-        const { setMainView, backwards } = this.props;
+        const { setNavMain, backwards } = this.props;
         this.setState({ value });
         const view = this.tabDict.toString[value];
         // eslint-disable-next-line
@@ -68,9 +68,9 @@ class MobileMenu extends React.Component {
         case 'open':
             return bounce(this.openFile);
         case 'text':
-            return setMainView('text');
+            return setNavMain('text');
         case 'image':
-            return setMainView('image');
+            return setNavMain('image');
         case 'undo':
             bounce();
             return backwards();
@@ -82,7 +82,7 @@ class MobileMenu extends React.Component {
         this.openFile = openFile;
     };
     componentWillReceiveProps(nextProps) {
-        this.syncTab(nextProps.mainView);
+        this.syncTab(nextProps.navMain);
     }
     componentWillMount() {
         this._isMounted = true;

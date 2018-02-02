@@ -26,9 +26,9 @@ const styles = {
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        mainView: state.views.main
+        navMain: state.edits.navigation.main
     }), (actions) => ({
-        setMainView: actions.views.setMain,
+        setNavMain: actions.edits.navigation.setMain,
         reset: actions.edits.reset,
         backwards: actions.edits.backwards,
         forwards: actions.edits.forwards
@@ -48,11 +48,11 @@ class Navigation extends React.Component {
     };
     handleChange = (e, index) => {
         const view = this.tabDict.toString[index];
-        this.props.setMainView(view);
+        this.props.setNavMain(view);
     };
     render() {
-        const { classes, mainView, height } = this.props;
-        const viewIndex = this.tabDict.toIndex[mainView] || 0;
+        const { classes, navMain, height } = this.props;
+        const viewIndex = this.tabDict.toIndex[navMain] || 0;
         const tabProps = {
             classes: {
                 root: classes.tab,

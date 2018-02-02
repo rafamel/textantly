@@ -27,10 +27,10 @@ const styles = (theme) => ({
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        mainView: state.views.main,
+        navMain: state.edits.navigation.main,
         isMobile: state.views.isMobile
     }), (actions) => ({
-        setMainView: actions.views.setMain
+        setNavMain: actions.edits.navigation.setMain
     })
 );
 
@@ -47,14 +47,14 @@ class Editor extends React.Component {
     };
     handleChange = (index) => {
         const view = this.tabDict.toString[index];
-        this.props.setMainView(view);
+        this.props.setNavMain(view);
     };
     render() {
-        const { theme, classes, mainView, isMobile } = this.props;
-        const viewIndex = this.tabDict.toIndex[mainView] || 0;
+        const { theme, classes, navMain, isMobile } = this.props;
+        const viewIndex = this.tabDict.toIndex[navMain] || 0;
 
         return (isMobile)
-            ? (mainView === 'text') ? (<TextEditor />) : (<ImageEditor />)
+            ? (navMain === 'text') ? (<TextEditor />) : (<ImageEditor />)
             : (
                 <div className={classes.root}>
                     <SwipeableViews

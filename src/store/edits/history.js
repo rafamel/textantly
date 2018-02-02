@@ -4,12 +4,9 @@ import { defaultValues } from '../historian';
 import typesActions, { values } from '../utils/types-actions';
 import { selectorWithType } from '../utils/withState';
 import { typesPre, historian, actions as editsActions } from './init';
-import isEqual from 'lodash.isequal';
 import source from './source';
 import image from './image';
 import text from './text';
-import views from '../views';
-import canvases from '../canvases';
 
 const { types: t, actions } = typesActions({
     pre: `${typesPre}_HISTORY`,
@@ -27,7 +24,11 @@ logic.push(createLogic({
                 return historian.insert(state, {
                     ...state,
                     text: text.initialState,
-                    image: image.initialState
+                    image: image.initialState,
+                    navigation: {
+                        ...state.navigation,
+                        crop: 'free'
+                    }
                 });
             case t.BACKWARDS:
                 return historian.backwards(state);
@@ -44,24 +45,11 @@ logic.push(createLogic({
         const state = globalState.edits;
         const payload = action.payload;
 
-        if (
-            globalState.views.main !== 'text'
-            && !isEqual(state.text, payload.text)
-        ) {
-            dispatch(views.actions.setMain('text'));
-        } else if (
-            globalState.views.main !== 'image'
-            && !isEqual(state.image, payload.image)
-        ) {
-            dispatch(views.actions.setMain('image'));
-        }
-
         dispatch(editsActions.overwrite(payload));
         if (state.source.id !== payload.source.id) {
             dispatch(source.actions.loadSource());
-        } else if (!isEqual(state.image, payload.image)) {
-            dispatch(canvases.actions.draw());
         }
+        if (state.navigation.image)
         done();
     }
 }));

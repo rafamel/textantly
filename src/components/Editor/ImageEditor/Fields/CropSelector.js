@@ -20,8 +20,8 @@ const styles = {
 
 class CropSelector extends React.Component {
     static propTypes = {
-        cropView: PropTypes.string,
-        setImageViews: PropTypes.func.isRequired,
+        crop: PropTypes.string,
+        setCrop: PropTypes.func.isRequired,
         active: PropTypes.bool,
         // JSS
         classes: PropTypes.object.isRequired
@@ -30,17 +30,17 @@ class CropSelector extends React.Component {
         active: true
     };
     handleChange = (event, value) => {
-        this.props.setImageViews({ crop: value });
+        this.props.setCrop(value);
     };
     shouldComponentUpdate(nextProps) {
         return nextProps.active;
     }
     render() {
-        const { classes, cropView } = this.props;
+        const { classes, crop } = this.props;
 
         return (
             <BottomNavigation
-                value={cropView || 'free'}
+                value={crop || 'free'}
                 onChange={this.handleChange}
                 className={classes.root}
             >

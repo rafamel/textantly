@@ -13,31 +13,12 @@ import * as init from './init';
 import styles from './styles';
 import config from 'config';
 
-const cropRatio = selectorWithType({
-    propType: PropTypes.number,
-    select: [
-        state => state.views.image.crop
-    ],
-    result: (cropView) => {
-        switch (cropView) {
-        case 'facebook':
-            return 1200 / 630;
-        case 'youtube':
-            return 1280 / 720;
-        case 'square':
-            return 1;
-        default:
-            return null;
-        }
-    }
-});
-
 const viewMode = selectorWithType({
     propType: PropTypes.bool.isRequired,
     select: [
-        state => state.views.image.main
+        state => state.edits.navigation.image
     ],
-    result: (imageView) => (imageView !== 'crop')
+    result: (navImage) => (navImage !== 'crop')
 });
 
 const broadcaster = withBroadcast('freeze');
@@ -48,7 +29,6 @@ const { connector, propTypes: storeTypes } = withState(
         sourceId: state.canvases.scaled.forSourceId,
         sourceDimensions: selectors.edits.image.dimensions.source(state),
         viewMode: viewMode(state),
-        cropRatio: cropRatio(state),
         rendering: state._loading.rendering,
         fitTo: state.views.dimensions,
         operations: state.edits.image,
@@ -73,6 +53,7 @@ class ImageView extends Component {
     };
     _isMounted = false;
     lastProps = null;
+    previousProps = null;
     loading = true;
     timeouts = { zoom: null, resize: null };
     cropper = null;
@@ -203,11 +184,15 @@ class ImageView extends Component {
     };
     componentWillReceiveProps(nextProps) {
         this.lastProps = nextProps;
+        if (!this.cropper || nextProps.freeze || !nextProps.scaled) return;
+
         this.init.update(nextProps);
+        this.previousProps = nextProps;
     }
     componentDidMount() {
         this._isMounted = true;
         this.lastProps = this.props;
+        this.previousProps = this.props;
         this.init.up();
         window.addEventListener('resize', this.onResize);
     }

@@ -16,10 +16,12 @@ import ResizeSliders from './Fields/ResizeSliders';
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        imageViews: state.views.image,
+        navImage: state.edits.navigation.image,
+        navCrop: state.edits.navigation.crop,
         isMobile: state.views.isMobile
     }), (actions) => ({
-        setImageViews: actions.views.setImage,
+        setNavImage: actions.edits.navigation.setImage,
+        setNavCrop: actions.edits.navigation.setCrop,
         flip: actions.edits.image.flip
     })
 );
@@ -40,7 +42,7 @@ class ImageEditor extends React.Component {
     };
     setActiveIndex = (props = this.props) => {
         if (this.lockIndex) return;
-        const imageIndex = this.tabDict.toIndex[props.imageViews.main];
+        const imageIndex = this.tabDict.toIndex[props.navImage];
         if (imageIndex === this.state.activeIndex) return;
         this.setState({ activeIndex: imageIndex });
     };
@@ -58,7 +60,7 @@ class ImageEditor extends React.Component {
         const view = this.tabDict.toString[index];
         if (view === 'flip') return this.doFlip();
 
-        this.props.setImageViews({ main: view });
+        this.props.setNavImage(view);
     };
     componentWillReceiveProps(nextProps) {
         this.setActiveIndex(nextProps);
@@ -67,14 +69,9 @@ class ImageEditor extends React.Component {
         this.setActiveIndex();
     }
     render() {
-        const {
-            theme,
-            imageViews,
-            setImageViews,
-            isMobile
-        } = this.props;
+        const { theme, navImage, navCrop, setNavCrop, isMobile } = this.props;
 
-        const isActive = (name) => imageViews.main === name;
+        const isActive = (name) => navImage === name;
         const actives = {
             crop: isActive('crop'),
             rotate: isActive('rotate'),
@@ -83,8 +80,8 @@ class ImageEditor extends React.Component {
         const fields = {
             crop: (<CropSelector
                 key="crop"
-                cropView={imageViews.crop}
-                setImageViews={setImageViews}
+                crop={navCrop}
+                setCrop={setNavCrop}
                 active={actives.crop}
             />),
             rotate: (<RotateSlider key="rotate" active={actives.rotate} />),
@@ -101,7 +98,7 @@ class ImageEditor extends React.Component {
                     />
                     <SwipeableViews
                         axis={(theme.direction === 'rtl') ? 'x-reverse' : 'x'}
-                        index={this.tabDict.toIndex[imageViews.main]}
+                        index={this.tabDict.toIndex[navImage]}
                         animateHeight={true}
                         disabled
                     >

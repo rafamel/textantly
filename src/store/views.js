@@ -6,32 +6,17 @@ import canvases from './canvases';
 
 const { types: t, typesBy, actions } = typesActions({
     pre: 'VIEWS',
-    types: [
-        'SET_MOBILE',
-        'SET_MAIN',
-        'SET_IMAGE',
-        'SET_DIMENSIONS'
-    ],
+    types: ['SET_MOBILE', 'SET_DIMENSIONS'],
     post: 'PRIVATE'
 });
 
 const initialState = {
     isMobile: false,
-    main: 'text',
-    image: {
-        main: 'crop',
-        crop: 'free'
-    },
     dimensions: { width: 0, height: 0 }
 };
 
 const propTypes = {
     isMobile: PropTypes.bool.isRequired,
-    main: PropTypes.string.isRequired,
-    image: {
-        main: PropTypes.string,
-        crop: PropTypes.string.isRequired
-    },
     dimensions: {
         width: PropTypes.number.isRequired,
         height: PropTypes.number.isRequired
@@ -44,19 +29,6 @@ function reducer(state = initialState, { type, payload }) {
         return {
             ...state,
             isMobile: payload
-        };
-    case t.SET_MAIN:
-        return {
-            ...state,
-            main: payload
-        };
-    case t.SET_IMAGE:
-        return {
-            ...state,
-            image: {
-                ...state.image,
-                ...payload
-            }
         };
     case typesBy.post.PRIVATE.SET_DIMENSIONS:
         return {

@@ -35,8 +35,7 @@ const styles = {
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        mainView: state.views.main,
-        imageView: state.views.image
+        navMain: state.edits.navigation.main
     }), (actions) => ({
         setDimensions: actions.views.setDimensions
     })
@@ -77,9 +76,9 @@ class Displayer extends React.Component {
         window.removeEventListener('resize', this.onResize);
     }
     render() {
-        const { classes, className, mainView, loading, rendering } = this.props;
+        const { classes, className, navMain, loading, rendering } = this.props;
 
-        const activeView = (!mainView || mainView !== 'image')
+        const activeView = (!navMain || navMain !== 'image')
             ? 'text-view'
             : 'image-view';
 

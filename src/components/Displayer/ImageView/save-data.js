@@ -1,4 +1,3 @@
-import isEqual from 'lodash.isequal';
 import deep from 'lodash.clonedeep';
 
 function maxDrawn() {
@@ -116,7 +115,7 @@ function crop() {
     };
 
     const initialValues = {
-        ratio: props.cropRatio,
+        ratio: props.operations.crop.ratio,
         width: {
             start: approximate(0, canvasRelative.left / canvasData.width),
             end: approximate(1,
@@ -158,8 +157,6 @@ function crop() {
     };
 
     props.crop(values);
-
-    if (!isEqual(initialValues, values)) this.load.crop();
 }
 
 export { maxDrawn, canvas, crop };

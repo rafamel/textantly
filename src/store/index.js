@@ -49,7 +49,6 @@ const selectors = {
 };
 
 const persist = [
-    'views',
     'edits'
 ];
 
