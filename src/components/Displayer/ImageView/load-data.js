@@ -3,7 +3,7 @@ import { cropForRatio } from 'engine/crop';
 import isEqual from 'lodash.isequal';
 
 function crop() {
-    if (!this.active.cropbox) return;
+    if (!this.activeCropbox) return;
 
     const props = this.lastProps;
     const fitTo = props.fitTo;
@@ -16,9 +16,9 @@ function crop() {
 
     if (width.start > 0 || width.end < 1
         || height.start > 0 || height.end < 1) {
-        this.active.crop = true;
+        this.setState({ activeCrop: true });
     } else {
-        this.active.crop = false;
+        this.setState({ activeCrop: false });
     }
 
     const toLoad = {

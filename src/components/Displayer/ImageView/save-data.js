@@ -1,4 +1,5 @@
 import deep from 'lodash.clonedeep';
+import isEqual from 'lodash.isequal';
 
 function maxDrawn() {
     const imageData = this.cropper.getImageData();
@@ -94,7 +95,7 @@ function canvas() {
 }
 
 function crop() {
-    if (!this.active.cropbox) return;
+    if (!this.activeCropbox) return;
     const props = this.lastProps;
 
     let cropBoxData = this.cropper.getCropBoxData();
@@ -157,6 +158,11 @@ function crop() {
     };
 
     props.crop(values);
+    if (props.isMobile && isEqual(values, props.operations.crop)) {
+        // If equal, it won't get updated though
+        // canvas location might have changed
+        this.load.crop();
+    }
 }
 
 export { maxDrawn, canvas, crop };

@@ -49,7 +49,8 @@ class ImageView extends Component {
     };
     state = {
         hidden: true,
-        noCropBox: false
+        noCropBox: false,
+        activeCrop: false
     };
     _isMounted = false;
     lastProps = null;
@@ -57,12 +58,9 @@ class ImageView extends Component {
     loading = true;
     timeouts = { zoom: null, resize: null };
     cropper = null;
+    activeCropBox = false;
     operations = null;
     data = null;
-    active = {
-        crop: false,
-        cropbox: false
-    };
     ifm = (cb) => (...args) => {
         if (!this._isMounted) return;
         /* eslint-disable */
@@ -204,6 +202,7 @@ class ImageView extends Component {
     shouldComponentUpdate(nextProps, nextState) {
         return this.state.hidden !== nextState.hidden
             || this.state.noCropBox !== nextState.noCropBox
+            || this.state.activeCrop !== nextState.activeCrop
             || this.props.fitTo !== nextProps.fitTo
             || this.props.viewMode !== nextProps.viewMode;
     }
@@ -214,10 +213,10 @@ class ImageView extends Component {
                 [classes.root]: true,
                 [classes.hidden]: this.state.hidden,
                 [classes.noCropBox]: this.state.noCropBox
-                    || (viewMode && !this.active.crop),
+                    || (viewMode && !this.state.activeCrop),
                 [classes.viewMode]: viewMode,
                 [classes.hiddenViewMode]: this.state.hidden
-                    && viewMode && this.active.crop
+                    && viewMode && this.state.activeCrop
             })}>
                 <Cropper
                     ref={(ref) => { this.cropper = ref; }}

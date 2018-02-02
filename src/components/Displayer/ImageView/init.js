@@ -20,14 +20,15 @@ function up() {
     };
 
     const crop = props.operations.crop;
-    this.active.crop = crop.ratio
+    const activeCrop = crop.ratio
         || crop.width.start > 0
         || crop.width.end < 1
         || crop.height.start > 0
         || crop.height.end < 1;
-    this.active.cropbox = !props.viewMode || this.active.crop;
+    this.setState({ activeCrop });
+    this.activeCropbox = !props.viewMode || activeCrop;
 
-    if (this._isMounted && this.active.cropbox) {
+    if (this._isMounted && this.activeCropbox) {
         this.cropper.setAspectRatio(crop.ratio);
     }
     this.forceUpdate();
@@ -45,7 +46,7 @@ function update() {
     const previousProps = this.previousProps;
 
     if (!props.viewMode) {
-        this.active.cropbox = true;
+        this.activeCropbox = true;
         const crop = props.operations.crop;
         if (!isEqual(previousProps.crop, crop)) {
             if (previousProps.crop.ratio !== crop.ratio) {
