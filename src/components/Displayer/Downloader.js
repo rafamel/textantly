@@ -92,6 +92,8 @@ class Downloader extends React.Component {
                 const link = document.createElement('a');
                 link.href = forDownload;
                 link.download = `textantly-${this.props.name || Date.now()}`;
+                link.style.display = 'none';
+                document.body.appendChild(link);
                 link.click();
             })
             .catch(_ => {
