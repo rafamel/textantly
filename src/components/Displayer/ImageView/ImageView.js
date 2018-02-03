@@ -10,7 +10,7 @@ import { selectors } from 'store';
 import * as saveData from './save-data';
 import * as loadData from './load-data';
 import * as init from './init';
-import styles from './styles';
+import styles from './ImageView.styles';
 import config from 'config';
 
 const viewMode = selectorWithType({
@@ -83,17 +83,7 @@ class ImageView extends Component {
         canvas: this.ifm(saveData.canvas.bind(this)),
         crop: this.ifm(saveData.crop.bind(this))
     };
-    onResize = (props) => {
-        this.setState({ hidden: true });
-        clearTimeout(this.timeouts.resize);
-        this.timeouts.resize = setTimeout(() => {
-            if (!props.rendering && !this.loading && this._isMounted) {
-                this.setContainer();
-                this.setState({ hidden: false });
-            }
-        }, 500);
-    };
-    setContainer = () => {
+    setContainerAndRun = () => {
         const props = this.lastProps;
         if (!this.cropper || !this.cropper.cropper
             || !this.cropper.cropper.cropper) {
@@ -111,25 +101,18 @@ class ImageView extends Component {
             container.style.width = `${fitTo.width}px`;
             container.style.height = `${fitTo.height}px`;
         })();
-        this.load.data();
-    };
-    onCropEnd = () => {
-        this.save.canvas();
-        this.save.crop();
-    };
-    onZoom = () => {
-        this.setState({ noCropBox: true });
 
-        clearTimeout(this.timeouts.zoom);
-        this.timeouts.zoom = setTimeout(() => {
-            this.save.canvas();
-            this.load.crop();
-            if (this._isMounted) this.setState({ noCropBox: false });
-        }, 300);
+        // Cropper.js has the ocasional issue with redimensionings
+        // as sometimes it's not aware of the operations on an image
+        // if not performed immediatly beforehand.
+        // We'll force a full operation redraw after resetting the container,
+        // which will in turn also load the data
+        this.operations = {};
+        this.runOperations();
     };
-    runOperations = (saveAll = true) => {
+    runOperations = (forceLoad = true) => {
         const props = this.lastProps;
-        if (!this._isMounted) return;
+        if (!this._isMounted) return false;
 
         let modified = false;
         const modify = (key, cb) => {
@@ -152,12 +135,27 @@ class ImageView extends Component {
             });
         }
 
-        if (modified || saveAll) {
-            this.save.maxDrawn();
+        if (modified) this.save.maxDrawn();
+        if (modified || forceLoad) {
             this.load.data(props);
             return true;
         }
+
         return false;
+    };
+    onCropEnd = () => {
+        this.save.canvas();
+        this.save.crop();
+    };
+    onZoom = () => {
+        this.setState({ noCropBox: true });
+
+        clearTimeout(this.timeouts.zoom);
+        this.timeouts.zoom = setTimeout(() => {
+            this.save.canvas();
+            this.load.crop();
+            if (this._isMounted) this.setState({ noCropBox: false });
+        }, 300);
     };
     setImage = () => {
         const props = this.lastProps;
@@ -170,9 +168,8 @@ class ImageView extends Component {
         this.ifm(() => this.cropper.replace(props.scaled.toDataURL()))();
     };
     onImageReady = () => {
-        this.setContainer();
-        this.operations = {};
-        this.runOperations();
+        this.setContainerAndRun();
+        this.save.maxDrawn();
 
         this.loading = false;
         this.props.setLoading(false);
@@ -190,12 +187,10 @@ class ImageView extends Component {
         this.lastProps = this.props;
         this.previousProps = this.props;
         this.init.up();
-        window.addEventListener('resize', this.onResize);
     }
     componentWillUnmount() {
         this._isMounted = false;
         this.cropper.cropper.destroy();
-        window.removeEventListener('resize', this.onResize);
     }
     shouldComponentUpdate(nextProps, nextState) {
         return this.state.hidden !== nextState.hidden

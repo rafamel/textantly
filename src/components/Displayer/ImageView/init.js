@@ -28,7 +28,6 @@ function up() {
     this.setState({ activeCrop });
 
     this.cropper.setAspectRatio(crop.ratio);
-    this.forceUpdate();
 
     // Clear timeouts, if existing
     Object.keys(this.timeouts).forEach(key => {
@@ -59,9 +58,7 @@ function update() {
 
     if (this.loading || props.rendering) return;
 
-    if (previousProps.fitTo !== props.fitTo) {
-        this.setContainer();
-    }
+    if (previousProps.fitTo !== props.fitTo) return this.setContainerAndRun();
     if (this.runOperations(false)) return;
 
     const diffRatios = () => !isEqual(
