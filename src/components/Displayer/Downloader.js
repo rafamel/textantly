@@ -86,12 +86,12 @@ class Downloader extends React.Component {
         html2canvas(this.textViewNode, options)
             .then(canvas => {
                 const forDownload = engine.merge(this.props.drawn, canvas)
-                    .toDataURL();
+                    .toDataURL('image/png');
                 finalize();
 
                 const link = document.createElement('a');
                 link.href = forDownload;
-                link.download = `textantly-${this.props.name || Date.now()}`;
+                link.download = `textantly-${this.props.name || Date.now()}.png`;
                 link.style.display = 'none';
                 document.body.appendChild(link);
                 link.click();

@@ -18,5 +18,9 @@ export default {
             overlayHeight: 20,
             colorScheme: 'light'
         }
+    },
+    imageProxy: (src) => {
+        src = encodeURI(src.split('//').slice(1).join('//'));
+        return `https://images.weserv.nl/?url=${src}&${Date.now()}`;
     }
 };

@@ -28,7 +28,7 @@ const propTypes = {
     id: PropTypes.number.isRequired
 };
 
-function loadImage(src, dispatch) {
+function loadImage(src, from, dispatch) {
     return new Promise((resolve, reject) => {
         const loadFailed = () => {
             dispatch(alerts.actions.add('Image could not be loaded'));
@@ -37,7 +37,11 @@ function loadImage(src, dispatch) {
         };
         dispatch(loading.actions.setRendering(true));
         const image = new Image();
-        image.src = src;
+        if (from !== 'url') image.src = src;
+        else {
+            image.crossOrigin = 'Anonymous';
+            image.src = config.imageProxy(src);
+        }
         setTimeout(loadFailed, 8000);
         image.onerror = loadFailed;
         image.onload = () => resolve(engine.makeCanvas(image));
@@ -52,7 +56,7 @@ logic.push(createLogic({
         const state = getState().edits;
         let payload = action.payload;
         if (payload.src === state.source.src) return done();
-        loadImage(payload.src, dispatch)
+        loadImage(payload.src, payload.from, dispatch)
             .then(canvas => {
                 payload = {
                     ...state,
@@ -78,7 +82,8 @@ logic.push(createLogic({
     type: t.LOAD_SOURCE,
     cancelType: values(t),
     process({ getState, action }, dispatch, done) {
-        loadImage(getState().edits.source.src, dispatch)
+        const state = getState().edits.source;
+        loadImage(state.src, state.from, dispatch)
             .then(canvas => {
                 dispatch(canvases.actions.setSource(canvas));
                 done();

@@ -59,7 +59,7 @@ const styles = (theme) => {
                 margin: '0 0 5px'
             },
             '.rc-slider-tooltip-inner': {
-                background: '#47a298',
+                background: '#65b0a7',
                 borderRadius: 3,
                 padding: '7px 7px 6px',
                 position: 'relative',
@@ -72,7 +72,7 @@ const styles = (theme) => {
                 bottom: 0,
                 marginLeft: -5,
                 borderWidth: '5px 5px 0',
-                borderTopColor: '#47a298'
+                borderTopColor: '#65b0a7'
             }
         }
     };
