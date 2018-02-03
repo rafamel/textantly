@@ -95,7 +95,6 @@ function canvas() {
 }
 
 function crop() {
-    if (!this.activeCropbox) return;
     const props = this.lastProps;
 
     let cropBoxData = this.cropper.getCropBoxData();

@@ -3,6 +3,7 @@ import { createLogic } from 'redux-logic';
 import typesActions, { values } from '../utils/types-actions';
 import { typesPre, actions as editsActions } from './init';
 import image from './image';
+import history from './history';
 
 const { types: t, actions } = typesActions({
     pre: `${typesPre}_NAVIGATION`,
@@ -21,9 +22,9 @@ const propTypes = {
     crop: PropTypes.string.isRequired
 };
 
-function cropRatio(payload, dispatch) {
+function cropRatioDispatch({ name, on, dispatch }) {
     const ratio = (() => {
-        switch (payload) {
+        switch (name) {
         case 'facebook':
             return 1200 / 630;
         case 'youtube':
@@ -34,12 +35,12 @@ function cropRatio(payload, dispatch) {
             return null;
         }
     })();
-    dispatch(image.actions.crop({ ...image.initialState.crop, ratio }));
+    dispatch(image.actions.crop({ ...on, ratio }));
 }
 
 const logic = [];
 logic.push(createLogic({
-    type: values(t),
+    type: [t.SET_MAIN, t.SET_IMAGE, t.SET_CROP],
     process({ getState, action }, dispatch, done) {
         const deliver = (load, skip = true) => {
             const payload = { navigation: load };
@@ -47,19 +48,27 @@ logic.push(createLogic({
             else dispatch(editsActions.writeNext(payload));
         };
 
-        const state = getState().edits.navigation;
+        const editsState = getState().edits;
+        const state = editsState.navigation;
         const { type, payload } = action;
+        const setCropRatio = (name = state.crop, reset = false) => {
+            const x = (reset) ? image.initialState.crop : editsState.image.crop;
+            cropRatioDispatch({ name, on: x, dispatch });
+        };
 
         switch (type) {
         case t.SET_MAIN:
-            deliver({ ...state, main: payload }, false);
+            const toSet = payload || state.main;
+            deliver({ ...state, main: toSet }, false);
+            if (toSet === 'image' && state.image === 'crop') setCropRatio();
             break;
         case t.SET_IMAGE:
             deliver({ ...state, image: payload });
+            if (payload === 'crop') setCropRatio();
             break;
         case t.SET_CROP:
             deliver({ ...state, crop: payload });
-            cropRatio(payload, dispatch);
+            setCropRatio(payload, true);
             break;
         default:
             return done();

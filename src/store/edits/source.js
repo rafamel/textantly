@@ -63,6 +63,10 @@ logic.push(createLogic({
                         id: state.source.id + 1
                     }
                 };
+                if (state.navigation.main === 'image'
+                    && state.navigation.image === 'crop') {
+                    payload.image.crop.ratio = state.image.crop.ratio;
+                }
                 dispatch(editsActions.writeHard(payload));
                 dispatch(canvases.actions.setSource(canvas));
                 done();

@@ -58,7 +58,6 @@ class ImageView extends Component {
     loading = true;
     timeouts = { zoom: null, resize: null };
     cropper = null;
-    activeCropBox = false;
     operations = null;
     data = null;
     ifm = (cb) => (...args) => {
