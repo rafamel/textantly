@@ -29,8 +29,6 @@ const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         navMain: state.edits.navigation.main,
         isMobile: state.views.isMobile
-    }), (actions) => ({
-        setNavMain: actions.edits.navigation.setMain
     })
 );
 
@@ -45,13 +43,8 @@ class Editor extends React.Component {
         toIndex: { text: 0, image: 1 },
         toString: { 0: 'text', 1: 'image' }
     };
-    handleChange = (index) => {
-        const view = this.tabDict.toString[index];
-        this.props.setNavMain(view);
-    };
     render() {
         const { theme, classes, navMain, isMobile } = this.props;
-        const viewIndex = this.tabDict.toIndex[navMain] || 0;
 
         return (isMobile)
             ? (navMain === 'text') ? (<TextEditor />) : (<ImageEditor />)
@@ -60,8 +53,7 @@ class Editor extends React.Component {
                     <SwipeableViews
                         className={classes.swipeable}
                         axis={(theme.direction === 'rtl') ? 'x-reverse' : 'x'}
-                        index={viewIndex}
-                        onChangeIndex={this.handleChange}
+                        index={this.tabDict.toIndex[navMain]}
                         disabled
                     >
                         <TextEditor />

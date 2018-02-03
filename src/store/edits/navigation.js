@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import { createLogic } from 'redux-logic';
 import typesActions, { values } from '../utils/types-actions';
 import { typesPre, actions as editsActions } from './init';
+import canvases from '../canvases';
 import image from './image';
-import history from './history';
 
 const { types: t, actions } = typesActions({
     pre: `${typesPre}_NAVIGATION`,
@@ -40,7 +40,7 @@ function cropRatioDispatch({ name, on, dispatch }) {
 
 const logic = [];
 logic.push(createLogic({
-    type: [t.SET_MAIN, t.SET_IMAGE, t.SET_CROP],
+    type: values(t),
     process({ getState, action }, dispatch, done) {
         const deliver = (load, skip = true) => {
             const payload = { navigation: load };
@@ -58,9 +58,9 @@ logic.push(createLogic({
 
         switch (type) {
         case t.SET_MAIN:
-            const toSet = payload || state.main;
-            deliver({ ...state, main: toSet }, false);
-            if (toSet === 'image' && state.image === 'crop') setCropRatio();
+            deliver({ ...state, main: payload }, false);
+            if (payload === 'image' && state.image === 'crop') setCropRatio();
+            else if (payload === 'text') dispatch(canvases.actions.draw());
             break;
         case t.SET_IMAGE:
             deliver({ ...state, image: payload });

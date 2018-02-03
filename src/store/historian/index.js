@@ -27,7 +27,6 @@ const defaultValues = {
     arr: [],
     onNextArr: [],
     temp: null,
-    consolidateNext: null,
     can: {
         forwards: false,
         backwards: false
@@ -52,13 +51,23 @@ export default function history({ key, exclude }) {
         const arr = (index === -1)
             ? history.arr
             : history.arr.slice(0, index);
+
+        // Leave only the last non skippable onNext
+        const lastNonSkippable = history.onNextArr
+            .reduce((acc, x, i) => (!x.skip) ? i : acc, null);
+        const onNextArr = (lastNonSkippable == null)
+            ? history.onNextArr
+            : history.onNextArr.map((x, i) => {
+                return (i !== lastNonSkippable) ? { ...x, skip: true } : x;
+            });
+
         return {
             ...updated,
             [key]: addCan({
                 ...history,
                 index: -1,
                 arr: arr
-                    .concat(history.onNextArr)
+                    .concat(onNextArr)
                     .concat({ diff: diffObj, onNext: false, skip: false }),
                 onNextArr: [],
                 temp: null
@@ -96,27 +105,25 @@ export default function history({ key, exclude }) {
             };
     }
 
-    function undoSkips(current) {
+    function undoOnNext(current) {
         const history = current[key];
         if (!history.onNextArr.length) return current;
 
         const selected = history.onNextArr.slice(-1)[0];
-        if (!selected.skip) return current;
-
         const updated = diffBackwards(current, selected.diff);
 
         updated[key] = {
             ...history,
             onNextArr: history.onNextArr.slice(0, -1)
         };
-        return undoSkips(updated);
+        return undoOnNext(updated);
     }
 
     function backwards(current) {
         const history = current[key];
         if (!history || !history.can.backwards) return current;
         if (history.temp) return history.temp;
-        current = undoSkips(current);
+        current = undoOnNext(current);
 
         const select = (history.index === -1)
             ? history.arr.length - 1
@@ -137,7 +144,7 @@ export default function history({ key, exclude }) {
     function forwards(current) {
         const history = current[key];
         if (!history || !history.can.forwards || history.temp) return current;
-        current = undoSkips(current);
+        current = undoOnNext(current);
 
         const selected = history.arr[history.index];
         const updated = diffForwards(current, selected.diff);

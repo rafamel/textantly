@@ -26,9 +26,6 @@ const { connector, propTypes: storeTypes } = withState(
         drawnId: state.canvases.drawn.id,
         isMobile: state.views.isMobile,
         fitTo: state.views.dimensions
-    }),
-    (actions) => ({
-        draw: actions.canvases.draw
     })
 );
 
@@ -106,7 +103,6 @@ class ImageRender extends React.Component {
         this.customUpdate(nextProps);
     }
     componentDidMount() {
-        this.props.draw();
         this.customUpdate();
         window.addEventListener('focus', this.redrawOnFocus);
     }
