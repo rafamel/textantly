@@ -4,8 +4,7 @@ import classnames from 'classnames';
 import { withState, compose } from 'store/utils';
 import { Broadcast } from 'react-broadcast';
 import { withStyles } from 'material-ui/styles';
-import Button from 'material-ui/Button';
-import SaveIcon from 'material-ui-icons/Save';
+import Downloader from './Downloader';
 import ResizeObserver from 'resize-observer-polyfill';
 import SwipeableViews from 'react-swipeable-views';
 import TextView from './TextView/TextView';
@@ -31,11 +30,10 @@ const styles = {
             }
         }
     },
-    saveButton: {
+    downloader: {
         position: 'absolute',
         bottom: 22,
-        right: 22,
-        boxShadow: 'none'
+        right: 22
     }
 };
 
@@ -139,14 +137,7 @@ class Displayer extends React.Component {
                         <ImageView />
                     </Broadcast>
                 </SwipeableViews>
-                <Button
-                    raised
-                    className={classes.saveButton}
-                    aria-label="save"
-                    fab
-                >
-                    <SaveIcon />
-                </Button>
+                <Downloader className={classes.downloader} />
             </main>
         );
     }

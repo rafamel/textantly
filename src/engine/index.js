@@ -26,6 +26,14 @@ function makeCanvas(canvasOrImage) {
     }
 }
 
+function merge(baseCanvas, onTopCanvas) {
+    const base = makeCanvas(baseCanvas);
+    base.getContext('2d').drawImage(
+        onTopCanvas, 0, 0, base.width, base.height
+    );
+    return base;
+}
+
 function draw(canvas, ops) {
     if (!ops) return canvas;
 
@@ -52,6 +60,7 @@ function getDimensions(dimensions, ops) {
 
 export default {
     makeCanvas,
+    merge,
     draw,
     getDimensions
 };

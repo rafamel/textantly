@@ -4,10 +4,10 @@ import { jss } from 'react-jss';
 import { withState, selectorWithType } from 'store/utils';
 import classnames from 'classnames';
 import config from 'config';
-import ImageRender from '../ImageRender';
-import styles from './TextView.styles';
 import { load as fontLoad } from 'services/fonts';
+import ImageRender from './ImageRender';
 import TextResizer from './TextResizer';
+import styles from './TextView.styles';
 import { selectors } from 'store';
 
 const doUpdate = selectorWithType({
@@ -33,19 +33,26 @@ const { connector, propTypes: storeTypes } = withState(
 
 class TextView extends React.Component {
     static propTypes = {
-        ...storeTypes
+        ...storeTypes,
+        children: PropTypes.element,
+        onLoad: PropTypes.func
     };
     state = {
         opacity: 1
     };
-    fontResize = () => {};
     _isMounted = false;
+    _fontResize = null;
     previousFailedFont = null;
     timeout = null;
     styleSheet = jss.createStyleSheet(styles, { link: true });
     classes = this.styleSheet.classes;
     stylesUpdate = (updateObj = this.props.textEdits) => {
         this.styleSheet.update(updateObj).attach();
+    };
+    fontResize = () => {
+        if (!this._fontResize) return;
+        this._fontResize();
+        if (this.props.onLoad && this.state.opacity) this.props.onLoad();
     };
     loadFont = (fontFamily, previousFF, keepOpacity) => {
         if (!fontFamily
@@ -71,13 +78,12 @@ class TextView extends React.Component {
             })
             .catch(() => {
                 this.previousFailedFont = fontFamily;
-                this.props.addAlert(`Font could not be loaded. \
-                    Do you have an active internet connection?`);
+                this.props.addAlert(`Font could not be loaded. Do you have an active internet connection?`);
             });
     };
     onImageUpdate = () => this.fontResize();
     hookResizer = ({ fontResize }) => {
-        this.fontResize = fontResize;
+        this._fontResize = fontResize;
     };
     // Lifecycle
     componentWillReceiveProps(nextProps) {
@@ -91,9 +97,8 @@ class TextView extends React.Component {
     }
     componentWillMount() {
         this._isMounted = true;
-
-        this.loadFont(this.props.textEdits.fontFamily, null, true);
         this.stylesUpdate();
+        this.loadFont(this.props.textEdits.fontFamily, null, true);
     }
     shouldComponentUpdate(nextProps) {
         return !nextProps.isRendering;
@@ -122,7 +127,11 @@ class TextView extends React.Component {
                         />
                     </div>
                 </div>
-                <ImageRender onUpdate={this.onImageUpdate} />
+                {
+                    (this.props.children)
+                        ? this.props.children
+                        : (<ImageRender onUpdate={this.onImageUpdate} />)
+                }
             </div>
         );
     }

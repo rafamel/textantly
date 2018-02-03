@@ -182,7 +182,6 @@ class ImageView extends Component {
     componentWillReceiveProps(nextProps) {
         this.lastProps = nextProps;
         if (!this.cropper || nextProps.freeze || !nextProps.scaled) return;
-
         this.init.update(nextProps);
         this.previousProps = nextProps;
     }

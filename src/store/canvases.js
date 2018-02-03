@@ -129,14 +129,19 @@ logic.push(createLogic({
         const source = state.canvases.source;
         const drawn = state.canvases.drawn;
         const operations = state.edits.image;
+        const forceIncrease = (action.payload)
+            ? action.payload.forceIncrease
+            : false;
 
-        if (
-            !source.canvas
-            || (
-                drawn.forOperations === operations
-                && drawn.forSourceId === source.id
-            )
-        ) {
+        if (!source.canvas) return done();
+
+        if (drawn.forOperations === operations
+            && drawn.forSourceId === source.id) {
+            if (forceIncrease) {
+                dispatch(internal.action({
+                    drawn: { ...drawn, id: drawn.id + 1 }
+                }));
+            }
             return done();
         }
 
