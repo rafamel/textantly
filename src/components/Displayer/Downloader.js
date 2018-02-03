@@ -117,11 +117,11 @@ class Downloader extends React.Component {
                     className={classes.textView}
                     ref={(ref) => { this.textViewNode = ref; }}
                 >
-                    <TextView onLoad={this.download}>
-                        <div
-                            style={{ width: drawn.width, height: drawn.height }}
-                        />
-                    </TextView>
+                    <TextView
+                        style={{ width: drawn.width, height: drawn.height }}
+                        onLoad={this.download}
+                        renderImage={false}
+                    />
                 </div>
             );
         return (

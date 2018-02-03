@@ -34,8 +34,11 @@ const { connector, propTypes: storeTypes } = withState(
 class TextView extends React.Component {
     static propTypes = {
         ...storeTypes,
-        children: PropTypes.element,
+        renderImage: PropTypes.bool,
         onLoad: PropTypes.func
+    };
+    static defaultProps = {
+        renderImage: true
     };
     state = {
         opacity: 1
@@ -82,9 +85,7 @@ class TextView extends React.Component {
             });
     };
     onImageUpdate = () => this.fontResize();
-    hookResizer = ({ fontResize }) => {
-        this._fontResize = fontResize;
-    };
+    hookResizer = ({ fontResize }) => { this._fontResize = fontResize; };
     // Lifecycle
     componentWillReceiveProps(nextProps) {
         if (nextProps.isRendering) return;
@@ -100,18 +101,28 @@ class TextView extends React.Component {
         this.stylesUpdate();
         this.loadFont(this.props.textEdits.fontFamily, null, true);
     }
-    shouldComponentUpdate(nextProps) {
-        return !nextProps.isRendering;
+    shouldComponentUpdate(nextProps, nextState) {
+        return !nextProps.isRendering && (
+            this.props.textEdits.textString !== nextProps.textEdits.textString
+            || this.state.opacity !== nextState.opacity
+            || this.props.style !== nextProps.style
+            || this.props.renderImage !== nextProps.renderImage
+        );
     }
     componentWillUnmount() {
         this._isMounted = false;
     }
     render() {
+        const { style, renderImage } = this.props;
         const classes = this.classes;
         const textString = this.props.textEdits.textString
             || config.defaults.text.textString;
+
         return (
-            <div className={classnames(classes.root, classes.text)}>
+            <div
+                style={style}
+                className={classnames(classes.root, classes.text)}
+            >
                 <div className={
                     classnames(classes.overlay, classes.overlayPosition)
                 }>
@@ -127,11 +138,7 @@ class TextView extends React.Component {
                         />
                     </div>
                 </div>
-                {
-                    (this.props.children)
-                        ? this.props.children
-                        : (<ImageRender onUpdate={this.onImageUpdate} />)
-                }
+                { renderImage && <ImageRender onUpdate={this.onImageUpdate} /> }
             </div>
         );
     }
