@@ -12,7 +12,8 @@ import { selectors } from 'store';
 
 const styles = {
     root: {
-        height: 72
+        height: 72,
+        userSelect: 'none'
     },
     tab: {
         flexGrow: 1,

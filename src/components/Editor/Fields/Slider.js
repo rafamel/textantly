@@ -20,34 +20,60 @@ const styles = (theme) => {
                 width: 'calc(100% - 16px)',
                 margin: '0 8px'
             },
-            // Track
+            // Rail
             '& .rc-slider-rail': {
                 width: 'calc(100% + 16px)',
                 margin: '0 -8px',
                 height: 2
             },
-            //
+            // Track
             '& .rc-slider-track': {
                 backgroundColor: primary,
                 height: 2,
                 left: '-8px !important'
             },
             // Handle
-            '& [role=\'slider\']': {
+            '& .rc-slider-handle': {
                 borderColor: primary,
                 marginTop: -7,
                 marginLeft: -8,
                 width: 16,
                 height: 16,
-                '&:active': {
+                '&:active, &:focus': {
                     boxShadow: `0 0 5px ${primary}`
                 }
             }
         },
+        // Tooltip
         tooltip: {
             ...body1,
+            fontSize: 12,
+            lineHeight: 1,
+            fontWeight: 500,
             color: '#fff',
-            lineHeight: 1.2
+            textShadow: '1px 1px rgba(0, 0, 0, 0.1)'
+        },
+        '@global': {
+            '.rc-slider-tooltip': {
+                padding: '0 0 5px',
+                margin: '0 0 5px'
+            },
+            '.rc-slider-tooltip-inner': {
+                background: '#47a298',
+                borderRadius: 3,
+                padding: '7px 7px 6px',
+                position: 'relative',
+                height: 'auto',
+                width: 'auto',
+                minWidth: 28,
+                boxShadow: 'none'
+            },
+            '.rc-slider-tooltip-placement-top .rc-slider-tooltip-arrow': {
+                bottom: 0,
+                marginLeft: -5,
+                borderWidth: '5px 5px 0',
+                borderTopColor: '#47a298'
+            }
         }
     };
 };
