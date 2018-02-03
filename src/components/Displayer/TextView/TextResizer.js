@@ -9,16 +9,19 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        width: '100%',
         flexGrow: 1,
-        overflow: 'hidden'
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        top: 0,
+        left: 0
     },
     inner: {
         margin: 'auto'
     },
     p: {
         display: 'block',
-        margin: '-0.125em 0 0',
+        margin: '-0.075em 0 0',
         padding: 0,
         lineHeight: 0.9,
         userSelect: 'none'
@@ -28,13 +31,13 @@ const styles = {
 class TextResizer extends React.Component {
     static propTypes = {
         text: PropTypes.string.isRequired,
+        onDone: PropTypes.func,
         actions: PropTypes.func,
         // JSS
         classes: PropTypes.object.isRequired
     };
     current = { up: null, phase: 0, fontSize: 100 };
     nodes = { outer: null, inner: null, text: null };
-    fontResize = fontResize.bind(this);
     observer = new ResizeObserver(() => { this.fontResize(); });
     setNode = (name) => (ref) => { this.nodes[name] = ref; };
     setObserver = ({ unobserve } = {}) => {
@@ -44,6 +47,19 @@ class TextResizer extends React.Component {
         } else {
             this.observer.observe(this.nodes.inner);
             this.observer.observe(this.nodes.outer);
+        }
+    };
+    fontResize = () => {
+        fontResize.call(this);
+        if (this.props.onDone) {
+            const inner = this.nodes.inner;
+            const innerDimensions = (!inner)
+                ? { width: 0, height: 0 }
+                : { width: inner.clientWidth, height: inner.clientHeight };
+            this.props.onDone({
+                fontSize: this.current.fontSize,
+                inner: innerDimensions
+            });
         }
     };
     setText = (text) => {

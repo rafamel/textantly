@@ -9,7 +9,9 @@ import ImageRender from './ImageRender';
 import TextResizer from './TextResizer';
 import styles from './TextView.styles';
 import { selectors } from 'store';
+import isEqual from 'lodash.isequal';
 
+// chc
 const doUpdate = selectorWithType({
     propType: PropTypes.bool.isRequired,
     select: [
@@ -41,10 +43,17 @@ class TextView extends React.Component {
         renderImage: true
     };
     state = {
-        opacity: 1
+        opacity: 1,
+        fontSize: 0,
+        innerHeight: 0
+    };
+    _checks = {
+        image: false,
+        font: false,
+        sent: false
     };
     _isMounted = false;
-    _fontResize = null;
+    loadedFonts = [config.defaults.fontFamily];
     previousFailedFont = null;
     timeout = null;
     styleSheet = jss.createStyleSheet(styles, { link: true });
@@ -52,15 +61,23 @@ class TextView extends React.Component {
     stylesUpdate = (updateObj = this.props.textEdits) => {
         this.styleSheet.update(updateObj).attach();
     };
-    fontResize = () => {
-        if (!this._fontResize) return;
-        this._fontResize();
-        if (this.props.onLoad && this.state.opacity) this.props.onLoad();
+    resizerSync = ({fontSize, inner}) => {
+        this.readyChecks({ font: true });
+        this.setState({ fontSize, innerHeight: inner.height });
     };
+    fontResize = () => {};
+    onImageUpdate = () => {
+        this.readyChecks({ image: true });
+        this.fontResize();
+    };
+    hookResizer = ({ fontResize }) => { this.fontResize = fontResize; };
     loadFont = (fontFamily, previousFF, keepOpacity) => {
-        if (!fontFamily
-            || fontFamily === previousFF
-            || fontFamily === this.previousFailedFont) {
+        if (!fontFamily || fontFamily === previousFF
+                || fontFamily === this.previousFailedFont) {
+            return;
+        }
+        if (this.loadedFonts.includes(fontFamily)) {
+            this.previousFailedFont = null;
             return;
         }
         if (!keepOpacity) this.setState({ opacity: 0 });
@@ -71,6 +88,7 @@ class TextView extends React.Component {
                     return;
                 }
 
+                this.loadedFonts.push(fontFamily);
                 this.previousFailedFont = null;
                 this.fontResize();
 
@@ -84,11 +102,25 @@ class TextView extends React.Component {
                 this.props.addAlert(`Font could not be loaded. Do you have an active internet connection?`);
             });
     };
-    onImageUpdate = () => this.fontResize();
-    hookResizer = ({ fontResize }) => { this._fontResize = fontResize; };
+    readyChecks = ({ image, font, updated } = {}) => {
+        const onReady = this.props.onLoad;
+        if (!onReady || this._checks.sent) return;
+
+        if (image) this._checks.image = true;
+        if (font && (!this.props.renderImage || this._checks.image)) {
+            this._checks.text = true;
+        }
+        if (updated && this._checks.text) {
+            this._checks.sent = true;
+            onReady();
+        }
+    };
     // Lifecycle
     componentWillReceiveProps(nextProps) {
         if (nextProps.isRendering) return;
+        if (this.props.isRendering !== nextProps.isRendering) {
+            this.forceUpdate();
+        }
         if (nextProps.doUpdate) this.stylesUpdate(nextProps.textEdits);
 
         this.loadFont(
@@ -96,15 +128,20 @@ class TextView extends React.Component {
         );
         this.fontResize();
     }
+    componentDidUpdate() {
+        this.readyChecks({ updated: true });
+    }
     componentWillMount() {
         this._isMounted = true;
         this.stylesUpdate();
         this.loadFont(this.props.textEdits.fontFamily, null, true);
     }
     shouldComponentUpdate(nextProps, nextState) {
+        const textEdits = nextProps.textEdits;
         return !nextProps.isRendering && (
-            this.props.textEdits.textString !== nextProps.textEdits.textString
-            || this.state.opacity !== nextState.opacity
+            !isEqual(this.state, nextState)
+            || this.props.textEdits.textString !== textEdits.textString
+            || this.props.textEdits.colorScheme !== textEdits.colorScheme
             || this.props.style !== nextProps.style
             || this.props.renderImage !== nextProps.renderImage
         );
@@ -113,10 +150,27 @@ class TextView extends React.Component {
         this._isMounted = false;
     }
     render() {
-        const { style, renderImage } = this.props;
         const classes = this.classes;
-        const textString = this.props.textEdits.textString
-            || config.defaults.text.textString;
+        const { opacity, fontSize, innerHeight } = this.state;
+        const { style, renderImage, textEdits } = this.props;
+        const { textString, colorScheme, overlayPosition } = textEdits;
+        const text = textString || config.defaults.text.textString;
+
+        const line = (!opacity || fontSize < 65
+            || overlayPosition === 'top' || overlayPosition === 'bottom')
+            ? null
+            : (
+                <span
+                    style={{ height: `calc(41% - ${innerHeight / 2}px)` }}
+                    className={classnames({
+                        [classes.line]: true,
+                        'ln-dark': colorScheme === 'dark',
+                        'ln-light': colorScheme === 'light'
+                    })}
+                >
+                    <span style={{ height: fontSize * 0.06 }} />
+                </span>
+            );
 
         return (
             <div
@@ -126,14 +180,17 @@ class TextView extends React.Component {
                 <div className={
                     classnames(classes.overlay, classes.overlayPosition)
                 }>
+                    {line}
+                    {line}
                     <div
                         className={classnames(
                             classes.contain, classes.containPosition
                         )}
-                        style={{ opacity: this.state.opacity }}
+                        style={{ opacity }}
                     >
                         <TextResizer
-                            text={textString}
+                            text={text}
+                            onDone={this.resizerSync}
                             actions={this.hookResizer}
                         />
                     </div>
