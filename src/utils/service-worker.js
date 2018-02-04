@@ -2,6 +2,9 @@
 // Read: https://goo.gl/KwvDNy.
 // This link also includes instructions on opting out of this behavior.
 import config from 'config';
+import warn from 'utils/warn';
+import store from 'store/_store';
+import { actions } from 'store';
 
 const isLocalhost = Boolean(
     window.location.hostname === 'localhost'
@@ -30,13 +33,14 @@ function checkValidServiceWorker(swUrl) {
                     });
                 });
             } else {
-            // Service worker found. Proceed as normal.
+                // Service worker found. Proceed as normal.
                 registerValidSW(swUrl);
             }
         })
         .catch(() => {
-            console.log(
-                'No internet connection found. App is running in offline mode.'
+            warn(
+                'No internet connection found. App is running in offline mode.',
+                'log'
             );
         });
 }
@@ -54,23 +58,33 @@ function registerValidSW(swUrl) {
                         // the fresh content will have been added to the cache.
                         // It's the perfect time to display a "New content is
                         // available; please refresh." message in your web app.
-                        console.log('New content is available; please refresh.');
+                        warn(
+                            `There's a new version available. Please refresh.`,
+                            'log'
+                        );
+                        store.dispatch(actions.alerts.add(
+                            `There's a new version available. Please refresh.`
+                        ));
                     } else {
                         // At this point, everything has been precached.
                         // It's the perfect time to display a
                         // "Content is cached for offline use." message.
-                        console.log('Content is cached for offline use.');
+                        warn('Content is cached for offline use.', 'log');
                     }
                 };
             };
         })
         .catch(error => {
-            console.error('Error during service worker registration:', error);
+            warn(
+                ['Error during service worker registration:', error],
+                'error'
+            );
         });
 }
 
-export default function register() {
-    if (config.production && 'serviceWorker' in navigator) {
+function register() {
+    if ('serviceWorker' in navigator) {
+        warn('Registering service worker', 'log');
         // The URL constructor is available in all browsers that support SW.
         const publicUrl = new URL(process.env.PUBLIC_URL, window.location);
         // Service worker won't work if PUBLIC_URL is on a different
@@ -92,10 +106,16 @@ export default function register() {
     }
 }
 
-export function unregister() {
+function unregister() {
     if ('serviceWorker' in navigator) {
+        warn('Unregistering service worker', 'log');
         navigator.serviceWorker.ready.then(registration => {
             registration.unregister();
         });
     }
+}
+
+export default function initServiceWorker() {
+    if (config.serviceWorker) register();
+    else unregister();
 }

@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
+import warn from 'utils/warn';
 
 function getType(obj, firstKey, actions) {
-    const msg = () => {
-        // eslint-disable-next-line
-        console.error(`withState couldn't get the types for some key '${firstKey}'`);
-    };
+    const msg = () => warn(
+        `withState couldn't get the types for some key '${firstKey}'`,
+        'error'
+    );
     if (!obj) return msg();
 
     if (typeof obj === 'function') {

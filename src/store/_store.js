@@ -3,6 +3,7 @@ import { persistStore, persistReducer, createTransform } from 'redux-persist';
 import localForage from 'localforage';
 import { initialState, reducer, logic, persist as persistWhitelist } from './index';
 import { historian } from './edits/init';
+import warn from 'utils/warn';
 import config from 'config';
 import packagejson from '../../package.json';
 
@@ -12,7 +13,7 @@ const hasSupport = () => localForage.supports(localForage.WEBSQL)
     || localForage.supports(localForage.LOCALSTORAGE);
 
 let store, persistor;
-if ((config.production || config.devStorePersist) && hasSupport()) {
+if ((config.persistStore) && hasSupport()) {
     localForage.config({
         driver: [
             localForage.WEBSQL,
@@ -33,8 +34,7 @@ if ((config.production || config.devStorePersist) && hasSupport()) {
                         // (or any other storage error),
                         // reset store
                         localForage.clear();
-                        // eslint-disable-next-line
-                        console.warn('Store persist has been disabled');
+                        warn('Store persist has been disabled');
                         disabled = true;
                         return Promise.reject(err);
                     });
@@ -87,8 +87,7 @@ if ((config.production || config.devStorePersist) && hasSupport()) {
     );
     persistor = persistStore(store);
 } else {
-    // eslint-disable-next-line
-    if (config.storePersist) console.warn('Store persist is not supported');
+    if (config.persistStore) warn('Store persist is not supported');
 
     store = createStore(reducer, middleware);
     persistor = {

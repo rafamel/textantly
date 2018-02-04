@@ -14,6 +14,6 @@ const fontData = Object.keys(fonts).reduce((acc, key) => {
 }, {});
 
 fs.writeFileSync(
-    path.join(__dirname, '../src/services/google-fonts.json'),
+    path.join(__dirname, '../src/services/fonts/google-fonts.json'),
     JSON.stringify(fontData)
 );

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
-import registerServiceWorker from './registerServiceWorker';
+import serviceWorker from './utils/service-worker';
 
 // Polyfill
 import 'babel-polyfill';
@@ -12,5 +12,4 @@ import 'font-awesome/css/font-awesome.css';
 import './index.css';
 
 ReactDOM.render(<App />, document.getElementById('root'));
-// TODO
-// registerServiceWorker();
+serviceWorker();

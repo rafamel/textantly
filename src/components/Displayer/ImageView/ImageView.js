@@ -4,6 +4,7 @@ import { withStyles } from 'material-ui/styles';
 import { withState, selectorWithType, compose } from 'store/utils';
 import withBroadcast from 'utils/withBroadcast';
 import Cropper from 'react-cropper';
+import warn from 'utils/warn';
 import 'cropperjs/dist/cropper.css';
 import classnames from 'classnames';
 import { selectors } from 'store';
@@ -11,7 +12,6 @@ import * as saveData from './save-data';
 import * as loadData from './load-data';
 import * as init from './init';
 import styles from './ImageView.styles';
-import config from 'config';
 
 const viewMode = selectorWithType({
     propType: PropTypes.bool.isRequired,
@@ -62,13 +62,12 @@ class ImageView extends Component {
     data = null;
     ifm = (cb) => (...args) => {
         if (!this._isMounted) return;
-        /* eslint-disable */
         try {
+            // eslint-disable-next-line
             return cb(...args);
         } catch (err) {
-            if (!config.production) console.warn(err);
+            warn(err);
         }
-        /* eslint-enable */
     };
     init = {
         up: init.up.bind(this),

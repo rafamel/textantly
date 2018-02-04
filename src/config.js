@@ -1,6 +1,8 @@
+const env = process.env.NODE_ENV;
+const onEnv = (obj) => obj.hasOwnProperty(env) ? obj[env] : obj.default;
+
 export default {
-    production: process.env.NODE_ENV === 'production',
-    devStorePersist: true,
+    production: env === 'production',
     snackbarDuration: 3500,
     mobileBreakpoint: 'md',
     defaults: {
@@ -19,11 +21,22 @@ export default {
             colorScheme: 'light'
         }
     },
+    persistStore: onEnv({
+        default: true,
+        development: false
+    }),
+    serviceWorker: onEnv({
+        default: true,
+        development: false
+    }),
     image: {
         timeout: 20000,
-        proxy: (src) => {
-            src = encodeURI(src.split('//').slice(1).join('//'));
-            return `https://images.weserv.nl/?url=${src}&${Date.now()}`;
-        }
+        proxy: onEnv({
+            default: (x) => x,
+            production: (src) => {
+                src = encodeURI(src.split('//').slice(1).join('//'));
+                return `https://images.weserv.nl/?url=${src}&${Date.now()}`;
+            }
+        })
     }
 };
