@@ -1,15 +1,6 @@
-import fonts from 'google-fonts-complete';
 import FontFaceObserver from 'fontfaceobserver';
 import googleFonts from 'google-fonts';
-
-const data = Object.keys(fonts).reduce((acc, key) => {
-    const font = fonts[key];
-    if (!font.variants || !font.variants.normal) return acc;
-    const weights = Object.keys(font.variants.normal);
-    if (!weights.length) return acc;
-    acc[key] = weights;
-    return acc;
-}, {});
+import data from './google-fonts';
 
 function preload(fontName, weight, timeout) {
     return (new FontFaceObserver(fontName, { weight }))
@@ -23,7 +14,4 @@ function load(fontName, timeout = 4000) {
     );
 }
 
-export {
-    data,
-    load
-};
+export { data, load };
