@@ -50,9 +50,13 @@ logic.push(createLogic({
         dispatch(editsActions.overwrite(payload));
         if (state.source.id !== payload.source.id) {
             dispatch(source.actions.loadSource());
-        } else if (payload.navigation.main !== 'image'
-            && !isEqual(state.image, payload.image)) {
-            // Can happen on resets
+        } else if (
+            payload.navigation.main !== 'image'
+            && (
+                payload.navigation.main !== state.navigation.main
+                || !isEqual(payload.image, state.image)
+            )
+        ) {
             dispatch(canvases.actions.draw());
         }
         done();

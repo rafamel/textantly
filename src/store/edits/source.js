@@ -28,21 +28,24 @@ const propTypes = {
     id: PropTypes.number.isRequired
 };
 
-function loadImage(src, from, dispatch) {
+function loadImage(src, from, firstFetch, dispatch) {
     return new Promise((resolve, reject) => {
         const loadFailed = () => {
             dispatch(alerts.actions.add('Image could not be loaded'));
             dispatch(loading.actions.setRendering(false));
             reject(Error());
         };
+
         dispatch(loading.actions.setRendering(true));
         const image = new Image();
-        if (from !== 'url') image.src = src;
+        if (!firstFetch) image.src = src;
         else {
-            image.crossOrigin = 'Anonymous';
-            image.src = config.imageProxy(src);
+            if (from !== 'file') image.crossOrigin = 'Anonymous';
+            if (from === 'url') image.src = config.image.proxy(src);
+            else image.src = src;
         }
-        setTimeout(loadFailed, 8000);
+
+        setTimeout(loadFailed, config.image.timeout);
         image.onerror = loadFailed;
         image.onload = () => resolve(engine.makeCanvas(image));
     });
@@ -53,11 +56,12 @@ logic.push(createLogic({
     type: t.SET_SOURCE,
     cancelType: t.SET_SOURCE,
     process({ getState, action }, dispatch, done) {
-        const state = getState().edits;
         let payload = action.payload;
-        if (payload.src === state.source.src) return done();
-        loadImage(payload.src, payload.from, dispatch)
+        if (payload.src === getState().edits.source.src) return done();
+        loadImage(payload.src, payload.from, true, dispatch)
             .then(canvas => {
+                if (payload.from !== 'file') payload.src = canvas.toDataURL();
+                const state = getState().edits;
                 payload = {
                     ...state,
                     image: image.initialState,
@@ -83,7 +87,7 @@ logic.push(createLogic({
     cancelType: values(t),
     process({ getState, action }, dispatch, done) {
         const state = getState().edits.source;
-        loadImage(state.src, state.from, dispatch)
+        loadImage(state.src, state.from, false, dispatch)
             .then(canvas => {
                 dispatch(canvases.actions.setSource(canvas));
                 done();
