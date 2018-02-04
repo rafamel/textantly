@@ -32,8 +32,8 @@ const styles = {
     },
     downloader: {
         position: 'absolute',
-        bottom: 22,
-        right: 22
+        right: 22,
+        bottom: 22
     }
 };
 

@@ -37,7 +37,7 @@ class TextView extends React.Component {
     static propTypes = {
         ...storeTypes,
         renderImage: PropTypes.bool,
-        onLoad: PropTypes.func
+        onReady: PropTypes.func
     };
     static defaultProps = {
         renderImage: true
@@ -103,7 +103,7 @@ class TextView extends React.Component {
             });
     };
     readyChecks = ({ image, font, updated } = {}) => {
-        const onReady = this.props.onLoad;
+        const onReady = this.props.onReady;
         if (!onReady || this._checks.sent) return;
 
         if (image) this._checks.image = true;
