@@ -38,9 +38,10 @@ function loadImage(src, from, firstFetch, dispatch) {
 
         dispatch(loading.actions.setRendering(true));
         const image = new Image();
-        if (!firstFetch) image.src = src;
+        if (!firstFetch || !from) image.src = src;
         else {
             if (from !== 'file') image.crossOrigin = 'Anonymous';
+
             if (from === 'url') image.src = config.image.proxy(src);
             else image.src = src;
         }

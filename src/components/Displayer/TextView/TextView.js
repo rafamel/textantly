@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { jss } from 'react-jss';
-import { withState, selectorWithType } from 'store/utils';
+import { withState } from 'store/utils';
 import classnames from 'classnames';
 import config from 'config';
 import { load as fontLoad } from 'services/fonts';
@@ -11,23 +11,11 @@ import styles from './TextView.styles';
 import { selectors } from 'store';
 import isEqual from 'lodash.isequal';
 
-// chc
-const doUpdate = selectorWithType({
-    propType: PropTypes.bool.isRequired,
-    select: [
-        state => selectors.edits.isTemp(state),
-        state => state.views.isMobile
-    ],
-    result: (temp, isMobile) => {
-        return (!isMobile || !temp);
-    }
-});
-
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
         textEdits: state.edits.text,
         isRendering: state._loading.rendering,
-        doUpdate: doUpdate(state)
+        drawnDimensions: selectors.edits.image.dimensions.drawn(state)
     }), (actions) => ({
         addAlert: actions.alerts.add
     })
@@ -121,7 +109,7 @@ class TextView extends React.Component {
         if (this.props.isRendering !== nextProps.isRendering) {
             this.forceUpdate();
         }
-        if (nextProps.doUpdate) this.stylesUpdate(nextProps.textEdits);
+        this.stylesUpdate(nextProps.textEdits);
 
         this.loadFont(
             nextProps.textEdits.fontFamily, this.props.textEdits.fontFamily
@@ -152,12 +140,18 @@ class TextView extends React.Component {
     render() {
         const classes = this.classes;
         const { opacity, fontSize, innerHeight } = this.state;
-        const { style, renderImage, textEdits } = this.props;
-        const { textString, colorScheme, overlayPosition } = textEdits;
-        const text = textString || config.defaults.text.textString;
+        const { style, renderImage, textEdits, drawnDimensions } = this.props;
+        const { colorScheme, overlayPosition, overlayWidth } = textEdits;
+        const textString = this.props.textEdits.textString
+            || config.defaults.text.textString;
 
-        const line = (!opacity || fontSize < 65
-            || overlayPosition === 'top' || overlayPosition === 'bottom')
+        const line = (
+            !opacity
+            || overlayPosition === 'top'
+            || overlayPosition === 'bottom'
+            || drawnDimensions.height < 200
+            || (drawnDimensions.width * overlayWidth * 0.01) < 175
+        )
             ? null
             : (
                 <span
@@ -189,7 +183,7 @@ class TextView extends React.Component {
                         style={{ opacity }}
                     >
                         <TextResizer
-                            text={text}
+                            text={textString}
                             onDone={this.resizerSync}
                             actions={this.hookResizer}
                         />

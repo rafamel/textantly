@@ -69,6 +69,8 @@ export default {
             position: 'absolute',
             width: '100%',
             display: 'block',
+            minHeight: 5,
+            maxHeight: '20%',
             top: 0,
             left: 0,
             right: 0,
@@ -82,11 +84,13 @@ export default {
             },
             '&:before': {
                 top: 0,
-                height: '22%'
+                height: '22%',
+                minHeight: 1
             },
             '&:after': {
                 bottom: 0,
-                height: '40%'
+                height: '40%',
+                minHeight: 2
             }
         },
         '&:first-child': {

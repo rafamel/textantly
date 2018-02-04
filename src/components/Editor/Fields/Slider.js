@@ -10,6 +10,8 @@ const SliderWithTooltip = createSliderWithTooltip(RCSlider);
 
 const styles = (theme) => {
     const primary = theme.palette.primary.main;
+    const pastel = theme.palette.primary.pastel;
+    const text = theme.palette.primary.contrastText;
     const body1 = theme.typography.body1;
     return {
         root: {
@@ -50,7 +52,7 @@ const styles = (theme) => {
             fontSize: 12,
             lineHeight: 1,
             fontWeight: 500,
-            color: '#fff',
+            color: text,
             textShadow: '1px 1px rgba(0, 0, 0, 0.1)'
         },
         '@global': {
@@ -59,7 +61,7 @@ const styles = (theme) => {
                 margin: '0 0 5px'
             },
             '.rc-slider-tooltip-inner': {
-                background: '#65b0a7',
+                background: pastel,
                 borderRadius: 3,
                 padding: '7px 7px 6px',
                 position: 'relative',
@@ -72,7 +74,7 @@ const styles = (theme) => {
                 bottom: 0,
                 marginLeft: -5,
                 borderWidth: '5px 5px 0',
-                borderTopColor: '#65b0a7'
+                borderTopColor: pastel
             }
         }
     };

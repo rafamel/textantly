@@ -31,12 +31,9 @@ export default {
     }),
     image: {
         timeout: 20000,
-        proxy: onEnv({
-            default: (x) => x,
-            production: (src) => {
-                src = encodeURI(src.split('//').slice(1).join('//'));
-                return `https://images.weserv.nl/?url=${src}&${Date.now()}`;
-            }
-        })
+        proxy: (src) => {
+            src = encodeURI(src.split('//').slice(1).join('//'));
+            return `https://images.weserv.nl/?url=${src}&${Date.now()}`;
+        }
     }
 };

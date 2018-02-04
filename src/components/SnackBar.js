@@ -11,19 +11,22 @@ import config from 'config';
 const styles = theme => ({
     root: {
         [theme.breakpoints._q.desktop]: {
-            width: '600px',
+            minWidth: 450,
             '& > *': {
-                width: '100%',
                 maxWidth: '100%'
             }
         }
     },
     contentRoot: {
+        background: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+        textShadow: '1px 1px rgba(0, 0, 0, 0.1)',
+        padding: '6px 24px 6px 30px',
         width: '100%'
     },
     contentMessage: {
-        width: 'calc(100% - 48px)',
-        textAlign: 'center'
+        textShadow: '1px 1px rgba(0, 0, 0, 0.1)',
+        width: 'calc(100% - 48px)'
     },
     close: {
         width: theme.spacing.unit * 4,

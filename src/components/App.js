@@ -28,7 +28,8 @@ const styles = {
 
 const { connector, propTypes: storeTypes } = withState(
     (state) => ({
-        isMobile: state.views.isMobile
+        isMobile: state.views.isMobile,
+        drawnId: state.canvases.drawn.id
     }),
     (actions) => ({
         setLoading: actions._loading.setLoading,
@@ -46,6 +47,7 @@ class App extends React.Component {
     state = {
         hasLoaded: false
     };
+    _firstLoad = false;
     setUI = (width = window.innerWidth) => {
         const breakpoint = theme.breakpoints.values[config.mobileBreakpoint];
         const isMobile = width < breakpoint;
@@ -55,8 +57,9 @@ class App extends React.Component {
             this.props.setLoading(true);
             this.props.setMobile(isMobile);
             setTimeout(() => {
-                this.props.setLoading(false);
+                if (!this._firstLoad) return;
                 this.setState({ hasLoaded: true });
+                this.props.setLoading(false);
             }, 500);
         }
     };
@@ -67,8 +70,12 @@ class App extends React.Component {
     componentDidMount() {
         const startAt = Date.now();
         const interval = setInterval(() => {
-            if (document.readyState === 'complete' || (Date.now() - startAt) > 7500) {
+            if (
+                (document.readyState === 'complete' && this.props.drawnId >= 0)
+                || (Date.now() - startAt) > 10000
+            ) {
                 clearInterval(interval);
+                this._firstLoad = true;
                 this.setState({ hasLoaded: true });
                 this.props.setLoading(false);
             }

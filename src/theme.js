@@ -16,7 +16,10 @@ export default createMuiTheme({
         }
     },
     palette: {
-        primary: { main: teal[500] },
+        primary: {
+            main: teal[500],
+            pastel: '#65b0a7'
+        },
         secondary: { main: blueGrey[500] }
     },
     typography: {

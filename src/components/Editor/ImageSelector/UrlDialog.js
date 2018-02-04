@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Button from 'material-ui/Button';
 import TextField from 'material-ui/TextField';
+import Typography from 'material-ui/Typography';
 import Dialog, {
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle
 } from 'material-ui/Dialog';
 
@@ -20,10 +20,14 @@ class UrlDialog extends React.Component {
     openUrlImage = () => {
         this.props.callback(this.state.url.trim());
     };
-    inputChange = (ev) => {
+    inputChange = (e) => {
         this.setState({
-            [ev.target.name]: ev.target.value
+            [e.target.name]: e.target.value
         });
+    };
+    onSubmit = (e) => {
+        e.preventDefault();
+        this.openUrlImage();
     };
     render() {
         return (
@@ -33,30 +37,25 @@ class UrlDialog extends React.Component {
                 aria-labelledby="form-dialog-title"
                 fullWidth
             >
-                {/* <DialogTitle id="form-dialog-title">
-                    Open an Image from the Interwebs!
-                </DialogTitle> */}
+                <DialogTitle style={{ paddingBottom: 6 }} disableTypography>
+                    <Typography type="button" style={{ opacity: 0.8 }}>
+                        Open URL
+                    </Typography>
+                </DialogTitle>
                 <DialogContent>
-                    <DialogContentText
-                        style={{
-                            fontWeight: '500',
-                            marginBottom: '10px'
-                        }}
-                    >
-                        Open an Image from the Interwebs!
-                    </DialogContentText>
-                    <TextField
-                        value={this.state.url}
-                        onChange={this.inputChange}
-                        name='url'
-                        // eslint-disable-next-line
-                        autoFocus
-                        margin="dense"
-                        label="Image URL"
-                        type="text"
-                        placeholder="http://"
-                        fullWidth
-                    />
+                    <form onSubmit={this.onSubmit}>
+                        <TextField
+                            value={this.state.url}
+                            onChange={this.inputChange}
+                            name='url'
+                            margin="dense"
+                            label="http://"
+                            type="text"
+                            fullWidth
+                            // eslint-disable-next-line
+                            autoFocus
+                        />
+                    </form>
                 </DialogContent>
                 <DialogActions>
                     <Button

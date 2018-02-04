@@ -1,11 +1,9 @@
 # Textantly
 
-[![License](https://img.shields.io/github/license/rafamel/textantly.svg)](https://github.com/rafamel/textantly/blob/master/LICENSE)
+[![Logo](https://raw.githubusercontent.com/rafamel/textantly/master/public/favicon.ico)](https://textantly.surge.sh)
 
-**Delicious morning coffee*. A keystroke away.**
+**Delicious morning coffee\*. A keystroke away.**
 
-Trying bring back to life an old project - rewritten on React. Captions on your pictures powered by your browser.**
+Image edition and captions, powered by your browser. PWA made with React and [deployed here](https://textantly.surge.sh).
 
-\* Coffee not included.
-
-** Lifevest under your seat. Use with caution.
+*\* Coffee not included.*

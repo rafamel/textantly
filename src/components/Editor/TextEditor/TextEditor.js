@@ -69,9 +69,6 @@ class TextEditor extends React.Component {
             [e.target.name]: e.target.value
         });
     };
-    onSubmit = (e) => {
-        e.preventDefault();
-    };
     render() {
         const { classes, text, theme, isMobile } = this.props;
         const lb = (label) => (!isMobile) ? label : null;
@@ -186,14 +183,9 @@ class TextEditor extends React.Component {
                     </SwipeableViews>
                 </React.Fragment>
             ) : (
-                <form
-                    className={classes.form}
-                    noValidate
-                    autoComplete="off"
-                    onSubmit={this.onSubmit}
-                >
+                <div className={classes.form}>
                     {fields}
-                </form>
+                </div>
             );
     }
 }
