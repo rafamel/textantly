@@ -1,7 +1,9 @@
+import packagejson from '../package.json';
 const env = process.env.NODE_ENV;
 const onEnv = (obj) => obj.hasOwnProperty(env) ? obj[env] : obj.default;
 
 export default {
+    version: packagejson.version,
     production: env === 'production',
     snackbarDuration: 3500,
     mobileBreakpoint: 'md',
@@ -22,12 +24,16 @@ export default {
         }
     },
     persistStore: onEnv({
-        default: true,
-        development: false
+        default: false,
+        production: true
     }),
     serviceWorker: onEnv({
-        default: true,
-        development: false
+        default: false,
+        production: true
+    }),
+    tracking: onEnv({
+        default: false,
+        production: true
     }),
     image: {
         timeout: 20000,

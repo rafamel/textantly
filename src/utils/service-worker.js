@@ -108,7 +108,6 @@ function register() {
 
 function unregister() {
     if ('serviceWorker' in navigator) {
-        warn('Unregistering service worker', 'log');
         navigator.serviceWorker.ready.then(registration => {
             registration.unregister();
         });

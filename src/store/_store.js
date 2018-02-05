@@ -5,7 +5,6 @@ import { initialState, reducer, logic, persist as persistWhitelist } from './ind
 import { historian } from './edits/init';
 import warn from 'utils/warn';
 import config from 'config';
-import packagejson from '../../package.json';
 
 const middleware = applyMiddleware(logic);
 
@@ -56,7 +55,7 @@ if ((config.persistStore) && hasSupport()) {
     };
 
     const persistConfig = {
-        version: packagejson.version,
+        version: config.version,
         key: 'root',
         storage: safeLocalForage,
         whitelist: persistWhitelist,
