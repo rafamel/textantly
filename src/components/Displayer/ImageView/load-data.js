@@ -4,11 +4,31 @@ import isEqual from 'lodash.isequal';
 
 function crop() {
     const props = this.lastProps;
-    const fitTo = props.fitTo;
     const canvasData = this.cropper.getCanvasData();
+    const canvasVisible = this.data.canvas.visible;
+
+    const crop = props.operations.crop;
+    const limitedCrop = {
+        ratio: crop.ratio,
+        width: {
+            start: Math.max(crop.width.start, canvasVisible.width.start),
+            end: Math.min(crop.width.end, canvasVisible.width.end)
+        },
+        height: {
+            start: Math.max(crop.height.start, canvasVisible.height.start),
+            end: Math.min(crop.height.end, canvasVisible.height.end)
+        }
+    };
+    if (limitedCrop.width.end - limitedCrop.width.start < 0) {
+        limitedCrop.width = { ...canvasVisible.width };
+    }
+    if (limitedCrop.height.end - limitedCrop.height.start < 0) {
+        limitedCrop.height = { ...canvasVisible.height };
+    }
+
     const cropped = cropForRatio(
         { width: canvasData.width, height: canvasData.height },
-        props.operations.crop
+        limitedCrop
     );
     const { width, height } = cropped.crop;
 
@@ -26,21 +46,8 @@ function crop() {
         height: cropped.dimensions.height
     };
 
-    if (toLoad.left < 0) toLoad.width += toLoad.left;
-    const wDiff = fitTo.width - (toLoad.left + toLoad.width);
-    if (wDiff < 0) {
-        toLoad.width += wDiff;
-        toLoad.left -= wDiff;
-    }
-
-    if (toLoad.top < 0) toLoad.height += toLoad.top;
-    const hDiff = fitTo.height - (toLoad.top + toLoad.height);
-    if (hDiff < 0) {
-        toLoad.height += hDiff;
-        toLoad.top -= hDiff;
-    }
-
     this.cropper.setCropBoxData(toLoad);
+    if (!isEqual(crop, limitedCrop)) this.save.crop();
 }
 
 function data() {
