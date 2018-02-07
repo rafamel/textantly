@@ -41,7 +41,7 @@ class TextView extends React.Component {
         sent: false
     };
     _isMounted = false;
-    loadedFonts = [config.defaults.fontFamily];
+    loadedFonts = [];
     previousFailedFont = null;
     timeout = null;
     styleSheet = jss.createStyleSheet(styles, { link: true });
@@ -68,6 +68,11 @@ class TextView extends React.Component {
             this.previousFailedFont = null;
             return;
         }
+        if (!this.loadedFonts.length) {
+            this.loadedFonts.push(fontFamily);
+            return;
+        }
+
         if (!keepOpacity) this.setState({ opacity: 0 });
         fontLoad(fontFamily)
             .then(() => {
