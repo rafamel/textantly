@@ -1,3 +1,4 @@
+const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
 // const rewireEslint = require('react-app-rewire-eslint');
 
 module.exports = {
@@ -10,6 +11,28 @@ module.exports = {
 
         return {
             ...config,
+            // Customize SWPrecacheWebpackPlugin to precache static/default.png
+            // (only in production)
+            plugins: config.plugins.map(plugin => {
+                if (env !== 'production'
+                    || plugin.constructor.name !== 'SWPrecacheWebpackPlugin') {
+                    return plugin;
+                }
+                return new SWPrecacheWebpackPlugin({
+                    ...plugin.options,
+                    filename: 'service-worker.js',
+                    mergeStaticsConfig: true,
+                    staticFileGlobs: [
+                        'public/static/default.png'
+                    ],
+                    stripPrefix: 'public/',
+                    staticFileGlobsIgnorePatterns: [
+                        /\.map$/,
+                        /asset-manifest\.json$/
+                    ]
+                });
+            }),
+            // Customize modules resolve by adding ./src as absolute
             resolve: {
                 ...(config.resolve || {}),
                 modules: ((config.resolve && config.resolve.modules) || [])

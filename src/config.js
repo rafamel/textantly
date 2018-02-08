@@ -8,7 +8,7 @@ export default {
     snackbarDuration: 3500,
     mobileBreakpoint: 'md',
     defaults: {
-        src: {
+        source: {
             name: '',
             src: 'static/default.png'
         },
@@ -23,12 +23,9 @@ export default {
             colorScheme: 'light'
         }
     },
+    serviceWorker: true, // Only in production
     persistStore: onEnv({
-        default: false,
-        production: true
-    }),
-    serviceWorker: onEnv({
-        default: false,
+        default: true,
         production: true
     }),
     tracking: onEnv({

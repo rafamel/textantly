@@ -115,6 +115,7 @@ function unregister() {
 }
 
 export default function initServiceWorker() {
+    if (!config.production) return;
     if (config.serviceWorker) register();
     else unregister();
 }

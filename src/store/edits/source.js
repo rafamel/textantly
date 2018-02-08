@@ -15,7 +15,7 @@ const { types: t, actions } = typesActions({
 });
 
 const initialState = {
-    ...config.defaults.src,
+    ...config.defaults.source,
     id: 0,
     from: false
 };
