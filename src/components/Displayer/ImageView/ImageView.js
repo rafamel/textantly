@@ -104,8 +104,8 @@ class ImageView extends Component {
         // Cropper.js has the ocasional issue with redimensionings
         // as sometimes it's not aware of the operations on an image
         // if not performed immediatly beforehand.
-        // We'll force a full operation redraw after resetting the container,
-        // which will in turn also load the data
+        // We'll force a full operation redraw after resetting the
+        // container, which will in turn also load the data
         this.operations = {};
         this.runOperations();
     };
@@ -164,7 +164,14 @@ class ImageView extends Component {
         this.props.setLoading(true);
         this.setState({ hidden: true });
         // Will trigger onImageReady
-        this.ifm(() => this.cropper.replace(props.scaled.toDataURL()))();
+        this.ifm(() => {
+            const src = props.scaled.toDataURL();
+            this.cropper.replace(src);
+            // Setting also as cropper originalUrl
+            // This will prevent an error requesting ...url/null
+            // when unmounting and detroying the cropper
+            this.cropper.cropper.originalUrl = src;
+        })();
     };
     onImageReady = () => {
         this.setContainerAndRun();
