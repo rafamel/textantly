@@ -6,50 +6,43 @@ import Select from 'material-ui/Select';
 import isEqual from 'lodash.isequal';
 
 class Selector extends React.Component {
-    static propTypes = {
-        name: PropTypes.string,
-        label: PropTypes.string,
-        value: PropTypes.string.isRequired,
-        options: PropTypes.array.isRequired,
-        className: PropTypes.string,
-        onChange: PropTypes.func
-    };
-    shouldComponentUpdate(nextProps) {
-        return this.props.value !== nextProps.value
-            || !isEqual(this.props.options, nextProps.options);
-    }
-    render() {
-        const label = (!this.props.label) ? null : (
-            <InputLabel>
-                {this.props.label}
-            </InputLabel>
-        );
-        return (
-            <FormControl
-                className={this.props.className}
-                margin="normal"
-                fullWidth
-            >
-                {label}
-                <Select
-                    native
-                    name={this.props.name}
-                    value={this.props.value}
-                    onChange={this.props.onChange}
-                    input={<Input />}
-                >
-                    {this.props.options.map(({ display, value }) => (
-                        <option
-                            value={value}
-                            key={this.props.name + value}
-                        >
-                            {display}
-                        </option>
-                    ))}
-                </Select>
-            </FormControl>
-        );
-    }
+  static propTypes = {
+    name: PropTypes.string,
+    label: PropTypes.string,
+    value: PropTypes.string.isRequired,
+    options: PropTypes.array.isRequired,
+    className: PropTypes.string,
+    onChange: PropTypes.func
+  };
+  shouldComponentUpdate(nextProps) {
+    return (
+      this.props.value !== nextProps.value ||
+      !isEqual(this.props.options, nextProps.options)
+    );
+  }
+  render() {
+    const label = !this.props.label ? null : (
+      <InputLabel>{this.props.label}</InputLabel>
+    );
+    return (
+      <FormControl className={this.props.className} margin="normal" fullWidth>
+        {label}
+        <Select
+          native
+          name={this.props.name}
+          value={this.props.value}
+          onChange={this.props.onChange}
+          input={<Input />}
+        >
+          {this.props.options.map(({ display, value }) => (
+            <option value={value} key={this.props.name + value}>
+              {display}
+            </option>
+          ))}
+        </Select>
+      </FormControl>
+    );
+  }
 }
 
 export default Selector;

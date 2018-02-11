@@ -2,59 +2,59 @@ import PropTypes from 'prop-types';
 import { typesActions } from './utils';
 
 class Alert {
-    constructor(string) {
-        this.alert = string;
-        this.timestamp = Date.now();
-    }
+  constructor(string) {
+    this.alert = string;
+    this.timestamp = Date.now();
+  }
 }
 
 const { types: t, actions } = typesActions({
-    pre: 'ALERTS',
-    types: ['CLOSE_CURRENT', 'ADD']
+  pre: 'ALERTS',
+  types: ['CLOSE_CURRENT', 'ADD']
 });
 
 const initialState = {
-    current: null,
-    stack: []
+  current: null,
+  stack: []
 };
 
 const propTypes = {
-    current: PropTypes.instanceOf(Alert)
+  current: PropTypes.instanceOf(Alert)
 };
 
 function reducer(state = initialState, { type, payload }) {
-    switch (type) {
+  switch (type) {
     case t.ADD:
-        const alert = new Alert(payload);
-        if (!state.current) {
-            return {
-                ...state,
-                current: alert
-            };
-        }
+      const alert = new Alert(payload);
+      if (!state.current) {
         return {
-            ...state,
-            stack: state.stack.concat([alert])
+          ...state,
+          current: alert
         };
+      }
+      return {
+        ...state,
+        stack: state.stack.concat([alert])
+      };
     case t.CLOSE_CURRENT:
-        if (!state.stack.length) {
-            return {
-                ...state,
-                current: null
-            };
-        }
+      if (!state.stack.length) {
         return {
-            current: state.stack[0],
-            stack: state.stack.slice(1)
+          ...state,
+          current: null
         };
+      }
+      return {
+        current: state.stack[0],
+        stack: state.stack.slice(1)
+      };
     default:
-        return state;
-    }
+      return state;
+  }
 }
 
 export default {
-    initialState,
-    propTypes,
-    reducer,
-    actions
+  initialState,
+  propTypes,
+  reducer,
+  actions
 };

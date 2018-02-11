@@ -6,81 +6,83 @@ import canvases from '../canvases';
 import image from './image';
 
 const { types: t, actions } = typesActions({
-    pre: `${typesPre}_NAVIGATION`,
-    types: ['SET_MAIN', 'SET_IMAGE', 'SET_CROP']
+  pre: `${typesPre}_NAVIGATION`,
+  types: ['SET_MAIN', 'SET_IMAGE', 'SET_CROP']
 });
 
 const initialState = {
-    main: 'text',
-    image: 'crop',
-    crop: 'free'
+  main: 'text',
+  image: 'crop',
+  crop: 'free'
 };
 
 const propTypes = {
-    main: PropTypes.string.isRequired,
-    image: PropTypes.string.isRequired,
-    crop: PropTypes.string.isRequired
+  main: PropTypes.string.isRequired,
+  image: PropTypes.string.isRequired,
+  crop: PropTypes.string.isRequired
 };
 
 function cropRatioDispatch({ name, on, dispatch }) {
-    const ratio = (() => {
-        switch (name) {
-        case 'facebook':
-            return 1200 / 630;
-        case 'youtube':
-            return 1280 / 720;
-        case 'square':
-            return 1;
-        default:
-            return null;
-        }
-    })();
-    dispatch(image.actions.crop({ ...on, ratio }));
+  const ratio = (() => {
+    switch (name) {
+      case 'facebook':
+        return 1200 / 630;
+      case 'youtube':
+        return 1280 / 720;
+      case 'square':
+        return 1;
+      default:
+        return null;
+    }
+  })();
+  dispatch(image.actions.crop({ ...on, ratio }));
 }
 
 const logic = [];
-logic.push(createLogic({
+logic.push(
+  createLogic({
     type: values(t),
     process({ getState, action }, dispatch, done) {
-        const deliver = (load, skip = true) => {
-            const payload = { navigation: load };
-            if (skip) dispatch(editsActions.writeNextSkip(payload));
-            else dispatch(editsActions.writeNext(payload));
-        };
+      const deliver = (load, skip = true) => {
+        const payload = { navigation: load };
+        if (skip) dispatch(editsActions.writeNextSkip(payload));
+        else dispatch(editsActions.writeNext(payload));
+      };
 
-        const editsState = getState().edits;
-        const state = editsState.navigation;
-        const { type, payload } = action;
-        const setCropRatio = (name = state.crop, reset = false) => {
-            const x = (reset) ? image.initialState.crop : editsState.image.crop;
-            cropRatioDispatch({ name, on: x, dispatch });
-        };
+      const editsState = getState().edits;
+      const state = editsState.navigation;
+      const { type, payload } = action;
+      const setCropRatio = (name = state.crop, reset = false) => {
+        const x = reset ? image.initialState.crop : editsState.image.crop;
+        cropRatioDispatch({ name, on: x, dispatch });
+      };
 
-        switch (type) {
+      switch (type) {
         case t.SET_MAIN:
-            deliver({ ...state, main: payload }, false);
-            if (payload === 'image' && state.image === 'crop') setCropRatio();
-            else if (payload === 'text') dispatch(canvases.actions.draw());
-            break;
+          deliver({ ...state, main: payload }, false);
+          if (payload === 'image' && state.image === 'crop') setCropRatio();
+          else if (payload === 'text') dispatch(canvases.actions.draw());
+          break;
         case t.SET_IMAGE:
-            deliver({ ...state, image: payload });
-            if (payload === 'crop') setCropRatio();
-            break;
+          deliver({ ...state, image: payload });
+          if (payload === 'crop') setCropRatio();
+          break;
         case t.SET_CROP:
-            deliver({ ...state, crop: payload });
-            setCropRatio(payload, true);
-            break;
+          deliver({ ...state, crop: payload });
+          setCropRatio(payload, true);
+          break;
         default:
-            return done();
-        }
+          return done();
+      }
 
-        done();
+      done();
     }
-}));
+  })
+);
 
 export default {
-    initialState,
-    propTypes,
-    actions,
-    logic
+  initialState,
+  propTypes,
+  actions,
+  logic
 };

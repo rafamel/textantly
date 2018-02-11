@@ -5,37 +5,34 @@ import classnames from 'classnames';
 import { InputLabel } from 'material-ui/Input';
 
 const styles = {
-    root: {
-        textAlign: 'left',
-        transformOrigin: 'top left',
-        transform: 'scale(0.75)',
-        marginBottom: 5
-    }
+  root: {
+    textAlign: 'left',
+    transformOrigin: 'top left',
+    transform: 'scale(0.75)',
+    marginBottom: 5
+  }
 };
 
 class FreeLabel extends React.Component {
-    static propTypes = {
-        label: PropTypes.string,
-        className: PropTypes.string,
-        style: PropTypes.object,
-        // JSS
-        classes: PropTypes.object.isRequired
-    };
-    shouldComponentUpdate(nextProps) {
-        return this.props.label !== nextProps.label;
-    }
-    render() {
-        const { classes, className, style, label } = this.props;
-        if (!label) return null;
-        return (
-            <div
-                className={classnames(classes.root, className)}
-                style={style}
-            >
-                <InputLabel>{label}</InputLabel>
-            </div>
-        );
-    }
+  static propTypes = {
+    label: PropTypes.string,
+    className: PropTypes.string,
+    style: PropTypes.object,
+    // JSS
+    classes: PropTypes.object.isRequired
+  };
+  shouldComponentUpdate(nextProps) {
+    return this.props.label !== nextProps.label;
+  }
+  render() {
+    const { classes, className, style, label } = this.props;
+    if (!label) return null;
+    return (
+      <div className={classnames(classes.root, className)} style={style}>
+        <InputLabel>{label}</InputLabel>
+      </div>
+    );
+  }
 }
 
 export default withStyles(styles)(FreeLabel);

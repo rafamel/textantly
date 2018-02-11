@@ -11,62 +11,62 @@ import HistoryButtons from './HistoryButtons';
 const barHeight = 64;
 const drawerWidth = 350;
 const styles = {
-    frame: {
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-        overflow: 'hidden'
-    },
-    left: {
-        display: 'flex',
-        flexDirection: 'column',
-        width: drawerWidth
-    },
-    right: {
-        maxWidth: `calc(100% - ${drawerWidth}px)`,
-        flexGrow: 1,
-        display: 'flex',
-        flexDirection: 'column'
-    },
-    drawer: {
-        height: `calc(100% - ${barHeight}px)`
-    },
-    drawerPaper: {
-        height: '100%',
-        width: drawerWidth,
-        position: 'static',
-        borderRight: '1px solid rgba(136, 136, 136, 0.16)'
-    },
-    displayer: {
-        flexGrow: 1
-    }
+  frame: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    overflow: 'hidden'
+  },
+  left: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: drawerWidth
+  },
+  right: {
+    maxWidth: `calc(100% - ${drawerWidth}px)`,
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  drawer: {
+    height: `calc(100% - ${barHeight}px)`
+  },
+  drawerPaper: {
+    height: '100%',
+    width: drawerWidth,
+    position: 'static',
+    borderRight: '1px solid rgba(136, 136, 136, 0.16)'
+  },
+  displayer: {
+    flexGrow: 1
+  }
 };
 
 const DesktopUI = ({ classes }) => (
-    <div className={classes.frame}>
-        <div className={classes.left}>
-            <Navigation height={barHeight} />
-            <Drawer
-                classes={{
-                    docked: classes.drawer,
-                    paper: classes.drawerPaper
-                }}
-                type="permanent"
-                open
-            >
-                <Editor/>
-            </Drawer>
-        </div>
-        <div className={classes.right}>
-            <TopBar isMobile={false} />
-            <Displayer className={classes.displayer} />
-            <HistoryButtons />
-        </div>
+  <div className={classes.frame}>
+    <div className={classes.left}>
+      <Navigation height={barHeight} />
+      <Drawer
+        classes={{
+          docked: classes.drawer,
+          paper: classes.drawerPaper
+        }}
+        type="permanent"
+        open
+      >
+        <Editor />
+      </Drawer>
     </div>
+    <div className={classes.right}>
+      <TopBar isMobile={false} />
+      <Displayer className={classes.displayer} />
+      <HistoryButtons />
+    </div>
+  </div>
 );
 
 DesktopUI.propTypes = {
-    classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(DesktopUI);

@@ -6,4 +6,4 @@
 
 Image edition and captions, powered by your browser. PWA made with React and [deployed here](https://textantly.surge.sh).
 
-*\* Coffee not included.*
+_\* Coffee not included._

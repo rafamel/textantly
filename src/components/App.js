@@ -15,111 +15,105 @@ import theme from '../theme';
 import config from 'config';
 
 const styles = {
-    ui: {
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        width: '100%',
-        '& > *': {
-            flexGrow: 1
-        }
+  ui: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100vh',
+    width: '100%',
+    '& > *': {
+      flexGrow: 1
     }
+  }
 };
 
 const { connector, propTypes: storeTypes } = withState(
-    (state) => ({
-        isMobile: state.views.isMobile,
-        drawnId: state.canvases.drawn.id
-    }),
-    (actions) => ({
-        setLoading: actions._loading.setLoading,
-        setMobile: actions.views.setMobile,
-        loadSource: actions.edits.source.loadSource
-    })
+  (state) => ({
+    isMobile: state.views.isMobile,
+    drawnId: state.canvases.drawn.id
+  }),
+  (actions) => ({
+    setLoading: actions._loading.setLoading,
+    setMobile: actions.views.setMobile,
+    loadSource: actions.edits.source.loadSource
+  })
 );
 
 class App extends React.Component {
-    static propTypes = {
-        ...storeTypes,
-        // JSS
-        classes: PropTypes.object.isRequired
-    };
-    state = {
-        hasLoaded: false
-    };
-    _firstLoad = false;
-    setUI = (width = window.innerWidth) => {
-        const breakpoint = theme.breakpoints.values[config.mobileBreakpoint];
-        const isMobile = width < breakpoint;
+  static propTypes = {
+    ...storeTypes,
+    // JSS
+    classes: PropTypes.object.isRequired
+  };
+  state = {
+    hasLoaded: false
+  };
+  _firstLoad = false;
+  setUI = (width = window.innerWidth) => {
+    const breakpoint = theme.breakpoints.values[config.mobileBreakpoint];
+    const isMobile = width < breakpoint;
 
-        if (isMobile !== this.props.isMobile) {
-            this.setState({ hasLoaded: false });
-            this.props.setLoading(true);
-            this.props.setMobile(isMobile);
-            setTimeout(() => {
-                if (!this._firstLoad) return;
-                this.setState({ hasLoaded: true });
-                this.props.setLoading(false);
-            }, 500);
-        }
-    };
-    componentWillMount() {
-        this.props.loadSource();
-        this.props.setLoading(true);
+    if (isMobile !== this.props.isMobile) {
+      this.setState({ hasLoaded: false });
+      this.props.setLoading(true);
+      this.props.setMobile(isMobile);
+      setTimeout(() => {
+        if (!this._firstLoad) return;
+        this.setState({ hasLoaded: true });
+        this.props.setLoading(false);
+      }, 500);
     }
-    componentDidMount() {
-        const startAt = Date.now();
-        const interval = setInterval(() => {
-            if (
-                (document.readyState === 'complete' && this.props.drawnId >= 0)
-                || (Date.now() - startAt) > 10000
-            ) {
-                clearInterval(interval);
-                this._firstLoad = true;
-                this.setState({ hasLoaded: true });
-                this.props.setLoading(false);
-            }
-        }, 50);
+  };
+  componentWillMount() {
+    this.props.loadSource();
+    this.props.setLoading(true);
+  }
+  componentDidMount() {
+    const startAt = Date.now();
+    const interval = setInterval(() => {
+      if (
+        (document.readyState === 'complete' && this.props.drawnId >= 0) ||
+        Date.now() - startAt > 10000
+      ) {
+        clearInterval(interval);
+        this._firstLoad = true;
+        this.setState({ hasLoaded: true });
+        this.props.setLoading(false);
+      }
+    }, 50);
 
-        this.setUI();
-        fontLoad(config.defaults.text.fontFamily);
-        window.addEventListener('resize', (e) => {
-            this.setUI(e.target.innerWidth);
-        });
-    }
-    render() {
-        const { isMobile, classes } = this.props;
-        const hasLoaded = this.state.hasLoaded;
-        return (
-            <div>
-                {!hasLoaded && (<LoadingBar />)}
-                <div
-                    className={classes.ui}
-                    style={{ opacity: (hasLoaded) ? 1 : 0 }}
-                >
-                    {(isMobile) ? (<MobileUI />) : (<DesktopUI />)}
-                </div>
-                <SnackBar />
-            </div>
-        );
-    };
+    this.setUI();
+    fontLoad(config.defaults.text.fontFamily);
+    window.addEventListener('resize', (e) => {
+      this.setUI(e.target.innerWidth);
+    });
+  }
+  render() {
+    const { isMobile, classes } = this.props;
+    const hasLoaded = this.state.hasLoaded;
+    return (
+      <div>
+        {!hasLoaded && <LoadingBar />}
+        <div className={classes.ui} style={{ opacity: hasLoaded ? 1 : 0 }}>
+          {isMobile ? <MobileUI /> : <DesktopUI />}
+        </div>
+        <SnackBar />
+      </div>
+    );
+  }
 }
 
-const wrapApp = (App) => function AppWrapper() {
+const wrapApp = (App) =>
+  function AppWrapper() {
     return (
-        <Provider store={store}>
-            <PersistGate loading={null} persistor={persistor}>
-                <MuiThemeProvider theme={theme}>
-                    <Reboot />
-                    <App />
-                </MuiThemeProvider>
-            </PersistGate>
-        </Provider>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <MuiThemeProvider theme={theme}>
+            <Reboot />
+            <App />
+          </MuiThemeProvider>
+        </PersistGate>
+      </Provider>
     );
-};
+  };
 
-export default compose(
-    wrapApp,
-    withStyles(styles),
-    connector
-)(App);
+export default compose(wrapApp, withStyles(styles), connector)(App);

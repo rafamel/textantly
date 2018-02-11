@@ -7,39 +7,40 @@ import config from 'config';
 const ptSymbol = Symbol('proptypes');
 
 function selectorWithType(
-    { propType, select, result },
-    selectorCreator = createSelector
+  { propType, select, result },
+  selectorCreator = createSelector
 ) {
-    const builtSelector = selectorCreator(select, result);
-    return function (...args) {
-        return (args[0][ptSymbol])
-            ? propType
-            : builtSelector(...args);
-    };
+  const builtSelector = selectorCreator(select, result);
+  return function(...args) {
+    return args[0][ptSymbol] ? propType : builtSelector(...args);
+  };
 }
 
 export { selectorWithType };
 export default function withState(...args) {
-    if (args[1] && typeof args[1] === 'function') {
-        args[1] = args[1](actions);
-    }
+  if (args[1] && typeof args[1] === 'function') {
+    args[1] = args[1](actions);
+  }
 
-    const types = {};
-    if (!config.production) {
-        if (args[0]) {
-            propTypes[ptSymbol] = true;
-            Object.assign(types, propTyper(args[0](propTypes)));
-        }
-        if (args[1]) {
-            Object.assign(types, propTyper(
-                ((typeof args[1] === 'function') ? args[1](() => {}) : args[1]),
-                true
-            ));
-        }
+  const types = {};
+  if (!config.production) {
+    if (args[0]) {
+      propTypes[ptSymbol] = true;
+      Object.assign(types, propTyper(args[0](propTypes)));
     }
+    if (args[1]) {
+      Object.assign(
+        types,
+        propTyper(
+          typeof args[1] === 'function' ? args[1](() => {}) : args[1],
+          true
+        )
+      );
+    }
+  }
 
-    return {
-        propTypes: types,
-        connector: connect(...args)
-    };
-};
+  return {
+    propTypes: types,
+    connector: connect(...args)
+  };
+}

@@ -5,15 +5,15 @@ const fonts = require('google-fonts-complete');
 // Fonts - We'll pre-select the data we need
 // as it'll significantly reduce the bundle size
 const fontData = Object.keys(fonts).reduce((acc, key) => {
-    const font = fonts[key];
-    if (!font.variants || !font.variants.normal) return acc;
-    const weights = Object.keys(font.variants.normal);
-    if (!weights.length) return acc;
-    acc[key] = weights;
-    return acc;
+  const font = fonts[key];
+  if (!font.variants || !font.variants.normal) return acc;
+  const weights = Object.keys(font.variants.normal);
+  if (!weights.length) return acc;
+  acc[key] = weights;
+  return acc;
 }, {});
 
 fs.writeFileSync(
-    path.join(__dirname, '../src/services/fonts/google-fonts.json'),
-    JSON.stringify(fontData)
+  path.join(__dirname, '../src/services/fonts/google-fonts.json'),
+  JSON.stringify(fontData)
 );

@@ -8,31 +8,31 @@ import Editor from '../Editor/Editor';
 import TopBar from '../TopBar/TopBar';
 
 const styles = {
-    frame: {
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden'
-    },
-    displayer: {
-        margin: '2px 0 1px',
-        flexGrow: 1
-    }
+  frame: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden'
+  },
+  displayer: {
+    margin: '2px 0 1px',
+    flexGrow: 1
+  }
 };
 
 const MobileUI = ({ classes }) => (
-    <div className={classes.frame}>
-        <TopBar isMobile={true} />
-        <Paper>
-            <Editor />
-        </Paper>
-        <Displayer className={classes.displayer} />
-        <MobileMenu />
-    </div>
+  <div className={classes.frame}>
+    <TopBar isMobile={true} />
+    <Paper>
+      <Editor />
+    </Paper>
+    <Displayer className={classes.displayer} />
+    <MobileMenu />
+  </div>
 );
 
 MobileUI.propTypes = {
-    classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(MobileUI);
